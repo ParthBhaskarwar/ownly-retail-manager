@@ -1,0 +1,33 @@
+#!/bin/sh
+# pre-push hook — enforces branch naming convention
+# Blocks pushes from branches that don't match: feature/*, fix/*, hotfix/*, main, develop
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Allow main and develop always
+if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "develop" ]; then
+  exit 0
+fi
+
+# Allow feature/, fix/, hotfix/ prefixes
+if echo "$BRANCH" | grep -qE '^(feature|fix|hotfix)\/[a-z0-9][a-z0-9\-]*$'; then
+  exit 0
+fi
+
+echo ""
+echo "❌ Branch name rejected: '$BRANCH'"
+echo ""
+echo "   Branch names must follow the convention:"
+echo "   feature/<short-description>"
+echo "   fix/<short-description>"
+echo "   hotfix/<short-description>"
+echo ""
+echo "   Examples:"
+echo "   feature/product-wizard-redesign"
+echo "   fix/migration-circular-fk"
+echo "   hotfix/auth-token-expiry"
+echo ""
+echo "   Rename your branch with:"
+echo "   git branch -m $BRANCH feature/<your-description>"
+echo ""
+exit 1

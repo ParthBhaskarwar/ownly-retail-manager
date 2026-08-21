@@ -1,0 +1,40 @@
+{
+  "name": "Ownly",
+  "short_name": "Ownly",
+  "description": "Ownly – AI Retail Manager. Manage your store, staff, inventory, and billing from one place.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["business", "productivity", "shopping"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "Go to your store dashboard"
+    },
+    {
+      "name": "Staff",
+      "url": "/staff",
+      "description": "Manage your staff"
+    }
+  ]
+}

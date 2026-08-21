@@ -1,0 +1,145 @@
+/* ============================================================
+   OWNLY — Design Tokens
+   Clothing-retail grounded. Warm, legible, unfussy.
+   ============================================================ */
+
+:root {
+
+  /* ── Palette ─────────────────────────────────────────────── */
+
+  /* Paper — warm layout-paper grey. App background. */
+  --color-paper:          #F5F2EF;
+
+  /* Surface — white. Cards, panels, inputs float against paper. */
+  --color-surface:        #FFFFFF;
+
+  /* Borders */
+  --color-border:         #DDD8D2;    /* Standard — warm greige */
+  --color-border-subtle:  #EDEBE8;    /* Dividers, table rules  */
+  --color-border-strong:  #C4BDB5;    /* Inputs on focus unfocused, selected rows */
+
+  /* Ink — warm charcoal, not pure black */
+  --color-ink:            #1C1917;    /* Primary text */
+  --color-ink-secondary:  #6B6460;    /* Labels, metadata */
+  --color-ink-muted:      #A09893;    /* Placeholders, disabled, hints */
+  --color-ink-inverse:    #FFFFFF;    /* Text on dark/accent fills */
+
+  /* Denim — the one accent colour. Selvedge-denim blue.
+     Grounded in clothing retail. Not SaaS blue, not purple. */
+  --color-denim:          #3B5B8C;
+  --color-denim-dark:     #2D4A78;    /* Hover / pressed */
+  --color-denim-tint:     #EBF0F7;    /* Badge bg, focus ring, active nav bg */
+  --color-denim-border:   #C0CFDE;    /* Accent-tinted border */
+
+  /* Semantic — named for their retail meaning, not their hue */
+  --color-paid:           #2D6A4F;    /* Success — forest green like a PAID stamp */
+  --color-paid-tint:      #EBF5F0;
+  --color-paid-border:    #A3CBBA;
+
+  --color-caution:        #92400E;    /* Warning — amber-brown, caution sticker */
+  --color-caution-tint:   #FEF3E8;
+  --color-caution-border: #F3C89B;
+
+  --color-return:         #9B1C1C;    /* Error — dark tag-red, RETURN label */
+  --color-return-tint:    #FDF0F0;
+  --color-return-border:  #F0B8B8;
+
+  --color-info:           #1E4D8C;    /* Info — darker denim shade */
+  --color-info-tint:      #E8EEF7;
+  --color-info-border:    #B0C4DC;
+
+  /* Sidebar — warm grey, slightly darker than paper */
+  --color-sidebar-bg:     #EAE7E3;
+  --color-sidebar-border: #D4CFC9;
+
+  /* ── Typography ─────────────────────────────────────────── */
+
+  /* Body, UI, labels — DM Sans: humanist, legible at small sizes */
+  --font-body:    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Headings — Lora: print-quality serif, warm, trustworthy */
+  --font-heading: 'Lora', Georgia, 'Times New Roman', serif;
+
+  /* Monospace — data tables, codes only */
+  --font-mono:    'DM Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* Type scale — 4px base grid */
+  --text-xs:    0.75rem;     /* 12px — tags, timestamps */
+  --text-sm:    0.875rem;    /* 14px — secondary labels, table meta */
+  --text-base:  1rem;        /* 16px — body, inputs, primary UI */
+  --text-lg:    1.125rem;    /* 18px — card titles, section headers */
+  --text-xl:    1.25rem;     /* 20px — page subheadings */
+  --text-2xl:   1.5rem;      /* 24px — page titles (h2) */
+  --text-3xl:   1.875rem;    /* 30px — content h1 */
+  --text-4xl:   2.25rem;     /* 36px — auth / onboarding h1 */
+
+  /* Leading */
+  --leading-tight:   1.2;
+  --leading-snug:    1.375;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.65;
+
+  /* Weight */
+  --font-regular:   400;
+  --font-medium:    500;
+  --font-semibold:  600;
+  --font-bold:      700;
+
+  /* ── Spacing — 4px base grid ────────────────────────────── */
+
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+
+  /* ── Border radius — restrained, this is a tool ─────────── */
+
+  --radius-xs:   2px;      /* Tag badge pointed end */
+  --radius-sm:   4px;      /* Inputs, table cells */
+  --radius-md:   6px;      /* Buttons, form controls */
+  --radius-lg:   8px;      /* Cards, panels */
+  --radius-xl:   12px;     /* Modals */
+  --radius-full: 9999px;   /* Pill — used sparingly */
+
+  /* ── Elevation — value contrast + single warm shadow ───── */
+
+  /* No decorative shadows. Only modals/dropdowns get shadow. */
+  --shadow-card:    none;
+  --shadow-raised:  0 2px 8px rgba(28, 25, 23, 0.06);
+  --shadow-modal:   0 8px 32px rgba(28, 25, 23, 0.12);
+  --shadow-dropdown:0 4px 16px rgba(28, 25, 23, 0.09);
+
+  /* ── Transitions — minimal, functional ─────────────────── */
+
+  --transition-fast:   120ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow:   280ms ease-in-out;
+
+  /* ── Layout ─────────────────────────────────────────────── */
+
+  --sidebar-width:          248px;
+  --sidebar-collapsed-width: 64px;
+  --header-height:           56px;
+  --content-max-width:       1100px;
+
+  /* ── Tap targets — minimum 44px per iOS HIG ─────────────── */
+  --tap-target-min: 44px;
+
+  /* ── Z-index ─────────────────────────────────────────────── */
+
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+}

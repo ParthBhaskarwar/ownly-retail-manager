@@ -1,0 +1,80 @@
+/* ============================================================
+   OWNLY — Animations
+   Functional only. No decorative entrance sequences.
+   ============================================================ */
+
+/* ── State change animations ──────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Loading ──────────────────────────────────────────────── */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* Subtle pulse for loading/status indicators */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ── Feedback ─────────────────────────────────────────────── */
+
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  60%       { transform: translateX(4px); }
+}
+
+/* ── Utility classes ──────────────────────────────────────── */
+
+.animate-fade-in       { animation: fadeIn 0.2s ease both; }
+.animate-fade-in-up    { animation: fadeInUp 0.2s ease both; }
+.animate-fade-in-down  { animation: fadeInDown 0.2s ease both; }
+.animate-slide-right   { animation: slideInRight 0.2s ease both; }
+.animate-spin          { animation: spin 0.7s linear infinite; }
+.animate-pulse         { animation: pulse 1.6s ease-in-out infinite; }
+.animate-shake         { animation: shakeX 0.35s ease; }
+
+/* Skeleton loader — warm shimmer, not electric */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-border-subtle) 0%,
+    var(--color-border) 50%,
+    var(--color-border-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease infinite;
+  border-radius: var(--radius-sm);
+}
