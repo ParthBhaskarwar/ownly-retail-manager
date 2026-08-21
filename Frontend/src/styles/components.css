@@ -1304,3 +1304,489 @@ a.checklist-step:hover {
 
 /* ── Store setup form ────────────────────────────────────────── */
 .store-setup-form { display: flex; flex-direction: column; gap: var(--space-6); }
+
+/* ══════════════════════════════════════════════════════════════
+   PRODUCT ENTRY — Manual Add Product form
+   Single scrollable form with sticky summary panel.
+   All tokens from existing design system. No new colours.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Two-column layout ──────────────────────────────────────── */
+
+.pe-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .pe-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Main (left) column ─────────────────────────────────────── */
+
+.pe-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* ── Page header inside form ────────────────────────────────── */
+
+.pe-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-4);
+  border-bottom: 1.5px dashed var(--color-border-subtle);
+}
+
+/* ── Section cards ──────────────────────────────────────────── */
+/*    White surface + thin greige border. Matches auth-card style. */
+
+.pe-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.pe-card__header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1.5px dashed var(--color-border-subtle);
+}
+
+.pe-card__title {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pe-card__body {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Collapsible card — the Optional section */
+
+.pe-card__collapse-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-5) var(--space-6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: var(--space-3);
+  transition: background-color var(--transition-fast);
+}
+
+.pe-card__collapse-header:hover {
+  background: var(--color-paper);
+}
+
+.pe-card__collapse-icon {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  flex-shrink: 0;
+}
+
+/* ── Prefix-wrapped price inputs ────────────────────────────── */
+
+.pe-input-prefix-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pe-input-prefix {
+  position: absolute;
+  left: var(--space-4);
+  color: var(--color-ink-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.pe-input-with-prefix {
+  padding-left: var(--space-8) !important;
+}
+
+/* ── Inline margin hint ─────────────────────────────────────── */
+
+.pe-margin-hint {
+  font-size: var(--text-sm);
+  color: var(--color-paid);
+  background: var(--color-paid-tint);
+  border: 1px solid var(--color-paid-border);
+  border-left: 3px solid var(--color-paid);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  line-height: var(--leading-snug);
+}
+
+.pe-margin-hint--loss {
+  color: var(--color-return);
+  background: var(--color-return-tint);
+  border-color: var(--color-return-border);
+  border-left-color: var(--color-return);
+}
+
+/* ── Monospace input (SKU) ──────────────────────────────────── */
+
+.pe-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+/* ── Size chip grid ─────────────────────────────────────────── */
+
+.pe-size-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.pe-size-chip-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The chip itself — styled like retail-type-card but compact */
+.pe-size-chip {
+  min-width: 56px;
+  min-height: var(--tap-target-min);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-ink-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pe-size-chip:hover {
+  border-color: var(--color-denim);
+  color: var(--color-denim-dark);
+  background: var(--color-denim-tint);
+}
+
+/* Selected state — matches retail-type-card--selected */
+.pe-size-chip--checked {
+  background: var(--color-denim-tint);
+  border-color: var(--color-denim);
+  color: var(--color-denim-dark);
+  box-shadow: inset 0 0 0 1px var(--color-denim);
+}
+
+/* Qty field that appears below a checked chip */
+.pe-size-qty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.pe-size-qty__label {
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.pe-size-qty__input {
+  width: 56px !important;
+  height: 36px !important;
+  text-align: center;
+  font-weight: var(--font-semibold);
+  padding-inline: var(--space-2) !important;
+}
+
+/* Selected sizes summary row */
+.pe-size-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* ── Photo dropzone ─────────────────────────────────────────── */
+
+.pe-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-6);
+  background: var(--color-paper);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+  outline: none;
+}
+
+.pe-dropzone:hover,
+.pe-dropzone:focus-visible {
+  border-color: var(--color-denim);
+  background: var(--color-denim-tint);
+}
+
+.pe-dropzone--active {
+  border-color: var(--color-denim);
+  background: var(--color-denim-tint);
+}
+
+.pe-dropzone__icon { font-size: 1.75rem; }
+
+.pe-dropzone__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-ink-secondary);
+}
+
+.pe-dropzone__hint {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+/* ── Summary panel (right rail, sticky) ─────────────────────── */
+
+.pe-summary {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-5));
+}
+
+.pe-summary__inner {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.pe-summary__title {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+  padding-bottom: var(--space-3);
+  border-bottom: 1.5px dashed var(--color-border-subtle);
+  margin: 0;
+}
+
+.pe-summary__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+}
+
+.pe-summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.pe-summary__row--profit {
+  padding-top: var(--space-3);
+  border-top: 1.5px dashed var(--color-border-subtle);
+}
+
+.pe-summary__label {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  font-weight: var(--font-medium);
+}
+
+.pe-summary__value {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+}
+
+.pe-summary__value--qty {
+  font-size: var(--text-lg);
+  font-family: var(--font-heading);
+  color: var(--color-denim-dark);
+}
+
+.pe-summary__value--profit { color: var(--color-paid); }
+.pe-summary__value--loss   { color: var(--color-return); }
+
+/* Margin progress bar */
+.pe-summary__margin-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pe-summary__margin-track {
+  height: 4px;
+  background: var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.pe-summary__margin-fill {
+  height: 100%;
+  background: var(--color-paid);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+.pe-summary__margin-bar--loss .pe-summary__margin-fill {
+  background: var(--color-return);
+}
+
+.pe-summary__margin-label {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+/* Sizes row in summary */
+.pe-summary__sizes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pe-summary__sizes-label {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  font-weight: var(--font-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pe-summary__sizes-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* Empty/guided placeholder */
+.pe-summary__empty {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  line-height: var(--leading-relaxed);
+  text-align: center;
+  padding: var(--space-2) 0;
+}
+
+/* ── On mobile: summary moves below the form ─────────────────── */
+
+@media (max-width: 900px) {
+  .pe-summary {
+    position: static;
+    order: -1;  /* Move above form on mobile */
+  }
+
+  .pe-summary__inner {
+    /* Horizontal summary bar on mobile */
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+
+  .pe-summary__title { display: none; }
+
+  .pe-summary__rows {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+  }
+
+  .pe-summary__row--profit {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .pe-summary__margin-bar { display: none; }
+  .pe-summary__sizes { display: none; }
+  .pe-summary__empty { display: none; }
+}
+
+/* ── Success screen ──────────────────────────────────────────── */
+/*    Consistent with onboarding-checklist "Setup Complete" style */
+
+.pe-success-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-20) var(--space-6);
+  text-align: center;
+  min-height: 60vh;
+}
+
+.pe-success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-paid-tint);
+  border: 2px solid var(--color-paid-border);
+  color: var(--color-paid);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pe-success-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.pe-success-desc {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+

@@ -1,40 +1,21 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
-import { AuthGuard, PermissionGuard } from '@/shared/components/PermissionGuard';
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import { ProductService } from '@/modules/product/services/ProductService';
 import { CategorySelect } from '@/modules/catalog/components/CategorySelect';
 import { AttributeFieldRenderer } from '@/modules/attributes/components/AttributeFieldRenderer';
-import { VariantAttributeSet } from '@/modules/attributes/components/AttributeFieldRenderer';
 import { Adapters } from '@/adapters';
 import type { AttributeDefinition } from '@/modules/attributes/types';
-import type { CreateProductInput, CreateVariantInput } from '@/modules/product/types';
+import type { CreateProductInput } from '@/modules/product/types';
 import { CLOTHING_TEMPLATE_ID } from '@/db/seeds/clothing-attributes';
 
-// ── Wizard step config ────────────────────────────────────────────────────────
-const STEPS = [
-  { id: 1, label: 'Basic Details' },
-  { id: 2, label: 'Pricing' },
-  { id: 3, label: 'Product Details' },
-  { id: 4, label: 'Variants' },
-  { id: 5, label: 'Review' },
-];
+// ── Clothing sizes in display order ───────────────────────────────────────────
+const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'];
 
-// ── Default empty variant ─────────────────────────────────────────────────────
-function emptyVariant(): CreateVariantInput & { _key: string } {
-  return {
-    _key: Math.random().toString(36).slice(2),
-    sku: '',
-    displayName: '',
-    sellingPriceOverride: undefined,
-    costPriceOverride: undefined,
-    attributeValues: [],
-  };
-}
-
-// ── SKU suggestion from name ──────────────────────────────────────────────────
+// ── SKU suggestion ─────────────────────────────────────────────────────────────
 function suggestSku(name: string): string {
   return name
     .toUpperCase()
@@ -45,420 +26,565 @@ function suggestSku(name: string): string {
     .slice(0, 8);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Currency formatter ─────────────────────────────────────────────────────────
+function fmt(n: number): string {
+  return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0 });
+}
+
+// ── Size chip + qty row ────────────────────────────────────────────────────────
+interface SizeEntry {
+  size: string;
+  checked: boolean;
+  qty: number;
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 function NewProductContent() {
   const router = useRouter();
   const { user } = useAuthContext();
   const retailTemplateId = CLOTHING_TEMPLATE_ID;
 
-  const [step, setStep] = useState(1);
+  // ── State ──────────────────────────────────────────────────────────────────
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [optionalOpen, setOptionalOpen] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
-  // Step 1 — Basic Details
+  // Required fields
   const [name, setName] = useState('');
   const [baseSku, setBaseSku] = useState('');
+  const [skuManuallyEdited, setSkuManuallyEdited] = useState(false);
   const [categoryId, setCategoryId] = useState('');
   const [subcategoryId, setSubcategoryId] = useState('');
-
-  // Step 2 — Pricing
   const [baseSellingPrice, setBaseSellingPrice] = useState('');
   const [baseCostPrice, setBaseCostPrice] = useState('');
-  const [description, setDescription] = useState('');
 
-  // Step 3 — Product Attributes
+  // Sizes
+  const [sizes, setSizes] = useState<SizeEntry[]>(
+    STANDARD_SIZES.map((s) => ({ size: s, checked: false, qty: 1 }))
+  );
+
+  // Optional / attributes
   const [productAttrDefs, setProductAttrDefs] = useState<AttributeDefinition[]>([]);
   const [productAttrValues, setProductAttrValues] = useState<Record<string, string>>({});
+  const [description, setDescription] = useState('');
 
-  // Step 4 — Variants
-  const [variantAttrDefs, setVariantAttrDefs] = useState<AttributeDefinition[]>([]);
-  const [variants, setVariants] = useState<(CreateVariantInput & { _key: string })[]>([emptyVariant()]);
-
-  // Load attribute definitions
+  // ── Load attribute definitions ─────────────────────────────────────────────
   useEffect(() => {
-    async function loadDefs() {
-      const [productDefs, variantDefs] = await Promise.all([
-        Adapters.attribute.findProductLevelDefinitions(retailTemplateId),
-        Adapters.attribute.findVariantLevelDefinitions(retailTemplateId),
-      ]);
-      setProductAttrDefs(productDefs);
-      setVariantAttrDefs(variantDefs);
-    }
-    void loadDefs();
+    Adapters.attribute
+      .findProductLevelDefinitions(retailTemplateId)
+      .then(setProductAttrDefs)
+      .catch(() => { });
   }, [retailTemplateId]);
 
-  // Auto-suggest SKU from name
+  // ── Auto-suggest SKU ───────────────────────────────────────────────────────
   useEffect(() => {
-    if (name && !baseSku) setBaseSku(suggestSku(name));
-  }, [name]);
-
-  const updateVariant = (key: string, updates: Partial<CreateVariantInput>) => {
-    setVariants((prev) =>
-      prev.map((v) => (v._key === key ? { ...v, ...updates } : v))
-    );
-  };
-
-  const updateVariantAttr = (key: string, defId: string, value: string) => {
-    setVariants((prev) =>
-      prev.map((v) => {
-        if (v._key !== key) return v;
-        const existing = v.attributeValues.filter((av) => av.attributeDefinitionId !== defId);
-        return { ...v, attributeValues: [...existing, { attributeDefinitionId: defId, value }] };
-      })
-    );
-  };
-
-  const addVariant = () => setVariants((prev) => [...prev, emptyVariant()]);
-  const removeVariant = (key: string) =>
-    setVariants((prev) => prev.filter((v) => v._key !== key));
-
-  // Auto-suggest variant SKU + display name
-  const handleVariantAttrChange = (variantKey: string, defId: string, value: string) => {
-    updateVariantAttr(variantKey, defId, value);
-    // Auto-suggest display name if Size changed
-    const sizeDef = variantAttrDefs.find((d) => d.name === 'Size');
-    if (sizeDef && defId === sizeDef.id && value) {
-      const variant = variants.find((v) => v._key === variantKey);
-      if (variant) {
-        const newSku = `${baseSku}-${value.replace(/\s+/g, '').toUpperCase()}`;
-        const newDisplayName = name ? `${name} — ${value}` : value;
-        updateVariant(variantKey, { sku: newSku, displayName: newDisplayName });
-      }
+    if (name && !skuManuallyEdited) {
+      setBaseSku(suggestSku(name));
     }
+  }, [name, skuManuallyEdited]);
+
+  // ── Derived summary values ─────────────────────────────────────────────────
+  const summary = useMemo(() => {
+    const sp = parseFloat(baseSellingPrice) || 0;
+    const cp = parseFloat(baseCostPrice) || 0;
+    const totalQty = sizes.filter((s) => s.checked).reduce((acc, s) => acc + (s.qty || 0), 0);
+    const totalPurchaseValue = cp * totalQty;
+    const expectedSalesValue = sp * totalQty;
+    const potentialGrossProfit = expectedSalesValue - totalPurchaseValue;
+    const margin = expectedSalesValue > 0 ? (potentialGrossProfit / expectedSalesValue) * 100 : 0;
+    return { totalQty, totalPurchaseValue, expectedSalesValue, potentialGrossProfit, margin };
+  }, [baseSellingPrice, baseCostPrice, sizes]);
+
+  // ── Toggle size chip ───────────────────────────────────────────────────────
+  const toggleSize = useCallback((size: string) => {
+    setSizes((prev) =>
+      prev.map((s) => (s.size === size ? { ...s, checked: !s.checked } : s))
+    );
+  }, []);
+
+  const updateQty = useCallback((size: string, qty: number) => {
+    setSizes((prev) =>
+      prev.map((s) => (s.size === size ? { ...s, qty: Math.max(1, qty) } : s))
+    );
+  }, []);
+
+  // ── Validation ─────────────────────────────────────────────────────────────
+  const validate = (): boolean => {
+    const errs: Record<string, string> = {};
+    if (!name.trim()) errs.name = 'Product name is required.';
+    if (!baseSku.trim()) errs.baseSku = 'SKU is required.';
+    if (!categoryId) errs.category = 'Please select a category.';
+    if (!baseSellingPrice || parseFloat(baseSellingPrice) <= 0)
+      errs.sellingPrice = 'Enter a valid selling price.';
+    if (!baseCostPrice || parseFloat(baseCostPrice) < 0)
+      errs.costPrice = 'Enter a valid cost price.';
+    if (!sizes.some((s) => s.checked))
+      errs.sizes = 'Select at least one size.';
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!user?.storeId) return;
-    setError(null);
+  // ── Submit ─────────────────────────────────────────────────────────────────
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate() || !user?.storeId) return;
+    setServerError(null);
     setIsSubmitting(true);
     try {
+      const selectedSizes = sizes.filter((s) => s.checked);
       const input: CreateProductInput = {
         storeId: user.storeId,
         retailTemplateId,
         categoryId,
         subcategoryId: subcategoryId || undefined,
-        name,
-        baseSku,
-        description: description || undefined,
+        name: name.trim(),
+        baseSku: baseSku.trim(),
+        description: description.trim() || undefined,
         baseSellingPrice: parseFloat(baseSellingPrice),
         baseCostPrice: parseFloat(baseCostPrice),
         status: 'ACTIVE',
-        attributeValues: productAttrDefs.map((d) => ({
-          attributeDefinitionId: d.id,
-          value: productAttrValues[d.id] ?? '',
-        })).filter((av) => av.value),
-        variants: variants.map((v) => ({
-          sku: v.sku,
-          displayName: v.displayName,
-          sellingPriceOverride: v.sellingPriceOverride,
-          costPriceOverride: v.costPriceOverride,
-          attributeValues: v.attributeValues,
+        attributeValues: productAttrDefs
+          .map((d) => ({ attributeDefinitionId: d.id, value: productAttrValues[d.id] ?? '' }))
+          .filter((av) => av.value),
+        variants: selectedSizes.map((s) => ({
+          sku: `${baseSku.trim()}-${s.size.replace(/\s+/g, '').toUpperCase()}`,
+          displayName: `${name.trim()} — ${s.size}`,
+          attributeValues: [],
         })),
         createdBy: user.id,
       };
-
       const product = await ProductService.createProduct(input);
-      router.push(`/products/${product.id}`);
+      setSubmitSuccess(true);
+      setTimeout(() => router.push(`/products/${product.id}`), 1400);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create product.');
-      setStep(1);
+      setServerError(err instanceof Error ? err.message : 'Failed to create product.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // ── Step validation ────────────────────────────────────────────────────────
-  const step1Valid = name.trim() && baseSku.trim() && categoryId;
-  const step2Valid = parseFloat(baseSellingPrice) > 0 && parseFloat(baseCostPrice) >= 0;
-  const step4Valid = variants.length > 0 && variants.every((v) => v.sku && v.displayName);
+  // ── Success state ──────────────────────────────────────────────────────────
+  if (submitSuccess) {
+    return (
+      <div className="pe-success-screen" role="status" aria-live="polite">
+        <div className="pe-success-icon" aria-hidden="true">✓</div>
+        <h2 className="pe-success-title">Product Created</h2>
+        <p className="pe-success-desc">Taking you to the product page…</p>
+      </div>
+    );
+  }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  const checkedSizes = sizes.filter((s) => s.checked);
+  const sp = parseFloat(baseSellingPrice) || 0;
+  const cp = parseFloat(baseCostPrice) || 0;
+
   return (
-    <div className="page-content">
-      <nav className="breadcrumb" aria-label="Breadcrumb">
-        <a href="/products" className="breadcrumb__link">Products</a>
-        <span className="breadcrumb__sep">/</span>
-        <span className="breadcrumb__current">Add Product</span>
-      </nav>
+    <form
+      id="new-product-form"
+      className="pe-layout"
+      onSubmit={handleSubmit}
+      noValidate
+      aria-label="Add new product form"
+    >
+      {/* ── Left / main column ──────────────────────────────────────── */}
+      <div className="pe-main">
 
-      <h1 className="page-header__title">Add New Product</h1>
-
-      {/* Wizard progress */}
-      <ol className="wizard-steps" aria-label="Wizard steps">
-        {STEPS.map((s) => (
-          <li
-            key={s.id}
-            className={`wizard-step ${step === s.id ? 'wizard-step--active' : ''} ${step > s.id ? 'wizard-step--done' : ''}`}
-            aria-current={step === s.id ? 'step' : undefined}
-          >
-            <span className="wizard-step__num">{step > s.id ? '✓' : s.id}</span>
-            <span className="wizard-step__label">{s.label}</span>
-          </li>
-        ))}
-      </ol>
-
-      {error && <div className="alert alert--error" role="alert">{error}</div>}
-
-      {/* Step 1 — Basic Details */}
-      {step === 1 && (
-        <div className="wizard-panel animate-fade-in">
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="product-name">
-              Product Name <span className="form-field__required">*</span>
-            </label>
-            <input
-              id="product-name"
-              className="form-field__input"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Blue Denim Jacket"
-              required
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="product-sku">
-              Base SKU <span className="form-field__required">*</span>
-            </label>
-            <input
-              id="product-sku"
-              className="form-field__input"
-              type="text"
-              value={baseSku}
-              onChange={(e) => setBaseSku(e.target.value.toUpperCase())}
-              placeholder="e.g. BLU-DNM-JKT"
-              required
-            />
-            <span className="form-field__hint">Unique identifier for this product. Variants will inherit this with a suffix.</span>
-          </div>
-
-          <CategorySelect
-            retailTemplateId={retailTemplateId}
-            categoryId={categoryId}
-            subcategoryId={subcategoryId}
-            onCategoryChange={setCategoryId}
-            onSubcategoryChange={setSubcategoryId}
-            required
-          />
-        </div>
-      )}
-
-      {/* Step 2 — Pricing */}
-      {step === 2 && (
-        <div className="wizard-panel animate-fade-in">
-          <div className="form-row">
-            <div className="form-field">
-              <label className="form-field__label" htmlFor="product-selling-price">
-                Selling Price (₹) <span className="form-field__required">*</span>
-              </label>
-              <input
-                id="product-selling-price"
-                className="form-field__input"
-                type="number"
-                min={0}
-                step="0.01"
-                value={baseSellingPrice}
-                onChange={(e) => setBaseSellingPrice(e.target.value)}
-                placeholder="0.00"
-                required
-              />
-            </div>
-            <div className="form-field">
-              <label className="form-field__label" htmlFor="product-cost-price">
-                Cost Price (₹) <span className="form-field__required">*</span>
-              </label>
-              <input
-                id="product-cost-price"
-                className="form-field__input"
-                type="number"
-                min={0}
-                step="0.01"
-                value={baseCostPrice}
-                onChange={(e) => setBaseCostPrice(e.target.value)}
-                placeholder="0.00"
-                required
-              />
-            </div>
-          </div>
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="product-description">Description</label>
-            <textarea
-              id="product-description"
-              className="form-field__input form-field__textarea"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional product description"
-              rows={3}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Step 3 — Product Attributes */}
-      {step === 3 && (
-        <div className="wizard-panel animate-fade-in">
-          <p className="wizard-panel__hint">
-            These attributes describe the product as a whole (e.g. Material, Pattern).
-            Attributes that differentiate sizes/variants are set in the next step.
+        {/* Page header */}
+        <div className="pe-page-header">
+          <a href="/products" className="page-back-link" aria-label="Back to products">
+            ← Products
+          </a>
+          <h1 className="page-title">Add New Product</h1>
+          <p className="page-subtitle">
+            Fill in the required details below. Optional attributes help with search and reports.
           </p>
-          {productAttrDefs.map((def) => (
-            <AttributeFieldRenderer
-              key={def.id}
-              definition={def}
-              value={productAttrValues[def.id] ?? ''}
-              onChange={(v) =>
-                setProductAttrValues((prev) => ({ ...prev, [def.id]: v }))
-              }
-            />
-          ))}
-          {productAttrDefs.length === 0 && (
-            <p className="form-field__hint">No product-level attributes configured for this retail type.</p>
+        </div>
+
+        {/* Server error */}
+        {serverError && (
+          <div className="form-server-error" role="alert">
+            <strong>Error:</strong> {serverError}
+          </div>
+        )}
+
+        {/* ── Section 1: Required Details ─────────────────────────── */}
+        <section className="pe-card" aria-labelledby="section-required">
+          <header className="pe-card__header">
+            <h2 className="pe-card__title" id="section-required">Required Details</h2>
+          </header>
+
+          <div className="pe-card__body">
+
+            {/* Product name */}
+            <div className={`form-field ${fieldErrors.name ? 'form-field--error' : ''}`}>
+              <label className="form-label" htmlFor="pe-name">
+                Product Name <span className="form-required">*</span>
+              </label>
+              <input
+                id="pe-name"
+                className="form-input"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Blue Denim Jacket"
+                aria-required="true"
+                aria-describedby={fieldErrors.name ? 'pe-name-error' : undefined}
+              />
+              {fieldErrors.name && (
+                <span id="pe-name-error" className="form-error" role="alert">
+                  {fieldErrors.name}
+                </span>
+              )}
+            </div>
+
+            {/* SKU */}
+            <div className={`form-field ${fieldErrors.baseSku ? 'form-field--error' : ''}`}>
+              <label className="form-label" htmlFor="pe-sku">
+                Base SKU <span className="form-required">*</span>
+              </label>
+              <input
+                id="pe-sku"
+                className="form-input pe-mono"
+                type="text"
+                value={baseSku}
+                onChange={(e) => {
+                  setBaseSku(e.target.value.toUpperCase());
+                  setSkuManuallyEdited(true);
+                }}
+                placeholder="e.g. BLUDENJ"
+                aria-required="true"
+                aria-describedby="pe-sku-hint"
+              />
+              <span id="pe-sku-hint" className="form-hint">
+                Auto-suggested from the product name. Variants will suffix this (e.g. BLUDENJ-M).
+              </span>
+              {fieldErrors.baseSku && (
+                <span className="form-error" role="alert">{fieldErrors.baseSku}</span>
+              )}
+            </div>
+
+            {/* Category */}
+            <div className={fieldErrors.category ? 'form-field--error' : ''}>
+              <CategorySelect
+                retailTemplateId={retailTemplateId}
+                categoryId={categoryId}
+                subcategoryId={subcategoryId}
+                onCategoryChange={setCategoryId}
+                onSubcategoryChange={setSubcategoryId}
+                required
+              />
+              {fieldErrors.category && (
+                <span className="form-error" role="alert">{fieldErrors.category}</span>
+              )}
+            </div>
+
+            {/* Pricing row */}
+            <div className="form-section">
+              <div className="form-section__title">Pricing</div>
+              <div className="form-grid">
+                <div className={`form-field ${fieldErrors.sellingPrice ? 'form-field--error' : ''}`}>
+                  <label className="form-label" htmlFor="pe-selling-price">
+                    Selling Price (₹) <span className="form-required">*</span>
+                  </label>
+                  <div className="pe-input-prefix-wrap">
+                    <span className="pe-input-prefix" aria-hidden="true">₹</span>
+                    <input
+                      id="pe-selling-price"
+                      className="form-input pe-input-with-prefix"
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={baseSellingPrice}
+                      onChange={(e) => setBaseSellingPrice(e.target.value)}
+                      placeholder="0.00"
+                      aria-required="true"
+                    />
+                  </div>
+                  {fieldErrors.sellingPrice && (
+                    <span className="form-error" role="alert">{fieldErrors.sellingPrice}</span>
+                  )}
+                </div>
+                <div className={`form-field ${fieldErrors.costPrice ? 'form-field--error' : ''}`}>
+                  <label className="form-label" htmlFor="pe-cost-price">
+                    Cost Price (₹) <span className="form-required">*</span>
+                  </label>
+                  <div className="pe-input-prefix-wrap">
+                    <span className="pe-input-prefix" aria-hidden="true">₹</span>
+                    <input
+                      id="pe-cost-price"
+                      className="form-input pe-input-with-prefix"
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={baseCostPrice}
+                      onChange={(e) => setBaseCostPrice(e.target.value)}
+                      placeholder="0.00"
+                      aria-required="true"
+                    />
+                  </div>
+                  {fieldErrors.costPrice && (
+                    <span className="form-error" role="alert">{fieldErrors.costPrice}</span>
+                  )}
+                </div>
+              </div>
+              {/* Inline margin hint */}
+              {sp > 0 && cp > 0 && (
+                <div className={`pe-margin-hint ${sp < cp ? 'pe-margin-hint--loss' : ''}`}>
+                  {sp >= cp ? (
+                    <>
+                      Margin: <strong>{fmt(sp - cp)}</strong> per unit
+                      ({(((sp - cp) / sp) * 100).toFixed(1)}%)
+                    </>
+                  ) : (
+                    <>⚠ Cost exceeds selling price — you'd be selling at a loss.</>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Size chips */}
+            <div className="form-section">
+              <div className="form-section__title">
+                Sizes &amp; Quantities <span className="form-required">*</span>
+              </div>
+              <p className="form-hint" style={{ marginBottom: 'var(--space-3)' }}>
+                Select the sizes you stock. A quantity field appears for each selected size.
+              </p>
+              <div className="pe-size-grid" role="group" aria-label="Select sizes">
+                {STANDARD_SIZES.map((size) => {
+                  const entry = sizes.find((s) => s.size === size)!;
+                  return (
+                    <div key={size} className="pe-size-chip-wrap">
+                      <button
+                        id={`size-chip-${size}`}
+                        type="button"
+                        role="checkbox"
+                        aria-checked={entry.checked}
+                        className={`pe-size-chip ${entry.checked ? 'pe-size-chip--checked' : ''}`}
+                        onClick={() => toggleSize(size)}
+                      >
+                        {size}
+                      </button>
+                      {entry.checked && (
+                        <div className="pe-size-qty" aria-label={`Quantity for size ${size}`}>
+                          <label
+                            htmlFor={`size-qty-${size}`}
+                            className="pe-size-qty__label"
+                          >
+                            Qty
+                          </label>
+                          <input
+                            id={`size-qty-${size}`}
+                            type="number"
+                            min={1}
+                            className="form-input pe-size-qty__input"
+                            value={entry.qty}
+                            onChange={(e) => updateQty(size, parseInt(e.target.value) || 1)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {fieldErrors.sizes && (
+                <span className="form-error" role="alert">{fieldErrors.sizes}</span>
+              )}
+              {checkedSizes.length > 0 && (
+                <div className="pe-size-summary">
+                  {checkedSizes.map((s) => (
+                    <span key={s.size} className="badge badge--denim badge--sm">
+                      {s.size} × {s.qty}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── Section 2: Optional / Additional Details ────────────── */}
+        <section className="pe-card" aria-labelledby="section-optional">
+          <button
+            type="button"
+            id="pe-optional-toggle"
+            className="pe-card__collapse-header"
+            aria-expanded={optionalOpen}
+            aria-controls="pe-optional-body"
+            onClick={() => setOptionalOpen((v) => !v)}
+          >
+            <h2 className="pe-card__title" id="section-optional">
+              Additional Details
+              <span className="badge badge--neutral badge--sm" style={{ marginLeft: 'var(--space-2)' }}>
+                Optional
+              </span>
+            </h2>
+            <span className="pe-card__collapse-icon" aria-hidden="true">
+              {optionalOpen ? '▲' : '▼'}
+            </span>
+          </button>
+
+          {optionalOpen && (
+            <div id="pe-optional-body" className="pe-card__body">
+
+              {/* Photo upload dropzone */}
+              <div className="form-field">
+                <label className="form-label">
+                  Product Photo
+                  <span className="badge badge--neutral badge--sm" style={{ marginLeft: 'var(--space-2)' }}>
+                    Optional
+                  </span>
+                </label>
+                <div
+                  id="pe-photo-dropzone"
+                  className={`pe-dropzone ${dragOver ? 'pe-dropzone--active' : ''}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Upload product photo — drag and drop or click to browse"
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => { e.preventDefault(); setDragOver(false); }}
+                  onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.click()}
+                >
+                  <span className="pe-dropzone__icon" aria-hidden="true">📷</span>
+                  <span className="pe-dropzone__label">Drop a photo here, or click to browse</span>
+                  <span className="pe-dropzone__hint">JPG or PNG · max 5 MB · AI analysis coming soon</span>
+                </div>
+              </div>
+
+              {/* Product-level attributes */}
+              {productAttrDefs.length > 0 && (
+                <div className="form-section">
+                  <div className="form-section__title">Product Attributes</div>
+                  <div className="form-grid">
+                    {productAttrDefs.map((def) => (
+                      <AttributeFieldRenderer
+                        key={def.id}
+                        definition={def}
+                        value={productAttrValues[def.id] ?? ''}
+                        onChange={(v) =>
+                          setProductAttrValues((prev) => ({ ...prev, [def.id]: v }))
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              <div className="form-field">
+                <label className="form-label" htmlFor="pe-description">Description</label>
+                <textarea
+                  id="pe-description"
+                  className="form-textarea"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="e.g. Classic selvedge denim jacket with copper rivets. Machine wash cold."
+                  rows={3}
+                />
+                <span className="form-hint">Shown on product detail page and invoices.</span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Form actions */}
+        <div className="form-actions">
+          <a href="/products" className="btn btn-secondary">
+            Cancel
+          </a>
+          <button
+            id="pe-submit-btn"
+            type="submit"
+            className="btn btn-primary"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="btn-spinner" aria-hidden="true" />
+                Creating…
+              </>
+            ) : (
+              'Create Product'
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Summary panel (sticky right rail) ───────────────────── */}
+      <aside className="pe-summary" aria-label="Live order summary">
+        <div className="pe-summary__inner">
+          <h3 className="pe-summary__title">Summary</h3>
+          <dl className="pe-summary__rows">
+            <div className="pe-summary__row">
+              <dt className="pe-summary__label">Total Quantity</dt>
+              <dd className="pe-summary__value pe-summary__value--qty">
+                {summary.totalQty > 0 ? summary.totalQty : '—'}
+              </dd>
+            </div>
+            <div className="pe-summary__row">
+              <dt className="pe-summary__label">Purchase Value</dt>
+              <dd className="pe-summary__value">
+                {summary.totalPurchaseValue > 0 ? fmt(summary.totalPurchaseValue) : '—'}
+              </dd>
+            </div>
+            <div className="pe-summary__row">
+              <dt className="pe-summary__label">Expected Sales</dt>
+              <dd className="pe-summary__value">
+                {summary.expectedSalesValue > 0 ? fmt(summary.expectedSalesValue) : '—'}
+              </dd>
+            </div>
+            <div className={`pe-summary__row pe-summary__row--profit ${summary.potentialGrossProfit < 0 ? 'pe-summary__row--loss' : ''}`}>
+              <dt className="pe-summary__label">Gross Profit</dt>
+              <dd className={`pe-summary__value ${summary.potentialGrossProfit > 0 ? 'pe-summary__value--profit' : summary.potentialGrossProfit < 0 ? 'pe-summary__value--loss' : ''}`}>
+                {summary.potentialGrossProfit !== 0
+                  ? fmt(summary.potentialGrossProfit)
+                  : '—'}
+              </dd>
+            </div>
+          </dl>
+          {summary.totalQty > 0 && summary.expectedSalesValue > 0 && (
+            <div className={`pe-summary__margin-bar ${summary.margin < 0 ? 'pe-summary__margin-bar--loss' : ''}`}>
+              <div className="pe-summary__margin-track">
+                <div
+                  className="pe-summary__margin-fill"
+                  style={{ width: `${Math.min(Math.max(summary.margin, 0), 100)}%` }}
+                />
+              </div>
+              <span className="pe-summary__margin-label">
+                {summary.margin >= 0
+                  ? `${summary.margin.toFixed(1)}% margin`
+                  : `${Math.abs(summary.margin).toFixed(1)}% loss`}
+              </span>
+            </div>
+          )}
+          {/* Sizes selected chips */}
+          {checkedSizes.length > 0 && (
+            <div className="pe-summary__sizes">
+              <span className="pe-summary__sizes-label">Sizes:</span>
+              <div className="pe-summary__sizes-chips">
+                {checkedSizes.map((s) => (
+                  <span key={s.size} className="badge badge--neutral badge--sm">
+                    {s.size}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Placeholder state */}
+          {summary.totalQty === 0 && (
+            <p className="pe-summary__empty">
+              Select sizes and enter prices to see a live profit summary.
+            </p>
           )}
         </div>
-      )}
-
-      {/* Step 4 — Variants */}
-      {step === 4 && (
-        <div className="wizard-panel animate-fade-in">
-          <p className="wizard-panel__hint">
-            Add at least one variant. Each variant represents a specific size or variation.
-          </p>
-          {variants.map((variant, idx) => (
-            <div key={variant._key} className="variant-form-block">
-              <div className="variant-form-block__header">
-                <span className="variant-form-block__title">Variant {idx + 1}</span>
-                {variants.length > 1 && (
-                  <button
-                    type="button"
-                    id={`remove-variant-${idx}`}
-                    className="btn btn--ghost btn--sm btn--danger"
-                    onClick={() => removeVariant(variant._key)}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-
-              {/* Variant-level attributes (e.g. Size) */}
-              <VariantAttributeSet
-                definitions={variantAttrDefs}
-                values={Object.fromEntries(
-                  variant.attributeValues.map((av) => [av.attributeDefinitionId, av.value])
-                )}
-                onChange={(defId, value) => handleVariantAttrChange(variant._key, defId, value)}
-              />
-
-              <div className="form-row">
-                <div className="form-field">
-                  <label className="form-field__label" htmlFor={`variant-displayname-${idx}`}>
-                    Display Name <span className="form-field__required">*</span>
-                  </label>
-                  <input
-                    id={`variant-displayname-${idx}`}
-                    className="form-field__input"
-                    type="text"
-                    value={variant.displayName}
-                    onChange={(e) => updateVariant(variant._key, { displayName: e.target.value })}
-                    placeholder={`e.g. ${name || 'Product'} — XL`}
-                    required
-                  />
-                </div>
-                <div className="form-field">
-                  <label className="form-field__label" htmlFor={`variant-sku-${idx}`}>
-                    Variant SKU <span className="form-field__required">*</span>
-                  </label>
-                  <input
-                    id={`variant-sku-${idx}`}
-                    className="form-field__input"
-                    type="text"
-                    value={variant.sku}
-                    onChange={(e) => updateVariant(variant._key, { sku: e.target.value.toUpperCase() })}
-                    placeholder={`${baseSku}-XL`}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-          <button
-            type="button"
-            id="add-variant-btn"
-            className="btn btn--secondary"
-            onClick={addVariant}
-          >
-            + Add Another Variant
-          </button>
-        </div>
-      )}
-
-      {/* Step 5 — Review */}
-      {step === 5 && (
-        <div className="wizard-panel animate-fade-in">
-          <div className="review-section">
-            <h3 className="review-section__title">Product</h3>
-            <dl className="review-list">
-              <div className="review-list__row"><dt>Name</dt><dd>{name}</dd></div>
-              <div className="review-list__row"><dt>SKU</dt><dd><code>{baseSku}</code></dd></div>
-              <div className="review-list__row"><dt>Selling Price</dt><dd>₹{parseFloat(baseSellingPrice).toLocaleString('en-IN')}</dd></div>
-              <div className="review-list__row"><dt>Cost Price</dt><dd>₹{parseFloat(baseCostPrice).toLocaleString('en-IN')}</dd></div>
-            </dl>
-          </div>
-          <div className="review-section">
-            <h3 className="review-section__title">Variants ({variants.length})</h3>
-            {variants.map((v, i) => (
-              <div key={v._key} className="review-variant-row">
-                <span>{i + 1}. {v.displayName}</span>
-                <code className="sku-badge">{v.sku}</code>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Wizard navigation */}
-      <div className="wizard-nav">
-        {step > 1 && (
-          <button
-            id="wizard-back"
-            className="btn btn--ghost"
-            type="button"
-            onClick={() => setStep((s) => s - 1)}
-            disabled={isSubmitting}
-          >
-            ← Back
-          </button>
-        )}
-        <div className="wizard-nav__spacer" />
-        {step < 5 && (
-          <button
-            id="wizard-next"
-            className="btn btn--primary"
-            type="button"
-            disabled={
-              (step === 1 && !step1Valid) ||
-              (step === 2 && !step2Valid) ||
-              (step === 4 && !step4Valid)
-            }
-            onClick={() => setStep((s) => s + 1)}
-          >
-            Next →
-          </button>
-        )}
-        {step === 5 && (
-          <button
-            id="wizard-submit"
-            className="btn btn--primary"
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Creating Product…' : 'Create Product'}
-          </button>
-        )}
-      </div>
-    </div>
+      </aside>
+    </form>
   );
 }
 
