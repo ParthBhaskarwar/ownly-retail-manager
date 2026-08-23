@@ -1,64 +1,65 @@
-import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcryptjs';
-import { Adapters } from '@/adapters';
-import { AuditService } from '@/shared/audit/AuditService';
-import { AppConfig } from '@/config/env';
-import { User } from '@/modules/account/types';
-import { CreateStaffInput, UpdateStaffInput, StaffMember } from '@/modules/staff/types';
+/**
+ * StaffService — talks to the backend staff API.
+ *
+ * Password hashing moved to the server; bcrypt no longer runs in the browser.
+ * Signatures are unchanged so StaffList, StaffForm and the staff pages work
+ * without modification.
+ */
 
-function toStaffMember(user: User): StaffMember {
-  const { passwordHash: _, ...rest } = user;
-  return rest as StaffMember;
-}
+import { apiClient } from '@/lib/apiClient';
+import type { Session } from '@/modules/account/types';
+import type { CreateStaffInput, UpdateStaffInput, StaffMember } from '@/modules/staff/types';
 
 export const StaffService = {
-  async listByStore(storeId: string): Promise<StaffMember[]> {
-    const users = await Adapters.staff.findByStoreId(storeId);
-    return users.map(toStaffMember);
+  async listByStore(_storeId: string): Promise<StaffMember[]> {
+    const { staff } = await apiClient.get<{ staff: StaffMember[] }>('/api/staff');
+    return staff;
   },
 
   async getById(id: string): Promise<StaffMember | null> {
-    const user = await Adapters.staff.findById(id);
-    return user ? toStaffMember(user) : null;
-  },
-
-  async create(input: CreateStaffInput, actorId: string): Promise<StaffMember> {
-    // Prevent creating another OWNER
-    if (input.role === 'OWNER') {
-      throw new Error('Cannot create another OWNER account. Only one owner per store.');
+    try {
+      const { staff } = await apiClient.get<{ staff: StaffMember }>(`/api/staff/${id}`);
+      return staff;
+    } catch (err) {
+      if ((err as { status?: number }).status === 404) return null;
+      throw err;
     }
-    const existing = await Adapters.user.findByEmail(input.email);
-    if (existing) throw new Error('A user with this email already exists.');
-
-    const id = uuidv4();
-    const passwordHash = await bcrypt.hash(input.password, AppConfig.auth.bcryptRounds);
-    const user = await Adapters.staff.create({ ...input, id, passwordHash });
-    AuditService.log('staff.create', actorId, input.storeId, { role: input.role, email: input.email });
-    return toStaffMember(user);
   },
 
-  async update(id: string, updates: UpdateStaffInput, actorId: string, storeId: string): Promise<StaffMember> {
-    if (updates.role === 'OWNER') {
-      throw new Error('Cannot assign OWNER role to a staff member.');
-    }
-    const user = await Adapters.staff.update(id, updates);
-    AuditService.log('staff.update', actorId, storeId, { targetId: id });
-    return toStaffMember(user);
+  async create(input: CreateStaffInput, _actorId?: string): Promise<StaffMember> {
+    const { staff } = await apiClient.post<{ staff: StaffMember }>('/api/staff', {
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      password: input.password,
+      role: input.role,
+    });
+    return staff;
   },
 
-  async deactivate(id: string, actorId: string, storeId: string): Promise<void> {
-    await Adapters.staff.deactivate(id);
-    AuditService.log('staff.deactivate', actorId, storeId, { targetId: id });
+  async update(
+    id: string,
+    updates: UpdateStaffInput,
+    _actorId?: string,
+    _storeId?: string
+  ): Promise<StaffMember> {
+    const { staff } = await apiClient.put<{ staff: StaffMember }>(`/api/staff/${id}`, updates);
+    return staff;
   },
 
-  async reactivate(id: string, actorId: string, storeId: string): Promise<void> {
-    await Adapters.staff.reactivate(id);
-    AuditService.log('staff.reactivate', actorId, storeId, { targetId: id });
+  async deactivate(id: string, _actorId?: string, _storeId?: string): Promise<void> {
+    await apiClient.post(`/api/staff/${id}/deactivate`);
   },
 
-  /** Get active sessions for a user (stub — returns sessions from adapter). */
-  async getActiveSessions(userId: string) {
-    const now = new Date().toISOString();
-    return Adapters.session.findActive(userId, now);
+  async reactivate(id: string, _actorId?: string, _storeId?: string): Promise<void> {
+    await apiClient.put(`/api/staff/${id}`, { isActive: true });
+  },
+
+  /** Login history / sessions for one staff member. */
+  async getActiveSessions(userId: string): Promise<Session[]> {
+    const { sessions } = await apiClient.get<{ sessions: Session[] }>(
+      `/api/staff/${userId}/sessions`
+    );
+    return sessions;
   },
 };

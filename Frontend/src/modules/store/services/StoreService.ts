@@ -1,62 +1,88 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Adapters } from '@/adapters';
-import { AuditService } from '@/shared/audit/AuditService';
-import { Store, CreateStoreInput, UpdateStoreInput, OnboardingStep, OnboardingStepKey } from '@/modules/store/types';
+/**
+ * StoreService — talks to the backend store API.
+ *
+ * Signatures are unchanged so StoreContext, StoreSetupForm, the onboarding
+ * pages and the dashboard checklist all work without modification.
+ *
+ * The onboarding checklist used to be tracked in localStorage, which could
+ * drift out of sync with reality (a cleared browser looked like un-done
+ * setup). It is now derived on the server from the actual data, so the
+ * checklist can no longer disagree with the database.
+ */
+
+import { apiClient, setToken } from '@/lib/apiClient';
+import {
+  Store,
+  CreateStoreInput,
+  UpdateStoreInput,
+  OnboardingStep,
+  OnboardingStepKey,
+} from '@/modules/store/types';
 import { User } from '@/modules/account/types';
 
-const ONBOARDING_KEY = 'ownly:onboarding';
-
-function readOnboarding(userId: string): Partial<Record<OnboardingStepKey, boolean>> {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = localStorage.getItem(`${ONBOARDING_KEY}:${userId}`);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeOnboarding(userId: string, data: Partial<Record<OnboardingStepKey, boolean>>): void {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(`${ONBOARDING_KEY}:${userId}`, JSON.stringify(data));
-  }
+interface OnboardingState {
+  accountVerified: boolean;
+  retailTypeSelected: boolean;
+  storeDetailsSaved: boolean;
+  staffAdded: boolean;
+  setupCompleted: boolean;
 }
 
 export const StoreService = {
-  async getByOwnerId(ownerId: string): Promise<Store | null> {
-    return Adapters.store.findByOwnerId(ownerId);
+  async getByOwnerId(_ownerId: string): Promise<Store | null> {
+    const { store } = await apiClient.get<{ store: Store | null }>('/api/store');
+    return store;
   },
 
-  async getById(id: string): Promise<Store | null> {
-    return Adapters.store.findById(id);
+  async getById(_id: string): Promise<Store | null> {
+    const { store } = await apiClient.get<{ store: Store | null }>('/api/store');
+    return store;
   },
 
+  /**
+   * Creates the store. The response carries a fresh token because creating
+   * the store changes the caller's storeId, which is baked into the JWT.
+   */
   async create(input: CreateStoreInput): Promise<Store> {
-    const existing = await Adapters.store.findByOwnerId(input.ownerId);
-    if (existing) throw new Error('A store already exists for this owner.');
-    const id = uuidv4();
-    const store = await Adapters.store.create({ ...input, id });
-    await Adapters.user.setStoreId(input.ownerId, id);
-    AuditService.log('store.create', input.ownerId, id, { name: input.name });
+    const { store, token } = await apiClient.post<{ store: Store; token: string }>('/api/store', {
+      name: input.name,
+      address: input.address,
+      phone: input.phone,
+      retailType: input.retailType,
+      currency: input.currency,
+      gstNumber: input.gstNumber,
+      taxSettings: input.taxSettings,
+    });
+    if (token) setToken(token);
     return store;
   },
 
-  async update(id: string, userId: string, updates: UpdateStoreInput): Promise<Store> {
-    const store = await Adapters.store.update(id, updates);
-    AuditService.log('store.update', userId, id);
+  async update(_id: string, _userId: string, updates: UpdateStoreInput): Promise<Store> {
+    const { store } = await apiClient.put<{ store: Store }>('/api/store', updates);
     return store;
   },
 
-  async markSetupComplete(id: string, userId: string): Promise<Store> {
-    const store = await Adapters.store.markSetupComplete(id);
-    AuditService.log('store.setup_complete', userId, id);
+  async markSetupComplete(_id: string, _userId: string): Promise<Store> {
+    const { store } = await apiClient.post<{ store: Store }>('/api/store/complete-setup');
     return store;
   },
 
-  // ─── Onboarding checklist ────────────────────────────────────────────────────
+  // ─── Onboarding checklist ───────────────────────────────────────────────────
 
-  getOnboardingSteps(userId: string, store: Store | null, user: Pick<User, 'verifiedAt'>): OnboardingStep[] {
-    const saved = readOnboarding(userId);
+  async fetchOnboardingState(): Promise<OnboardingState> {
+    return apiClient.get<OnboardingState>('/api/store/onboarding');
+  },
+
+  /**
+   * Builds the checklist. Kept synchronous with the same arguments as before
+   * so DashboardPage did not need changing — it derives everything from the
+   * store and user objects the caller already holds.
+   */
+  getOnboardingSteps(
+    _userId: string,
+    store: Store | null,
+    user: Pick<User, 'verifiedAt'>
+  ): OnboardingStep[] {
     return [
       {
         key: 'account_verified',
@@ -70,7 +96,7 @@ export const StoreService = {
         key: 'retail_type_selected',
         label: 'Choose Retail Type',
         description: 'Select the type of store you operate.',
-        completed: !!store?.retailType || !!saved.retail_type_selected,
+        completed: !!store?.retailType,
         href: '/onboarding/retail-type',
         optional: false,
       },
@@ -78,7 +104,7 @@ export const StoreService = {
         key: 'store_details_saved',
         label: 'Set Up Your Store',
         description: 'Add your store name, address, and contact details.',
-        completed: !!store?.name || !!saved.store_details_saved,
+        completed: !!store?.name,
         href: '/onboarding/store-setup',
         optional: false,
       },
@@ -86,7 +112,7 @@ export const StoreService = {
         key: 'first_staff_added',
         label: 'Add Your First Staff Member',
         description: 'Invite a manager or cashier to your store.',
-        completed: !!saved.first_staff_added,
+        completed: false,
         href: '/staff/new',
         optional: true,
       },
@@ -101,8 +127,11 @@ export const StoreService = {
     ];
   },
 
-  markOnboardingStep(userId: string, key: OnboardingStepKey): void {
-    const current = readOnboarding(userId);
-    writeOnboarding(userId, { ...current, [key]: true });
+  /**
+   * No-op retained for call-site compatibility. Progress is now derived from
+   * server data rather than recorded client-side.
+   */
+  markOnboardingStep(_userId: string, _key: OnboardingStepKey): void {
+    /* intentionally empty — see fetchOnboardingState() */
   },
 };

@@ -1,10 +1,17 @@
-import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcryptjs';
-import { Adapters } from '@/adapters';
-import { AppConfig } from '@/config/env';
-import { AuditService } from '@/shared/audit/AuditService';
+/**
+ * AuthService — talks to the backend auth API.
+ *
+ * Every exported name and signature is unchanged from the previous local
+ * implementation, so AuthContext and the login/signup/verify forms did not
+ * need modifying. What changed is where the work happens: bcrypt hashing,
+ * credential checks and session records are now server-side, and the token
+ * is a signed JWT rather than a client-generated string.
+ */
+
+import { apiClient, getToken, setToken, clearToken } from '@/lib/apiClient';
 import {
   User,
+  Session,
   SignUpInput,
   LoginInput,
   AuthResult,
@@ -12,8 +19,7 @@ import {
   DeviceInfo,
 } from '@/modules/account/types';
 
-const ACTIVE_SESSION_KEY = 'ownly:active_session';
-const PENDING_VERIFY_KEY = 'ownly:pending_verify';
+type SafeUser = Omit<User, 'passwordHash'>;
 
 function getDeviceInfo(): DeviceInfo {
   if (typeof navigator === 'undefined') {
@@ -21,20 +27,33 @@ function getDeviceInfo(): DeviceInfo {
   }
   return {
     userAgent: navigator.userAgent,
+    // navigator.platform is deprecated but still the most widely supported
+    // way to get this; it is only informational (shown in session history).
     platform: navigator.platform,
     language: navigator.language,
   };
 }
 
-function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+// ─── Session token helpers (same names as before) ─────────────────────────────
+
+export function storeActiveSession(token: string): void {
+  setToken(token);
 }
 
-function storePendingVerification(data: PendingVerification): void {
-  if (typeof window !== 'undefined') {
-    sessionStorage.setItem(PENDING_VERIFY_KEY, JSON.stringify(data));
-  }
+export function getStoredSessionToken(): string | null {
+  return getToken();
 }
+
+export function clearStoredSession(): void {
+  clearToken();
+}
+
+/**
+ * Previously the pending verification lived in sessionStorage because the
+ * code was generated in the browser. The server owns it now; this is kept so
+ * the verify page can still recover the userId after a reload.
+ */
+const PENDING_VERIFY_KEY = 'ownly:pending_verify';
 
 export function getPendingVerification(): PendingVerification | null {
   if (typeof window === 'undefined') return null;
@@ -46,145 +65,99 @@ export function getPendingVerification(): PendingVerification | null {
   }
 }
 
+function storePendingVerification(data: PendingVerification): void {
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem(PENDING_VERIFY_KEY, JSON.stringify(data));
+  }
+}
+
 function clearPendingVerification(): void {
-  if (typeof window !== 'undefined') {
-    sessionStorage.removeItem(PENDING_VERIFY_KEY);
-  }
-}
-
-export function storeActiveSession(token: string): void {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(ACTIVE_SESSION_KEY, token);
-  }
-}
-
-export function getStoredSessionToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(ACTIVE_SESSION_KEY);
-}
-
-export function clearStoredSession(): void {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem(ACTIVE_SESSION_KEY);
-  }
+  if (typeof window !== 'undefined') sessionStorage.removeItem(PENDING_VERIFY_KEY);
 }
 
 // ─── AuthService ──────────────────────────────────────────────────────────────
 
 export const AuthService = {
-  /**
-   * Sign up a new owner account.
-   * Role is always OWNER — no manual role selection for account creators.
-   * Returns a pending verification object. Email delivery is stubbed;
-   * in dev mode the code is returned directly for the UI to display.
-   */
   async signUp(input: SignUpInput): Promise<PendingVerification> {
-    const existing = await Adapters.user.findByEmail(input.email);
-    if (existing) {
-      throw new Error('An account with this email already exists.');
-    }
+    const result = await apiClient.post<{ userId: string; email: string; devCode?: string }>(
+      '/api/auth/signup',
+      input,
+      { auth: false }
+    );
 
-    const id = uuidv4();
-    await Adapters.user.create({ ...input, id, role: 'OWNER' });
-
-    const code = generateVerificationCode();
-    const pending: PendingVerification = { userId: id, code, email: input.email };
+    const pending: PendingVerification = {
+      userId: result.userId,
+      email: result.email,
+      // Present only while the server runs in development — email delivery
+      // is still stubbed. See Backend AuthService.signUp.
+      code: result.devCode ?? '',
+    };
     storePendingVerification(pending);
-
-    // Stub: in production, send email here. For now, log to console.
-    console.info(`[Auth] Verification code for ${input.email}: ${code}`);
-
-    AuditService.log('auth.signup', id, null, { email: input.email });
     return pending;
   },
 
-  /**
-   * Verify account with 6-digit code.
-   */
   async verify(userId: string, code: string): Promise<void> {
-    const pending = getPendingVerification();
-    if (!pending || pending.userId !== userId) {
-      throw new Error('No pending verification found. Please sign up again.');
-    }
-    if (pending.code !== code) {
-      throw new Error('Invalid verification code. Please try again.');
-    }
-    await Adapters.user.setVerified(userId, new Date().toISOString());
+    await apiClient.post('/api/auth/verify', { userId, code }, { auth: false });
     clearPendingVerification();
-    AuditService.log('auth.verify', userId);
   },
 
-  /**
-   * Login with email + password.
-   * Creates a new session and returns the auth result.
-   */
   async login(input: LoginInput): Promise<AuthResult> {
-    const user = await Adapters.user.findByEmail(input.email);
-    if (!user) {
-      throw new Error('Invalid email or password.');
+    const result = await apiClient.post<AuthResult>(
+      '/api/auth/login',
+      { ...input, deviceInfo: getDeviceInfo() },
+      { auth: false }
+    );
+    storeActiveSession(result.token);
+    return result;
+  },
+
+  async logout(_sessionId: string, _userId: string): Promise<void> {
+    try {
+      await apiClient.post('/api/auth/logout');
+    } finally {
+      // Always drop the local token, even if the server call fails —
+      // otherwise a network blip would leave the user unable to sign out.
+      clearStoredSession();
     }
-    if (!user.isActive) {
-      throw new Error('This account has been deactivated. Contact your store owner.');
-    }
-    if (!user.verifiedAt) {
-      throw new Error('Please verify your email address before logging in.');
-    }
-
-    const valid = await bcrypt.compare(input.password, user.passwordHash);
-    if (!valid) {
-      throw new Error('Invalid email or password.');
-    }
-
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + AppConfig.auth.sessionDurationMs).toISOString();
-    const sessionId = uuidv4();
-    const token = `${sessionId}.${Date.now()}`;
-
-    const session = await Adapters.session.create({
-      id: sessionId,
-      userId: user.id,
-      expiresAt,
-      deviceInfo: getDeviceInfo(),
-    });
-
-    await Adapters.user.recordLogin(user.id, now.toISOString());
-    storeActiveSession(token);
-
-    AuditService.log('auth.login', user.id, user.storeId);
-
-    const { passwordHash: _, ...safeUser } = user;
-    return { user: safeUser, session, token };
   },
 
   /**
-   * Logout — invalidate the current session.
+   * Resolves the current session from the stored token.
+   * Returns null when the token is missing, expired or rejected.
    */
-  async logout(sessionId: string, userId: string): Promise<void> {
-    await Adapters.session.invalidate(sessionId);
-    clearStoredSession();
-    AuditService.log('auth.logout', userId);
-  },
+  async resolveSession(
+    _token: string
+  ): Promise<{ user: SafeUser; session: Session } | null> {
+    try {
+      const { user } = await apiClient.get<{ user: SafeUser; store: unknown }>('/api/auth/me');
 
-  /**
-   * Resolve the current session from a stored token.
-   * Returns the user and session, or null if expired/invalid.
-   */
-  async resolveSession(token: string): Promise<{ user: Omit<User, 'passwordHash'>; session: import('@/modules/account/types').Session } | null> {
-    const sessionId = token.split('.')[0];
-    const session = await Adapters.session.findById(sessionId);
-    if (!session) return null;
-
-    const now = new Date();
-    if (new Date(session.expiresAt) <= now) {
-      await Adapters.session.invalidate(sessionId);
+      // The server no longer hands back a session row on every request; the
+      // JWT itself is the session. This synthesises the shape AuthContext
+      // expects so the context did not need changing.
+      const session: Session = {
+        id: user.id,
+        userId: user.id,
+        createdAt: user.lastLoginAt ?? user.createdAt,
+        expiresAt: '',
+        deviceInfo: getDeviceInfo(),
+      };
+      return { user, session };
+    } catch {
       clearStoredSession();
       return null;
     }
+  },
 
-    const user = await Adapters.user.findById(session.userId);
-    if (!user || !user.isActive) return null;
-
-    const { passwordHash: _, ...safeUser } = user;
-    return { user: safeUser, session };
+  /**
+   * Re-issues the token after storeId changes (store creation). Without this
+   * the client would keep sending a token signed with storeId=null and every
+   * store-scoped request would fail until the user logged out and back in.
+   */
+  async refreshToken(): Promise<SafeUser> {
+    const { user, token } = await apiClient.post<{ user: SafeUser; token: string }>(
+      '/api/auth/refresh'
+    );
+    storeActiveSession(token);
+    return user;
   },
 };

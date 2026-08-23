@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { CategoryService } from '@/modules/catalog/services/CategoryService';
 import type { CategoryWithSubcategories } from '@/modules/catalog/types';
-import { CLOTHING_TEMPLATE_ID } from '@/db/seeds/clothing-attributes';
+import { CLOTHING_TEMPLATE_ID } from '@/config/retail-templates';
 
 interface CategorySelectProps {
   retailTemplateId?: string;

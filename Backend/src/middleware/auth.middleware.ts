@@ -1,18 +1,22 @@
 /**
- * Auth middleware — verifies JWT on protected routes.
+ * Auth middleware — verifies the JWT and enforces the permission matrix.
  */
 
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '@/config/env';
+import { evaluatePermission, type PermissionKey } from '@/config/permissions';
+import { AppError } from '@/shared/AppError';
+import type { Role } from '@/types/domain';
 
 export interface JwtPayload {
   userId: string;
   storeId: string | null;
-  role: string;
+  role: Role;
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: JwtPayload;
@@ -20,33 +24,50 @@ declare global {
   }
 }
 
-export function authenticate(req: Request, res: Response, next: NextFunction): void {
+export function authenticate(req: Request, _res: Response, next: NextFunction): void {
   const authHeader = req.headers['authorization'];
   if (!authHeader?.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'Missing or malformed Authorization header' });
+    next(AppError.unauthorized('Missing or malformed Authorization header'));
     return;
   }
 
   const token = authHeader.slice(7);
   try {
-    const payload = jwt.verify(token, config.jwtSecret) as JwtPayload;
-    req.user = payload;
+    req.user = jwt.verify(token, config.jwtSecret) as JwtPayload;
     next();
   } catch {
-    res.status(401).json({ error: 'Invalid or expired token' });
+    next(AppError.unauthorized('Invalid or expired token'));
   }
 }
 
-export function requireRole(...roles: string[]) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+/** Requires the authenticated user's role to hold `key` in the permission matrix. */
+export function requirePermission(key: PermissionKey) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.user) {
-      res.status(401).json({ error: 'Unauthenticated' });
+      next(AppError.unauthorized());
       return;
     }
-    if (!roles.includes(req.user.role)) {
-      res.status(403).json({ error: 'Insufficient permissions' });
+    if (!evaluatePermission(req.user.role, key)) {
+      next(AppError.forbidden(`Your role (${req.user.role}) cannot perform this action.`));
       return;
     }
     next();
   };
+}
+
+/**
+ * Returns the caller's storeId, rejecting if they have not completed store
+ * setup. Every tenant-scoped query derives its storeId from the token this
+ * way — never from the request body, which a client could forge to read
+ * another store's data.
+ */
+export function requireStoreId(req: Request): string {
+  if (!req.user) throw AppError.unauthorized();
+  if (!req.user.storeId) throw AppError.badRequest('No store is set up for this account yet.');
+  return req.user.storeId;
+}
+
+export function requireUserId(req: Request): string {
+  if (!req.user) throw AppError.unauthorized();
+  return req.user.userId;
 }

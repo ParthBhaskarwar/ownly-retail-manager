@@ -2,13 +2,13 @@
   "name": "ownly-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "Ownly AI Retail Manager — REST API backend",
+  "description": "Ownly AI Retail Manager \u2014 REST API backend",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
     "lint": "eslint src --ext .ts",
-    "test": "jest --passWithNoTests",
+    "test": "jest --runInBand",
     "db:migrate": "knex migrate:latest --knexfile src/db/knexfile.ts",
     "db:rollback": "knex migrate:rollback --knexfile src/db/knexfile.ts",
     "db:seed": "knex seed:run --knexfile src/db/knexfile.ts"
@@ -29,19 +29,20 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.10",
     "@types/pg": "^8.11.6",
-    "@types/uuid": "^9.0.8",
-    "@types/jest": "^29.5.12",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.3",
-    "eslint": "^8.57.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0"
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.3"
   }
 }
