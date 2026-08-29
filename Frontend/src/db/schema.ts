@@ -1,11 +1,8 @@
 /**
- * Dexie database schema — Ownly Week 2.
+ * Dexie database schema — Ownly.
  *
  * Compound index syntax: '[field1+field2]'
- * These map 1-to-1 with the Gate 1 DDL unique constraints and performance indexes.
- *
- * All primary keys are UUID strings (no ++, no auto-increment).
- * Compound index queries use: db.table.where('[a+b]').equals([aVal, bVal])
+ * Schema versioning supports seamless offline/local operation.
  */
 
 import type {
@@ -35,11 +32,6 @@ export type {
   InventoryMovement,
 };
 
-/**
- * Schema version 1 store declarations.
- * Format: 'primaryKey, index1, index2, [compound+index]'
- * Only indexed fields need to be declared; all other fields are stored but not indexed.
- */
 export const SCHEMA_V1 = {
   // ── Catalog ────────────────────────────────────────────────────────────────
   categories:
@@ -64,18 +56,30 @@ export const SCHEMA_V1 = {
   variantAttributeValues:
     'id, variantId, [variantId+attributeDefinitionId], [attributeDefinitionId+value]',
 
-  // ── Product hierarchy (levels 1 & 2) ───────────────────────────────────────
+  // ── Product hierarchy ─────────────────────────────────────────────────────
   products:
     'id, storeId, [storeId+baseSku], [storeId+categoryId], [storeId+subcategoryId], [storeId+supplierId], [storeId+status]',
 
   productVariants:
     'id, productId, [productId+sku], [productId+isActive]',
 
-  // ── Inventory hierarchy (levels 3 & 4) ────────────────────────────────────
-  // CRITICAL: [storeId+barcode] is the compound unique index for barcode-scan lookup.
+  // ── Inventory hierarchy ───────────────────────────────────────────────────
   inventoryItems:
     'id, storeId, [storeId+barcode], variantId, [variantId+status], [storeId+status], [storeId+purchaseDate]',
 
   inventoryMovements:
     'id, inventoryItemId, storeId, [storeId+movementType], [storeId+performedAt], [referenceType+referenceId]',
+} as const;
+
+export const SCHEMA_V2 = {
+  ...SCHEMA_V1,
+  customers: 'id, storeId, [storeId+phone], name',
+  invoices: 'id, storeId, invoiceNumber, [storeId+invoiceNumber], customerId, createdAt, status',
+  invoiceItems: 'id, invoiceId, inventoryItemId, barcode, productId, variantId',
+  payments: 'id, invoiceId, paymentMethod',
+  returns: 'id, storeId, returnNumber, originalInvoiceId, createdAt',
+  returnItems: 'id, returnId, originalInvoiceItemId, inventoryItemId',
+  exchanges: 'id, storeId, exchangeNumber, originalInvoiceId, returnId, replacementInvoiceId',
+  creditNotes: 'id, storeId, creditNoteNumber, status, [storeId+creditNoteNumber]',
+  auditLogs: 'id, storeId, userId, action, entityType, createdAt',
 } as const;

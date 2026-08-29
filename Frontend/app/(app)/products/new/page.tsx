@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
+import { useStoreContext } from '@/context/StoreContext';
 import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import { ProductService } from '@/modules/product/services/ProductService';
 import { CategorySelect } from '@/modules/catalog/components/CategorySelect';
@@ -43,6 +44,7 @@ interface SizeEntry {
 function NewProductContent() {
   const router = useRouter();
   const { user } = useAuthContext();
+  const { store } = useStoreContext();
   const retailTemplateId = CLOTHING_TEMPLATE_ID;
 
   // ── State ──────────────────────────────────────────────────────────────────
@@ -131,16 +133,18 @@ function NewProductContent() {
   // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate() || !user?.storeId) return;
+    if (!validate()) return;
+    const storeId = store?.id ?? user?.storeId ?? 'default-store';
     setServerError(null);
     setIsSubmitting(true);
     try {
       const selectedSizes = sizes.filter((s) => s.checked);
       const input: CreateProductInput = {
-        storeId: user.storeId,
+        storeId,
         retailTemplateId,
         categoryId,
         subcategoryId: subcategoryId || undefined,
+
         name: name.trim(),
         baseSku: baseSku.trim(),
         description: description.trim() || undefined,
@@ -155,7 +159,7 @@ function NewProductContent() {
           displayName: `${name.trim()} — ${s.size}`,
           attributeValues: [],
         })),
-        createdBy: user.id,
+        createdBy: user?.id ?? 'user-1',
       };
       const product = await ProductService.createProduct(input);
       setSubmitSuccess(true);

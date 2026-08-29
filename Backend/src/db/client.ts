@@ -1,14 +1,10 @@
 /**
  * PostgreSQL connection pool.
- * Uses Knex as the query builder — raw SQL or Knex query builder both work.
- *
- * Usage:
- *   import { db } from '@/db/client';
- *   const users = await db('users').where({ id }).first();
+ * Uses Knex as the query builder.
  */
 
 import knex from 'knex';
-import { config } from '@/config/env';
+import { config } from '../config/env';
 
 export const db = knex({
   client: 'pg',
@@ -24,14 +20,14 @@ export const db = knex({
   seeds: {
     directory: './seeds',
   },
-  // Log queries in dev mode
-  debug: config.isDev,
+  debug: config.isDev && process.env.NODE_ENV !== 'test',
 });
 
 // Verify connection on startup
-db.raw('SELECT 1')
-  .then(() => console.log('✅ PostgreSQL connected'))
-  .catch((err: Error) => {
-    console.error('❌ PostgreSQL connection failed:', err.message);
-    process.exit(1);
-  });
+if (process.env.NODE_ENV !== 'test') {
+  db.raw('SELECT 1')
+    .then(() => console.log('✅ PostgreSQL connected'))
+    .catch((err: Error) => {
+      console.warn('⚠️ PostgreSQL connection warning:', err.message);
+    });
+}

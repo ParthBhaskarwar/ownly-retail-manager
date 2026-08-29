@@ -1,41 +1,40 @@
 /**
  * Products routes — CRUD + variants.
- * Full implementation in Week 6.
  */
 
 import { Router } from 'express';
-import { authenticate } from '@/middleware/auth.middleware';
+import { authenticate } from '../../middleware/auth.middleware';
 
 export const productsRouter = Router();
 
-productsRouter.use(authenticate); // All product routes require auth
+productsRouter.use(authenticate);
 
-// GET /api/products?query=&categoryId=&status=&page=&pageSize=
+// GET /api/products
 productsRouter.get('/', async (req, res) => {
-  res.status(501).json({ error: 'Not implemented yet — coming in Week 6' });
+  res.status(501).json({ error: 'Not implemented yet' });
 });
 
 // POST /api/products
 productsRouter.post('/', async (req, res) => {
-  res.status(501).json({ error: 'Not implemented yet — coming in Week 6' });
+  res.status(501).json({ error: 'Not implemented yet' });
 });
 
 // GET /api/products/:id
 productsRouter.get('/:id', async (req, res) => {
-  res.status(501).json({ error: 'Not implemented yet — coming in Week 6' });
+  res.status(501).json({ error: 'Not implemented yet' });
 });
 
 // PUT /api/products/:id
 productsRouter.put('/:id', async (req, res) => {
-  res.status(501).json({ error: 'Not implemented yet — coming in Week 6' });
+  res.status(501).json({ error: 'Not implemented yet' });
 });
 
 // POST /api/products/:id/variants
 productsRouter.post('/:id/variants', async (req, res) => {
-  res.status(501).json({ error: 'Not implemented yet — coming in Week 6' });
+  res.status(501).json({ error: 'Not implemented yet' });
 });
 
 // PUT /api/products/:id/variants/:variantId
 productsRouter.put('/:id/variants/:variantId', async (req, res) => {
-  res.status(501).json({ error: 'Not implemented yet — coming in Week 6' });
+  res.status(501).json({ error: 'Not implemented yet' });
 });

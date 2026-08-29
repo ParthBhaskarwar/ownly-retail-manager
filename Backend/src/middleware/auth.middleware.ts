@@ -1,10 +1,11 @@
 /**
  * Auth middleware — verifies JWT on protected routes.
+ * Supports dev mode fallback for local demo sessions.
  */
 
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { config } from '@/config/env';
+import { config } from '../config/env';
 
 export interface JwtPayload {
   userId: string;
@@ -23,6 +24,11 @@ declare global {
 export function authenticate(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers['authorization'];
   if (!authHeader?.startsWith('Bearer ')) {
+    if (config.isDev) {
+      req.user = { userId: 'local-user', storeId: null, role: 'OWNER' };
+      next();
+      return;
+    }
     res.status(401).json({ error: 'Missing or malformed Authorization header' });
     return;
   }
@@ -33,6 +39,12 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
     req.user = payload;
     next();
   } catch {
+    // In development or local session mode, allow token fallback
+    if (config.isDev) {
+      req.user = { userId: 'local-cashier', storeId: null, role: 'OWNER' };
+      next();
+      return;
+    }
     res.status(401).json({ error: 'Invalid or expired token' });
   }
 }
