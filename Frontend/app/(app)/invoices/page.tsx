@@ -59,14 +59,12 @@ export default function InvoicesPage() {
         }
         results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setInvoices(results.map((inv) => ({
-          id: inv.id,
+          ...inv,
           invoice_number: inv.invoiceNumber,
           created_at: inv.createdAt,
           customer_name: inv.customerName,
           customer_phone: inv.customerPhone,
           grand_total: inv.grandTotal,
-          status: inv.status,
-          ...inv,
         })));
         setIsOfflineMode(true);
       } catch (dbErr) {

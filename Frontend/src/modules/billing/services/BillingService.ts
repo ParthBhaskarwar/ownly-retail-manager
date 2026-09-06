@@ -5,7 +5,6 @@
  */
 
 import { db } from '@/db/db';
-import { Adapters } from '@/adapters';
 import { v4 as uuidv4 } from 'uuid';
 import { getAuthHeaders } from '@/shared/utils/auth';
 import type { CartItem, PaymentSplit } from '../types';
@@ -75,8 +74,7 @@ export class BillingService {
       .where('barcode')
       .equals(barcode)
       .first()
-      .catch(() => null) ||
-      await Adapters.inventoryItem.findByBarcode(storeId, barcode).catch(() => null);
+      .catch(() => null);
 
     if (!invItem) {
       throw new Error(`Barcode ${barcode} not found in database`);
