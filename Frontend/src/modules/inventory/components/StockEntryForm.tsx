@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
-import { InventoryItemService } from '@/modules/inventory/services/InventoryItemService';
+import { InventoryItemService, deriveStoreCode } from '@/modules/inventory/services/InventoryItemService';
 import type { AddStockInput } from '@/modules/inventory/types';
 
 interface StockEntryFormProps {
@@ -10,7 +10,6 @@ interface StockEntryFormProps {
   variantSku: string;
   variantDisplayName: string;
   storeId: string;
-  storeCode: string;
   onSuccess: (count: number) => void;
   onCancel: () => void;
 }
@@ -20,7 +19,6 @@ export function StockEntryForm({
   variantSku,
   variantDisplayName,
   storeId,
-  storeCode,
   onSuccess,
   onCancel,
 }: StockEntryFormProps) {
@@ -66,7 +64,7 @@ export function StockEntryForm({
         notes: notes || undefined,
       };
 
-      const items = await InventoryItemService.addStock(input, storeCode, variantSku);
+      const items = await InventoryItemService.addStock(input, variantSku);
       onSuccess(items.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add stock. Please try again.');
@@ -157,9 +155,11 @@ export function StockEntryForm({
           )}
           {!barcodesProvided && (
             <span className="form-field__hint">
-              Auto-generate: {Array.from({ length: Math.min(quantity, 2) }, (_, i) =>
-                `${storeCode.toUpperCase()}-${variantSku.replace(/[^A-Z0-9]/gi, '').slice(0, 8).toUpperCase()}-${String(i + 1).padStart(5, '0')}`
-              ).join(', ')}{quantity > 2 ? `, … (+${quantity - 2} more)` : ''}
+              {/* The trailing number is a store-wide running sequence assigned at
+                  save time, so it can't be previewed accurately here — show the
+                  format rather than a specific number that would be wrong. */}
+              Auto-generate: {quantity} barcode{quantity !== 1 ? 's' : ''} in the format{' '}
+              {`${deriveStoreCode(storeId)}-${variantSku.replace(/[^A-Z0-9]/gi, '').slice(0, 8).toUpperCase()}-#####`}
             </span>
           )}
         </div>

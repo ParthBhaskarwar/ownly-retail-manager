@@ -89,3 +89,14 @@ export function isRetailTypeEnabled(type: RetailType): boolean {
   const template = RETAIL_TEMPLATES.find((t) => t.retailType === type);
   return template?.enabled ?? false;
 }
+
+/**
+ * Identifier for the Clothing & Fashion template.
+ *
+ * Must match `retail_template_id` in the backend seed
+ * (Backend/src/db/seeds/001_clothing_template.ts) — categories and attribute
+ * definitions are looked up by this value.
+ *
+ * Previously lived in the Dexie seed file, which no longer exists.
+ */
+export const CLOTHING_TEMPLATE_ID = 'tpl_clothing';

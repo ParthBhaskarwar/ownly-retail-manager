@@ -11,8 +11,6 @@
     "test:coverage": "jest --coverage --passWithNoTests"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "dexie": "^4.0.8",
     "next": "^14.2.35",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -22,7 +20,6 @@
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
-    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",

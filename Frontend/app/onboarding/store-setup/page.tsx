@@ -9,7 +9,7 @@ import { useAuth } from '@/shared/hooks/useAuth';
 import type { CreateStoreInput } from '@/modules/store/types';
 
 export default function StoreSetupPage() {
-  const { user } = useAuth();
+  const { user, refreshSession } = useAuth();
   const router = useRouter();
   const [retailType, setRetailType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,9 +28,13 @@ export default function StoreSetupPage() {
     setIsLoading(true);
     setServerError('');
     try {
-      const store = await StoreService.create(input);
-      StoreService.markOnboardingStep(user!.id, 'store_details_saved');
+      await StoreService.create(input);
       sessionStorage.removeItem('ownly:selected_retail_type');
+      // Creating the store changes the caller's storeId, which is baked into
+      // the JWT. StoreService.create already swapped in the refreshed token;
+      // this pulls the updated user (with storeId set) into auth context so
+      // screens gated on user.storeId work without a page reload.
+      await refreshSession();
       router.push('/onboarding/complete');
     } catch (err) {
       setServerError(err instanceof Error ? err.message : 'Failed to save store details.');

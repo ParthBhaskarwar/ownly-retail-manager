@@ -169,7 +169,6 @@ function ProductDetailContent() {
               variantSku={stockFormVariant.sku}
               variantDisplayName={stockFormVariant.displayName}
               storeId={user.storeId}
-              storeCode="OWN"
               onSuccess={(count) => {
                 setStockFormVariant(null);
                 void loadProduct();

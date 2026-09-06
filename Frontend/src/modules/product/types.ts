@@ -103,6 +103,12 @@ export interface CreateVariantInput {
   /** Variant-level attribute values (isVariantLevel = true, e.g. Size) */
   attributeValues: Array<{ attributeDefinitionId: string; value: string }>;
   sortOrder?: number;
+  /** If provided, immediately creates this many physical InventoryItems + unique barcodes for the variant. */
+  initialStock?: {
+    quantity: number;
+    purchaseCostPrice: number;
+    purchaseDate: string; // ISO date
+  };
 }
 
 export interface UpdateProductInput {

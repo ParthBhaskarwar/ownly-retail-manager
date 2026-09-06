@@ -7,10 +7,10 @@ import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import { ProductService } from '@/modules/product/services/ProductService';
 import { CategorySelect } from '@/modules/catalog/components/CategorySelect';
 import { AttributeFieldRenderer } from '@/modules/attributes/components/AttributeFieldRenderer';
-import { Adapters } from '@/adapters';
+import { AttributeService } from '@/modules/catalog/services/CategoryService';
 import type { AttributeDefinition } from '@/modules/attributes/types';
 import type { CreateProductInput } from '@/modules/product/types';
-import { CLOTHING_TEMPLATE_ID } from '@/db/seeds/clothing-attributes';
+import { CLOTHING_TEMPLATE_ID } from '@/config/retail-templates';
 
 // ── Clothing sizes in display order ───────────────────────────────────────────
 const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'];
@@ -71,12 +71,21 @@ function NewProductContent() {
   const [productAttrDefs, setProductAttrDefs] = useState<AttributeDefinition[]>([]);
   const [productAttrValues, setProductAttrValues] = useState<Record<string, string>>({});
   const [description, setDescription] = useState('');
+  // The variant-level 'Size' definition. Each variant records its size as an
+  // attribute value, not just as an SKU suffix — that is what makes
+  // size-wise inventory views and size-demand reporting possible.
+  const [sizeAttrDefId, setSizeAttrDefId] = useState<string | null>(null);
 
   // ── Load attribute definitions ─────────────────────────────────────────────
   useEffect(() => {
-    Adapters.attribute
-      .findProductLevelDefinitions(retailTemplateId)
+    AttributeService
+      .getDefinitions(retailTemplateId, 'product')
       .then(setProductAttrDefs)
+      .catch(() => { });
+
+    AttributeService
+      .getDefinitions(retailTemplateId, 'variant')
+      .then((defs) => setSizeAttrDefId(defs.find((d) => d.name === 'Size')?.id ?? null))
       .catch(() => { });
   }, [retailTemplateId]);
 
@@ -153,7 +162,14 @@ function NewProductContent() {
         variants: selectedSizes.map((s) => ({
           sku: `${baseSku.trim()}-${s.size.replace(/\s+/g, '').toUpperCase()}`,
           displayName: `${name.trim()} — ${s.size}`,
-          attributeValues: [],
+          attributeValues: sizeAttrDefId
+            ? [{ attributeDefinitionId: sizeAttrDefId, value: s.size }]
+            : [],
+          initialStock: {
+            quantity: s.qty,
+            purchaseCostPrice: parseFloat(baseCostPrice),
+            purchaseDate: new Date().toISOString().split('T')[0],
+          },
         })),
         createdBy: user.id,
       };
@@ -173,7 +189,10 @@ function NewProductContent() {
       <div className="pe-success-screen" role="status" aria-live="polite">
         <div className="pe-success-icon" aria-hidden="true">✓</div>
         <h2 className="pe-success-title">Product Created</h2>
-        <p className="pe-success-desc">Taking you to the product page…</p>
+        <p className="pe-success-desc">
+          {summary.totalQty} physical item{summary.totalQty !== 1 ? 's' : ''} added to stock with unique barcodes.
+          Taking you to the product page…
+        </p>
       </div>
     );
   }
