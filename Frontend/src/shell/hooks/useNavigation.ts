@@ -25,6 +25,42 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'dashboard:view',
     section: 'main',
   },
+  // POS Billing
+  {
+    id: 'nav-billing',
+    label: 'POS Billing',
+    href: '/billing',
+    icon: '⊟',
+    permissionKey: 'billing:view',
+    section: 'store',
+  },
+  // Invoices History
+  {
+    id: 'nav-invoices',
+    label: 'Invoices & Receipts',
+    href: '/invoices',
+    icon: '📄',
+    permissionKey: 'billing:view',
+    section: 'store',
+  },
+  // Returns
+  {
+    id: 'nav-returns',
+    label: 'Returns & Refunds',
+    href: '/returns',
+    icon: '↩',
+    permissionKey: 'returns:create',
+    section: 'store',
+  },
+  // Exchanges
+  {
+    id: 'nav-exchanges',
+    label: 'Product Exchanges',
+    href: '/exchanges',
+    icon: '⇄',
+    permissionKey: 'exchanges:create',
+    section: 'store',
+  },
   // Store
   {
     id: 'nav-store',
@@ -43,24 +79,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'inventory:view',
     section: 'store',
   },
-  // Inventory (future)
-  {
-    id: 'nav-inventory',
-    label: 'Inventory',
-    href: '/inventory',
-    icon: '▦',
-    permissionKey: 'inventory:view',
-    section: 'store',
-  },
-  // Billing (future)
-  {
-    id: 'nav-billing',
-    label: 'Billing',
-    href: '/billing',
-    icon: '⊟',
-    permissionKey: 'billing:view',
-    section: 'store',
-  },
   // Staff
   {
     id: 'nav-staff',
@@ -70,7 +88,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'staff:view',
     section: 'people',
   },
-  // Reports (future)
+  // Reports
   {
     id: 'nav-reports',
     label: 'Reports',
@@ -88,21 +106,8 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'settings:view',
     section: 'system',
   },
-  // Audit (future)
-  {
-    id: 'nav-audit',
-    label: 'Audit Log',
-    href: '/audit',
-    icon: '⊚',
-    permissionKey: 'audit:view',
-    section: 'system',
-  },
 ];
 
-/**
- * useNavigation — returns nav items filtered by the current user's role.
- * Role evaluation uses the central permission matrix — never per-item conditionals.
- */
 export function useNavigation() {
   const { user } = useAuthContext();
 

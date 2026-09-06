@@ -2,7 +2,7 @@
   "name": "ownly-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "Ownly AI Retail Manager \u2014 REST API backend",
+  "description": "Ownly AI Retail Manager — REST API backend",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/app.ts",
     "build": "tsc",

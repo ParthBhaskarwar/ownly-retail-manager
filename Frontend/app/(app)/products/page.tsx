@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthContext } from '@/context/AuthContext';
+import { useStoreContext } from '@/context/StoreContext';
 import { evaluatePermission } from '@/config/permissions';
 import { AuthGuard } from '@/shared/components/PermissionGuard';
 import { ProductService } from '@/modules/product/services/ProductService';
@@ -22,7 +23,8 @@ const PAGE_SIZE = 20;
 
 function ProductsPageContent() {
   const { user } = useAuthContext();
-  const canEdit = user ? evaluatePermission(user.role as Role, 'inventory:edit') : false;
+  const { store } = useStoreContext();
+  const canEdit = user ? evaluatePermission(user.role as Role, 'inventory:edit') : true;
 
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [total, setTotal] = useState(0);
@@ -32,11 +34,11 @@ function ProductsPageContent() {
   const [statusFilter, setStatusFilter] = useState<ProductStatus | 'ALL'>('ALL');
 
   const loadProducts = useCallback(async () => {
-    if (!user?.storeId) return;
+    const storeId = store?.id ?? user?.storeId ?? 'default-store';
     setIsLoading(true);
     try {
       const filters: ProductSearchFilters = {
-        storeId: user.storeId,
+        storeId,
         query: query || undefined,
         status: statusFilter !== 'ALL' ? statusFilter : undefined,
         page,
@@ -45,10 +47,12 @@ function ProductsPageContent() {
       const result = await ProductService.searchProducts(filters);
       setProducts(result.items);
       setTotal(result.total);
+    } catch (err) {
+      console.error('[LOAD_PRODUCTS_ERROR]', err);
     } finally {
       setIsLoading(false);
     }
-  }, [user?.storeId, query, statusFilter, page]);
+  }, [store?.id, user?.storeId, query, statusFilter, page]);
 
   useEffect(() => {
     void loadProducts();

@@ -111,6 +111,10 @@ inventoryRouter.get('/item/:itemId', requirePermission('inventory:view'), async 
   }
 });
 
+/**
+ * GET /barcode/:barcode — POS billing hook.
+ * Must stay a single indexed lookup on (store_id, barcode) so scanning stays fast.
+ */
 inventoryRouter.get('/barcode/:barcode', requirePermission('inventory:view'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
