@@ -1,15 +1,8 @@
 /**
  * Central permission-matrix configuration.
- *
- * This is the SINGLE SOURCE OF TRUTH for what each role can do.
- * No per-screen hard-coded role checks — everything flows through
- * evaluatePermission() and the usePermission() hook.
- *
- * To add a new permission: add the key to PermissionKey, then
- * populate its allowed value for each role below.
  */
 
-import { Role } from '@/modules/staff/types';
+import { Role } from '@/modules/account/types';
 
 // ─── Permission Keys ──────────────────────────────────────────────────────────
 
@@ -24,18 +17,24 @@ export type PermissionKey =
   | 'staff:create'
   | 'staff:edit'
   | 'staff:deactivate'
-  // Inventory (stubbed for future weeks)
+  // Inventory
   | 'inventory:view'
   | 'inventory:edit'
-  // Billing (stubbed for future weeks)
+  // Billing & POS
   | 'billing:view'
   | 'billing:create'
-  // Reports (stubbed for future weeks)
+  | 'billing:discount:limited'
+  | 'billing:discount:unlimited'
+  // Returns & Exchanges
+  | 'returns:create'
+  | 'exchanges:create'
+  | 'credit_notes:manage'
+  // Reports
   | 'reports:view'
   // Settings
   | 'settings:view'
   | 'settings:edit'
-  // Audit logs (stubbed for future weeks)
+  // Audit logs
   | 'audit:view';
 
 // ─── Permission Matrix ────────────────────────────────────────────────────────
@@ -55,6 +54,11 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': true,
     'billing:view': true,
     'billing:create': true,
+    'billing:discount:limited': true,
+    'billing:discount:unlimited': true,
+    'returns:create': true,
+    'exchanges:create': true,
+    'credit_notes:manage': true,
     'reports:view': true,
     'settings:view': true,
     'settings:edit': true,
@@ -72,6 +76,11 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': true,
     'billing:view': true,
     'billing:create': true,
+    'billing:discount:limited': true,
+    'billing:discount:unlimited': true,
+    'returns:create': true,
+    'exchanges:create': true,
+    'credit_notes:manage': true,
     'reports:view': true,
     'settings:view': true,
     'settings:edit': false,
@@ -89,6 +98,11 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': false,
     'billing:view': true,
     'billing:create': true,
+    'billing:discount:limited': true,
+    'billing:discount:unlimited': false,
+    'returns:create': true,
+    'exchanges:create': true,
+    'credit_notes:manage': false,
     'reports:view': false,
     'settings:view': false,
     'settings:edit': false,
@@ -106,6 +120,11 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': true,
     'billing:view': false,
     'billing:create': false,
+    'billing:discount:limited': false,
+    'billing:discount:unlimited': false,
+    'returns:create': false,
+    'exchanges:create': false,
+    'credit_notes:manage': false,
     'reports:view': false,
     'settings:view': false,
     'settings:edit': false,
@@ -123,6 +142,11 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': false,
     'billing:view': true,
     'billing:create': false,
+    'billing:discount:limited': false,
+    'billing:discount:unlimited': false,
+    'returns:create': false,
+    'exchanges:create': false,
+    'credit_notes:manage': true,
     'reports:view': true,
     'settings:view': false,
     'settings:edit': false,
@@ -140,6 +164,11 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': false,
     'billing:view': false,
     'billing:create': false,
+    'billing:discount:limited': false,
+    'billing:discount:unlimited': false,
+    'returns:create': false,
+    'exchanges:create': false,
+    'credit_notes:manage': false,
     'reports:view': false,
     'settings:view': false,
     'settings:edit': false,
@@ -147,19 +176,10 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
   },
 };
 
-// ─── Evaluator ────────────────────────────────────────────────────────────────
-
-/**
- * Evaluate whether a given role has a specific permission.
- * This is the canonical permission check function — use this everywhere.
- */
 export function evaluatePermission(role: Role, key: PermissionKey): boolean {
   return PERMISSION_MATRIX[role]?.[key] ?? false;
 }
 
-/**
- * Get all allowed permission keys for a role.
- */
 export function getAllowedPermissions(role: Role): PermissionKey[] {
   const matrix = PERMISSION_MATRIX[role];
   return (Object.keys(matrix) as PermissionKey[]).filter((key) => matrix[key]);

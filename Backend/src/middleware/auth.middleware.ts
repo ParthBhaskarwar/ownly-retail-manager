@@ -27,6 +27,13 @@ declare global {
 export function authenticate(req: Request, _res: Response, next: NextFunction): void {
   const authHeader = req.headers['authorization'];
   if (!authHeader?.startsWith('Bearer ')) {
+    // In development, allow unauthenticated requests with a default owner identity
+    // so the billing POS can be demoed locally without a live token.
+    if (config.isDev) {
+      req.user = { userId: 'local-user', storeId: null, role: 'OWNER' };
+      next();
+      return;
+    }
     next(AppError.unauthorized('Missing or malformed Authorization header'));
     return;
   }
@@ -36,6 +43,12 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
     req.user = jwt.verify(token, config.jwtSecret) as JwtPayload;
     next();
   } catch {
+    // In development, fall back to a default identity if token verification fails.
+    if (config.isDev) {
+      req.user = { userId: 'local-user', storeId: null, role: 'OWNER' };
+      next();
+      return;
+    }
     next(AppError.unauthorized('Invalid or expired token'));
   }
 }
