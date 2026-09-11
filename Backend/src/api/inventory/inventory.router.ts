@@ -118,9 +118,41 @@ inventoryRouter.get('/item/:itemId', requirePermission('inventory:view'), async 
 inventoryRouter.get('/barcode/:barcode', requirePermission('inventory:view'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
-    const item = await InventoryService.findByBarcode(storeId, param(req.params, 'barcode'));
-    if (!item) throw AppError.notFound('No item found with that barcode.');
-    res.json({ item });
+    const barcode = param(req.params, 'barcode');
+
+    // Join inventory → variant → product to get all fields the POS needs in one query.
+    const row = await db('inventory_items as ii')
+      .join('product_variants as v', 'v.id', 'ii.variant_id')
+      .join('products as p', 'p.id', 'v.product_id')
+      .where({ 'ii.store_id': storeId, 'ii.barcode': barcode })
+      .whereIn('ii.status', ['IN_STOCK', 'RETURNED_TO_STOCK'])
+      .select(
+        'ii.id as inventory_item_id',
+        'ii.barcode',
+        'ii.status',
+        'p.id as product_id',
+        'p.name as product_name',
+        'v.id as variant_id',
+        'v.display_name as variant_name',
+        'v.sku',
+        // Effective selling price: variant override takes priority over product base price.
+        db.raw('COALESCE(v.selling_price_override, p.base_selling_price) as unit_price')
+      )
+      .first();
+
+    if (!row) throw AppError.notFound('No in-stock item found with that barcode.');
+
+    res.json({
+      inventoryItemId: row.inventoryItemId,
+      barcode: row.barcode,
+      status: row.status,
+      productId: row.productId,
+      productName: row.productName,
+      variantId: row.variantId,
+      variantName: row.variantName,
+      sku: row.sku,
+      unitPrice: Number(row.unitPrice),
+    });
   } catch (err) {
     next(err);
   }

@@ -1,0 +1,13 @@
+{
+  // This file exists so the VS Code TypeScript language server picks up
+  // the correct tsconfig for all files under tests/.
+  //
+  // Without this, VS Code walks up to Backend/tsconfig.json which:
+  //   1. Has rootDir = "./src" (test files are outside src/)
+  //   2. Excludes the tests/ folder entirely
+  //   3. Does NOT include "@types/jest", so expect/describe/it are unknown
+  //
+  // By placing a tsconfig.json here, VS Code uses this one for test files,
+  // which inherits all Jest globals and the @/ path alias from tsconfig.test.json.
+  "extends": "../tsconfig.test.json"
+}

@@ -79,6 +79,15 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'inventory:view',
     section: 'store',
   },
+  // Inventory
+  {
+    id: 'nav-inventory',
+    label: 'Inventory',
+    href: '/inventory',
+    icon: '📦',
+    permissionKey: 'inventory:view',
+    section: 'store',
+  },
   // Staff
   {
     id: 'nav-staff',

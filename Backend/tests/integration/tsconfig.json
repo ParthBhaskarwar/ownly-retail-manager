@@ -1,0 +1,7 @@
+{
+  // Inherits Jest types and @/ alias from the parent test tsconfig.
+  // This ensures VS Code uses tsconfig.test.json for all *.test.ts files
+  // in this subdirectory without needing to walk all the way up to the
+  // main tsconfig.json (which excludes tests/ and has no Jest types).
+  "extends": "../../tsconfig.test.json"
+}

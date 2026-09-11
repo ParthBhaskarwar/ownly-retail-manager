@@ -25,4 +25,6 @@ export const config = {
     .split(',')
     .map((s) => s.trim()),
   isDev: (process.env.NODE_ENV ?? 'development') === 'development',
+  /** Directory where backup JSON files are stored. Created automatically if absent. */
+  backupDir: getEnv('BACKUP_DIR', path.resolve(__dirname, '../../backups')),
 };

@@ -26,6 +26,11 @@ import { returnsRouter } from './api/returns/returns.router';
 import { exchangesRouter } from './api/exchanges/exchanges.router';
 import { creditNotesRouter } from './api/credit_notes/credit_notes.router';
 import { customersRouter } from './api/customers/customers.router';
+// Week 5 — restocking, dashboard, reports, backup
+import { restockRouter } from './api/inventory/restock.router';
+import { dashboardRouter } from './api/dashboard/dashboard.router';
+import { reportsRouter } from './api/reports/reports.router';
+import { backupRouter } from './api/backup/backup.router';
 
 const app = express();
 
@@ -41,7 +46,7 @@ app.use(express.json({ limit: '2mb' }));
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', version: '0.3.0', env: config.nodeEnv });
+  res.json({ status: 'ok', version: '0.5.0', env: config.nodeEnv });
 });
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
@@ -57,6 +62,11 @@ app.use('/api/returns', returnsRouter);
 app.use('/api/exchanges', exchangesRouter);
 app.use('/api/credit-notes', creditNotesRouter);
 app.use('/api/customers', customersRouter);
+// Week 5 routes
+app.use('/api/inventory/restock', restockRouter);
+app.use('/api/dashboard', dashboardRouter);
+app.use('/api/reports', reportsRouter);
+app.use('/api/backup', backupRouter);
 
 // ─── 404 handler ──────────────────────────────────────────────────────────────
 app.use((_req, res) => {

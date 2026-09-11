@@ -7,7 +7,6 @@ import { useStoreContext } from '@/context/StoreContext';
 import { StoreService } from '@/modules/store/services/StoreService';
 import { OnboardingChecklist } from '@/modules/store/components/OnboardingChecklist';
 import { PermissionGuard } from '@/shared/components/PermissionGuard';
-import { db } from '@/db/db';
 import type { OnboardingStep } from '@/modules/store/types';
 
 export default function DashboardPage() {
@@ -27,44 +26,43 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    const s = StoreService.getOnboardingSteps(user.id, store, user);
-    setSteps(s);
 
-    // Calculate live dashboard stats from Dexie DB
+    const loadSteps = async () => {
+      try {
+        const onboarding = await StoreService.fetchOnboardingState();
+        const s = StoreService.getOnboardingSteps(user.id, store, user, onboarding.staffAdded);
+        setSteps(s);
+      } catch {
+        // fall back to basic steps without staff info
+        const s = StoreService.getOnboardingSteps(user.id, store, user);
+        setSteps(s);
+      }
+    };
+    loadSteps();
+
+    // Load dashboard stats from the backend API (PostgreSQL)
     const loadDashboardData = async () => {
       try {
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const allInvoices = await db.invoices.toArray().catch(() => []);
-        const todayInvoices = allInvoices.filter((inv) =>
-          inv.createdAt?.startsWith(todayStr)
+        const token = typeof window !== 'undefined'
+          ? localStorage.getItem('ownly:token')
+          : null;
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/dashboard/summary`,
+          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
         );
+        if (!res.ok) return; // silently degrade — dashboard still renders with zeros
 
-        const sales = todayInvoices.reduce(
-          (sum, inv) => sum + (Number(inv.grandTotal) || 0),
-          0
-        );
-
-        const prodsCount = await db.products.count().catch(() => 0);
-        const invItems = await db.inventoryItems
-          .where('status')
-          .equals('IN_STOCK')
-          .count()
-          .catch(() => 0);
-        const returns = await db.returns.count().catch(() => 0);
+        const data = await res.json();
 
         setStats({
-          todaySales: sales,
-          ordersToday: todayInvoices.length,
-          totalProducts: prodsCount,
-          inStockItems: invItems,
-          returnsCount: returns,
+          todaySales: data.salesKpi?.todayRevenue ?? 0,
+          ordersToday: data.salesKpi?.todayOrders ?? 0,
+          totalProducts: data.stockKpi?.totalProducts ?? 0,
+          inStockItems: data.stockKpi?.totalInStock ?? 0,
+          returnsCount: data.stockKpi?.returnsToday ?? 0,
         });
 
-        // Top 5 recent invoices
-        const sorted = [...allInvoices].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ).slice(0, 5);
-        setRecentInvoices(sorted);
+        setRecentInvoices(data.recentInvoices ?? []);
       } catch (e) {
         console.error('[DASHBOARD_DATA_ERROR]', e);
       }
@@ -88,9 +86,6 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
-            <Link href="/billing" className="btn btn-primary" style={{ height: '44px', gap: 'var(--space-2)' }}>
-              ⚡ Open POS Billing
-            </Link>
             <Link href="/products/new" className="btn btn-secondary" style={{ height: '44px' }}>
               + Add Product
             </Link>
@@ -143,15 +138,7 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div className="form-section__title">Retail Operations &amp; Workflows</div>
           <div className="workflows-grid">
-            <Link href="/billing" className="workflow-card">
-              <div className="workflow-card__icon-wrap" style={{ color: 'var(--color-denim-dark)' }}>
-                ⊟
-              </div>
-              <h3 className="workflow-card__title">Point-of-Sale (POS)</h3>
-              <p className="workflow-card__desc">
-                High-speed barcode checkout, line discounts, customer selection, and split tender payments.
-              </p>
-            </Link>
+
 
             <Link href="/invoices" className="workflow-card">
               <div className="workflow-card__icon-wrap" style={{ color: 'var(--color-info)' }}>

@@ -1,10 +1,12 @@
 /**
  * getAuthToken — reads the active session token from localStorage.
- * Supports both old key ('ownly_auth_token') and new key ('ownly:active_session').
+ * The canonical key is 'ownly:token' (written by apiClient → setToken).
+ * Legacy keys are checked as fallbacks so old sessions still work.
  */
 export function getAuthToken(): string {
   if (typeof window === 'undefined') return '';
   return (
+    localStorage.getItem('ownly:token') ||
     localStorage.getItem('ownly:active_session') ||
     localStorage.getItem('ownly_auth_token') ||
     ''

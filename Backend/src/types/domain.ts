@@ -286,19 +286,21 @@ export const ALL_INVENTORY_STATUSES: InventoryStatus[] = [
 export type MovementType =
   | 'PURCHASE' | 'SALE' | 'RETURN_TO_STOCK' | 'RETURN_DAMAGED'
   | 'DAMAGE_WRITE_OFF' | 'LOSS_WRITE_OFF' | 'TRANSFER_OUT' | 'TRANSFER_IN'
-  | 'MANUAL_ADJUSTMENT' | 'EXCHANGE' | 'DEFECT_WRITE_OFF' | 'SUPPLIER_RETURN';
+  | 'MANUAL_ADJUSTMENT' | 'EXCHANGE' | 'DEFECT_WRITE_OFF' | 'SUPPLIER_RETURN'
+  | 'RESTOCK';
 
 export const ALL_MOVEMENT_TYPES: MovementType[] = [
   'PURCHASE', 'SALE', 'RETURN_TO_STOCK', 'RETURN_DAMAGED', 'DAMAGE_WRITE_OFF',
   'LOSS_WRITE_OFF', 'TRANSFER_OUT', 'TRANSFER_IN', 'MANUAL_ADJUSTMENT',
-  'EXCHANGE', 'DEFECT_WRITE_OFF', 'SUPPLIER_RETURN',
+  'EXCHANGE', 'DEFECT_WRITE_OFF', 'SUPPLIER_RETURN', 'RESTOCK',
 ];
 
 /** Statuses that count as physically present and sellable. */
 export const IN_STOCK_STATUSES: InventoryStatus[] = ['IN_STOCK', 'RETURNED_TO_STOCK'];
 
 export type MovementReferenceType =
-  | 'INVOICE' | 'RETURN_TRANSACTION' | 'MANUAL_ADJUSTMENT' | 'PURCHASE_ENTRY';
+  | 'INVOICE' | 'RETURN_TRANSACTION' | 'MANUAL_ADJUSTMENT' | 'PURCHASE_ENTRY'
+  | 'RESTOCK_BATCH';
 
 export interface InventoryItem {
   id: string;
@@ -426,4 +428,34 @@ export interface StockAlerts {
   lowStock: LowStockVariant[];
   outOfStock: LowStockVariant[];
   ageing: AgeingBucket[];
+}
+
+// ─── Restocking (plan Week 5) ─────────────────────────────────────────────────
+
+/** One size/variant line in a manual restock request. */
+export interface RestockLineInput {
+  variantId: string;
+  quantity: number;
+  purchaseCostPrice: number;
+  purchaseDate: string; // YYYY-MM-DD
+}
+
+/** Full restock request for one batch operation. */
+export interface RestockInput {
+  storeId: string;
+  performedBy: string;
+  lines: RestockLineInput[];
+  notes?: string;
+}
+
+/** Result for one variant within a restock batch. */
+export interface RestockBatchLine {
+  variantId: string;
+  itemsCreated: InventoryItem[];
+}
+
+export interface RestockBatchResult {
+  batchId: string;
+  totalUnits: number;
+  lines: RestockBatchLine[];
 }

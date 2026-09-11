@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { getAuthHeaders } from '@/shared/utils/auth';
-import { db } from '@/db/db';
 
 interface CustomerSelectModalProps {
   isOpen: boolean;
@@ -41,22 +40,11 @@ export function CustomerSelectModal({
         const data = await res.json();
         setSearchResults(data);
       } else {
-        const q = searchQuery.trim().toLowerCase();
-        const results = await db.customers.filter(
-          (c) => c.name.toLowerCase().includes(q) || c.phone.includes(q)
-        ).toArray();
-        setSearchResults(results);
+        const errData = await res.json().catch(() => ({}));
+        setError((errData as any).error || 'Customer search failed.');
       }
     } catch {
-      try {
-        const q = searchQuery.trim().toLowerCase();
-        const results = await db.customers.filter(
-          (c) => c.name.toLowerCase().includes(q) || c.phone.includes(q)
-        ).toArray();
-        setSearchResults(results);
-      } catch {
-        setError('Search failed. Check your connection.');
-      }
+      setError('Search failed. Check your connection.');
     } finally {
       setIsSearching(false);
     }
@@ -79,22 +67,13 @@ export function CustomerSelectModal({
       if (res.ok) {
         const customer = await res.json();
         onSelectCustomer({ id: customer.id, name: customer.name, phone: customer.phone, email: customer.email });
+        onClose();
       } else {
-        const { v4: uuidv4 } = await import('uuid');
-        const customer = {
-          id: uuidv4(),
-          name: newName.trim(),
-          phone: newPhone.trim(),
-          email: newEmail.trim() || undefined,
-          totalPurchases: 0,
-          createdAt: new Date().toISOString(),
-        };
-        await db.customers.add(customer);
-        onSelectCustomer({ id: customer.id, name: customer.name, phone: customer.phone, email: customer.email });
+        const errData = await res.json().catch(() => ({}));
+        setError((errData as any).error || 'Failed to create customer record.');
       }
-      onClose();
     } catch {
-      setError('Failed to create customer record.');
+      setError('Failed to create customer record. Check your connection.');
     } finally {
       setIsCreating(false);
     }

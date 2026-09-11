@@ -81,7 +81,8 @@ export const StoreService = {
   getOnboardingSteps(
     _userId: string,
     store: Store | null,
-    user: Pick<User, 'verifiedAt'>
+    user: Pick<User, 'verifiedAt'>,
+    staffAdded?: boolean
   ): OnboardingStep[] {
     return [
       {
@@ -112,7 +113,7 @@ export const StoreService = {
         key: 'first_staff_added',
         label: 'Add Your First Staff Member',
         description: 'Invite a manager or cashier to your store.',
-        completed: false,
+        completed: staffAdded === true,
         href: '/staff/new',
         optional: true,
       },

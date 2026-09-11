@@ -97,8 +97,8 @@ billingRouter.post('/checkout', async (req, res): Promise<void> => {
 
         validatedItems.push({
           id: uuidv4(),
-          productId: invRecord.product_id,
-          variantId: invRecord.variant_id,
+          productId: invRecord.productId,
+          variantId: invRecord.variantId,
           inventoryItemId: invRecord.id,
           barcode: invRecord.barcode,
           productName: invRecord.productName,
@@ -209,10 +209,10 @@ billingRouter.post('/checkout', async (req, res): Promise<void> => {
         id: uuidv4(),
         store_id: storeId || null,
         user_id: cashierId,
-        action: 'SALE_COMPLETED',
-        entity_type: 'INVOICE',
+        action: 'sale.completed',
+        entity_type: 'invoice',
         entity_id: invoiceId,
-        details: JSON.stringify({
+        meta: JSON.stringify({
           invoiceNumber,
           grandTotal,
           itemCount: validatedItems.length,
@@ -233,6 +233,20 @@ billingRouter.post('/checkout', async (req, res): Promise<void> => {
     res.status(201).json(invoiceResult);
   } catch (err: any) {
     console.error('[CHECKOUT_ERROR]', err.message);
+
+    // Detect missing-table errors (migration not yet applied) and give a clear message.
+    const isMissingTable =
+      err.code === '42P01' ||
+      (typeof err.message === 'string' && err.message.includes('does not exist'));
+
+    if (isMissingTable) {
+      res.status(503).json({
+        error:
+          'The billing tables are not set up yet. Please run: npm run db:migrate in the Backend folder, then restart the server.',
+      });
+      return;
+    }
+
     res.status(400).json({ error: err.message || 'Checkout failed' });
   }
 });
