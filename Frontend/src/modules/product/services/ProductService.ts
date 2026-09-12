@@ -93,7 +93,7 @@ export const ProductService = {
         new: { baseSellingPrice: after.baseSellingPrice, baseCostPrice: after.baseCostPrice },
       });
     } else {
-      AuditService.log('product.update', id, storeId, updates);
+      AuditService.log('product.update', id, storeId, { ...updates });
     }
 
     return after;

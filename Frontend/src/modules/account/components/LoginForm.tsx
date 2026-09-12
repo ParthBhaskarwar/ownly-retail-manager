@@ -99,7 +99,7 @@ export function LoginForm({ onSubmit, isLoading, serverError }: LoginFormProps) 
       </Button>
 
       <p className="auth-form__footer-text">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <Link href="/signup" id="login-signup-link">Create one</Link>
       </p>
     </form>
