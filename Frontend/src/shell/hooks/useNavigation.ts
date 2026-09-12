@@ -79,10 +79,19 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'inventory:view',
     section: 'store',
   },
+  // Manual Restock
+  {
+    id: 'nav-restock',
+    label: 'Restock',
+    href: '/restock',
+    icon: '⚡',
+    permissionKey: 'inventory:edit',
+    section: 'store',
+  },
   // Inventory
   {
     id: 'nav-inventory',
-    label: 'Inventory',
+    label: 'Inventory Ledger',
     href: '/inventory',
     icon: '📦',
     permissionKey: 'inventory:view',
@@ -105,6 +114,15 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: '⊗',
     permissionKey: 'reports:view',
     section: 'insights',
+  },
+  // Backup & Storage Health
+  {
+    id: 'nav-backup',
+    label: 'Backup & Safety',
+    href: '/backup',
+    icon: '💾',
+    permissionKey: 'settings:view',
+    section: 'system',
   },
   // Settings
   {

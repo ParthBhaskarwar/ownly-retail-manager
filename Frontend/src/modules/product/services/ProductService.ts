@@ -48,10 +48,33 @@ export const ProductService = {
     return product;
   },
 
-  async updateProduct(id: string, updates: UpdateProductInput, _storeId?: string): Promise<Product> {
-    const { updatedBy: _ignored, ...body } = updates;
-    const { product } = await apiClient.put<{ product: Product }>(`/api/products/${id}`, body);
-    return product;
+  /**
+   * Update a product. Logs price changes to audit trail.
+   */
+  async updateProduct(
+    id: string,
+    updates: UpdateProductInput,
+    storeId: string
+  ): Promise<Product> {
+    const before = await Adapters.product.findById(id);
+    if (!before) throw new Error(`Product ${id} not found`);
+
+    const after = await Adapters.product.update(id, updates);
+
+    // Audit price changes explicitly — they are sensitive
+    if (
+      updates.baseSellingPrice !== undefined ||
+      updates.baseCostPrice !== undefined
+    ) {
+      AuditService.log('product.price_change', id, storeId, {
+        old: { baseSellingPrice: before.baseSellingPrice, baseCostPrice: before.baseCostPrice },
+        new: { baseSellingPrice: after.baseSellingPrice, baseCostPrice: after.baseCostPrice },
+      });
+    } else {
+      AuditService.log('product.update', id, storeId, { ...updates });
+    }
+
+    return after;
   },
 
   async getProductDetail(id: string): Promise<ProductDetail | null> {
