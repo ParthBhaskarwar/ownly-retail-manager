@@ -46,7 +46,6 @@ export function BackupManager() {
     void refreshHealth();
   }, [storeId]);
 
-  // Handle Full Backup Export
   const handleExportBackup = async () => {
     setIsExporting(true);
     setExportSuccess(false);
@@ -63,7 +62,6 @@ export function BackupManager() {
     }
   };
 
-  // Handle File Selection for Restore
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -90,7 +88,6 @@ export function BackupManager() {
     reader.readAsText(file);
   };
 
-  // Execute Restore
   const handleConfirmRestore = async () => {
     if (!restorePayload) return;
     setIsRestoring(true);
@@ -112,7 +109,6 @@ export function BackupManager() {
     }
   };
 
-  // Generate Sample Demo Clothing Data
   const handleGenerateSampleData = async () => {
     if (!confirm('This will populate sample products, categories, suppliers, and inventory stock to test the system. Continue?')) {
       return;
@@ -128,7 +124,6 @@ export function BackupManager() {
       const past30d = new Date(Date.now() - 25 * 86400000).toISOString();
       const past70d = new Date(Date.now() - 75 * 86400000).toISOString();
 
-      // Ensure Supplier
       const supplierId = uuidv4();
       await db.suppliers.put({
         id: supplierId,
@@ -142,7 +137,6 @@ export function BackupManager() {
         updatedAt: now,
       });
 
-      // Sample Products
       const sampleProds = [
         { name: 'Slim Fit Oxford Shirt', sku: 'OXFSHIRT', sp: 1890, cp: 850, cat: 'Shirts' },
         { name: 'Selvedge Denim Jeans', sku: 'SELVDENIM', sp: 2990, cp: 1400, cat: 'Jeans' },
@@ -152,7 +146,6 @@ export function BackupManager() {
 
       for (const p of sampleProds) {
         const prodId = uuidv4();
-        // Category
         const catId = uuidv4();
         await db.categories.put({
           id: catId,
@@ -185,7 +178,6 @@ export function BackupManager() {
           updatedAt: now,
         });
 
-        // Add 3 sizes per product
         const sizes = ['S', 'M', 'L', 'XL'];
         for (let i = 0; i < sizes.length; i++) {
           const sz = sizes[i];
@@ -204,8 +196,7 @@ export function BackupManager() {
             updatedAt: now,
           });
 
-          // Add physical inventory items
-          const qty = i === 3 ? 2 : 6; // make XL low stock
+          const qty = i === 3 ? 2 : 6;
           const pDate = i % 2 === 0 ? past70d : past30d;
 
           const items: import('@/modules/inventory/types').InventoryItem[] = [];
@@ -214,7 +205,7 @@ export function BackupManager() {
           for (let q = 1; q <= qty; q++) {
             const itemId = uuidv4();
             const bc = `OWN-${varSku.replace(/[^A-Z0-9]/gi, '').slice(0, 8)}-${String(q).padStart(5, '0')}`;
-            const isSold = q === 1; // mark 1 unit sold for sales report
+            const isSold = q === 1;
 
             items.push({
               id: itemId,
@@ -260,7 +251,6 @@ export function BackupManager() {
 
   return (
     <div className="backup-manager animate-fade-in">
-      {/* Page Header */}
       <div className="pe-page-header">
         <h1 className="page-title">Backup, Restore &amp; Data Safety</h1>
         <p className="page-subtitle">
@@ -268,7 +258,6 @@ export function BackupManager() {
         </p>
       </div>
 
-      {/* Backup Reminder Banner */}
       {health?.backupDue && (
         <div className="alert alert--warning" style={{ marginBottom: 'var(--space-4)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -309,7 +298,6 @@ export function BackupManager() {
       )}
 
       <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
-        {/* Storage Health Card */}
         <section className="card">
           <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="card__title">💾 Local Storage Health</h2>
@@ -323,7 +311,6 @@ export function BackupManager() {
               {health?.statusMessage || 'Local IndexedDB storage is operational.'}
             </p>
 
-            {/* Storage Meter */}
             {health?.isSupported && (
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-xs)', marginBottom: '4px' }}>
@@ -342,7 +329,6 @@ export function BackupManager() {
               </div>
             )}
 
-            {/* Table Counts */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: 'var(--text-xs)' }}>
               <div className="stat-pill">Products: <strong>{health?.tableCounts?.products ?? 0}</strong></div>
               <div className="stat-pill">Variants: <strong>{health?.tableCounts?.variants ?? 0}</strong></div>
@@ -358,7 +344,6 @@ export function BackupManager() {
           </div>
         </section>
 
-        {/* Export Backup Card */}
         <section className="card">
           <div className="card__header">
             <h2 className="card__title">📦 Full Database Export</h2>
@@ -379,7 +364,6 @@ export function BackupManager() {
           </button>
         </section>
 
-        {/* Restore Database Card */}
         <section className="card">
           <div className="card__header">
             <h2 className="card__title">🔄 Restore from Backup</h2>
@@ -418,7 +402,6 @@ export function BackupManager() {
           )}
         </section>
 
-        {/* Demo Data & Recovery Card */}
         <section className="card">
           <div className="card__header">
             <h2 className="card__title">🧪 Testing &amp; Sample Data</h2>
@@ -440,7 +423,6 @@ export function BackupManager() {
         </section>
       </div>
 
-      {/* Restore Preview Modal */}
       {showPreviewModal && restorePayload && (
         <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="modal card animate-fade-in-up" style={{ maxWidth: 540, width: '90%', padding: 'var(--space-6)' }}>

@@ -36,14 +36,12 @@ export function RestockForm() {
   const [error, setError] = useState<string | null>(null);
   const [restockResult, setRestockResult] = useState<RestockResult | null>(null);
 
-  // Load products & suppliers
   useEffect(() => {
     if (!storeId) return;
     Adapters.product.search({ storeId, pageSize: 200 }).then((res) => setProducts(res.items));
     Adapters.supplier.findByStore(storeId).then(setSuppliers);
   }, [storeId]);
 
-  // Load product lines when product selected
   useEffect(() => {
     if (!selectedProductId) {
       setProductDetail(null);
@@ -68,28 +66,24 @@ export function RestockForm() {
       .finally(() => setIsLoadingProduct(false));
   }, [selectedProductId]);
 
-  // Update line quantity
   const handleQtyChange = (variantId: string, qty: number) => {
     setLines((prev) =>
       prev.map((l) => (l.variantId === variantId ? { ...l, restockQty: Math.max(0, qty) } : l))
     );
   };
 
-  // Update line cost price override
   const handleCostChange = (variantId: string, cost: number) => {
     setLines((prev) =>
       prev.map((l) => (l.variantId === variantId ? { ...l, costPriceOverride: cost > 0 ? cost : undefined } : l))
     );
   };
 
-  // Update line selling price override
   const handlePriceChange = (variantId: string, price: number) => {
     setLines((prev) =>
       prev.map((l) => (l.variantId === variantId ? { ...l, sellingPriceOverride: price > 0 ? price : undefined } : l))
     );
   };
 
-  // Derived financial summary
   const summary = useMemo(() => {
     if (!productDetail) return { totalQty: 0, totalCost: 0, expectedSales: 0, profit: 0, margin: 0 };
 
@@ -114,7 +108,6 @@ export function RestockForm() {
     return { totalQty, totalCost, expectedSales, profit, margin };
   }, [productDetail, lines]);
 
-  // Handle restock execution
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!productDetail || !user) return;
@@ -145,14 +138,12 @@ export function RestockForm() {
     }
   };
 
-  // Filter products by search query
   const filteredProducts = useMemo(() => {
     if (!searchQuery) return products;
     const q = searchQuery.toLowerCase();
     return products.filter((p) => p.name.toLowerCase().includes(q) || p.baseSku.toLowerCase().includes(q));
   }, [products, searchQuery]);
 
-  // Success view with generated barcodes and label print option
   if (restockResult) {
     return (
       <div className="card animate-fade-in-up" style={{ maxWidth: 800, margin: '0 auto', padding: 'var(--space-6)' }}>
@@ -181,7 +172,6 @@ export function RestockForm() {
           </div>
         </div>
 
-        {/* Barcodes list */}
         <div className="card" style={{ background: 'var(--color-paper)', marginBottom: 'var(--space-6)' }}>
           <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ fontSize: 'var(--text-base)', margin: 0 }}>
@@ -231,7 +221,6 @@ export function RestockForm() {
   return (
     <form onSubmit={handleSubmit} className="pe-layout" noValidate>
       <div className="pe-main">
-        {/* Header */}
         <div className="pe-page-header">
           <h1 className="page-title">Manual Restocking</h1>
           <p className="page-subtitle">
@@ -245,7 +234,6 @@ export function RestockForm() {
           </div>
         )}
 
-        {/* Step 1: Select Product */}
         <section className="card" style={{ marginBottom: 'var(--space-4)' }}>
           <div className="card__header">
             <h2 className="card__title">1. Select Garment to Restock</h2>
@@ -279,7 +267,6 @@ export function RestockForm() {
           </div>
         </section>
 
-        {/* Step 2: Supplier & Restock Notes */}
         {productDetail && (
           <section className="card" style={{ marginBottom: 'var(--space-4)' }}>
             <div className="card__header">
@@ -317,7 +304,6 @@ export function RestockForm() {
           </section>
         )}
 
-        {/* Step 3: Size-wise Restock Matrix */}
         {productDetail && (
           <section className="card" style={{ marginBottom: 'var(--space-4)' }}>
             <div className="card__header">
@@ -394,7 +380,6 @@ export function RestockForm() {
           </section>
         )}
 
-        {/* Submit action */}
         {productDetail && (
           <div className="form-actions">
             <button
@@ -415,7 +400,6 @@ export function RestockForm() {
         )}
       </div>
 
-      {/* Sticky Right Summary Rail */}
       <aside className="pe-summary" aria-label="Restock summary">
         <div className="pe-summary__inner">
           <h3 className="pe-summary__title">Restock Summary</h3>

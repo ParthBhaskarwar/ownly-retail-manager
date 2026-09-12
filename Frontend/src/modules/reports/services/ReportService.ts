@@ -1,5 +1,4 @@
 import { db } from '@/db/db';
-import { Adapters } from '@/adapters';
 import type {
   ReportFilter,
   SalesReportSummary,
@@ -40,9 +39,6 @@ function getDateRangeBounds(preset: string): { start: Date; end: Date } {
 }
 
 export const ReportService = {
-  /**
-   * Generates Sales and Gross Profit analytics report.
-   */
   async getSalesReport(storeId: string, filter?: ReportFilter): Promise<SalesReportSummary> {
     if (!db) {
       return {
@@ -63,14 +59,12 @@ export const ReportService = {
     const startIso = filter?.startDate ?? start.toISOString();
     const endIso = filter?.endDate ?? end.toISOString();
 
-    // 1. Get all movements of type SALE or with status SOLD in date range
     const saleMovements = await db.inventoryMovements
       .where('storeId')
       .equals(storeId)
       .filter((m) => m.movementType === 'SALE' && m.performedAt >= startIso && m.performedAt <= endIso)
       .toArray();
 
-    // Also get all items marked SOLD
     const soldItemIds = Array.from(new Set(saleMovements.map((m) => m.inventoryItemId)));
     const soldItems = await db.inventoryItems
       .where('storeId')
@@ -108,7 +102,6 @@ export const ReportService = {
       totalRevenue += sp;
       totalCogs += cp;
 
-      // Category aggregation
       const catName = categoryMap.get(product.categoryId) || 'General Clothing';
       const cat = categoryStats.get(catName) || { unitsSold: 0, revenue: 0, profit: 0 };
       cat.unitsSold += 1;
@@ -116,7 +109,6 @@ export const ReportService = {
       cat.profit += profit;
       categoryStats.set(catName, cat);
 
-      // Product aggregation
       const prodKey = product.id;
       const prod = productStats.get(prodKey) || {
         name: product.name,
@@ -135,7 +127,6 @@ export const ReportService = {
     const grossMarginPercent = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
     const totalItemsSold = soldItems.length;
 
-    // Estimate invoice count based on batches/movements
     const uniqueInvoiceRefs = new Set(
       saleMovements.map((m) => m.referenceId).filter((r) => r && r.length > 0)
     );
@@ -170,9 +161,6 @@ export const ReportService = {
     };
   },
 
-  /**
-   * Generates comprehensive Inventory & Stock Valuation report.
-   */
   async getInventoryValuationReport(storeId: string, filter?: ReportFilter): Promise<InventoryValuationSummary> {
     if (!db) {
       return {
@@ -253,9 +241,10 @@ export const ReportService = {
         if (!variant) continue;
         const product = prodMap.get(variant.productId);
         if (!product) continue;
+        const rawProduct = products.find((p) => p.id === variant.productId);
 
         const cp = item.purchaseCostPrice || 0;
-        const sp = variant.sellingPriceOverride ?? 0;
+        const sp = variant.sellingPriceOverride ?? rawProduct?.baseSellingPrice ?? 0;
 
         totalCostVal += cp;
         totalRetailVal += sp;
@@ -296,9 +285,6 @@ export const ReportService = {
     };
   },
 
-  /**
-   * Generates Stock Ageing and Dead Stock risk report.
-   */
   async getStockAgeingReport(storeId: string, filter?: ReportFilter): Promise<StockAgeingSummary> {
     if (!db) {
       return {
@@ -387,9 +373,6 @@ export const ReportService = {
     };
   },
 
-  /**
-   * Generates Supplier performance and procurement analysis.
-   */
   async getSupplierPerformanceReport(storeId: string): Promise<SupplierPerformanceSummary> {
     if (!db) return { suppliers: [] };
 
@@ -453,9 +436,6 @@ export const ReportService = {
     return { suppliers: suppliersList };
   },
 
-  /**
-   * Generates Returns and Defective Item Analysis report.
-   */
   async getReturnsReport(storeId: string): Promise<ReturnsReportSummary> {
     if (!db) {
       return {
@@ -499,7 +479,7 @@ export const ReportService = {
     for (const item of returnedItems) {
       if (item.status === 'DAMAGED' || item.status === 'RETURNED_DAMAGED') damagedOrDefective++;
       else returnedToStock++;
-      refundAmount += (item.purchaseCostPrice || 0) * 1.4; // approx selling refund
+      refundAmount += (item.purchaseCostPrice || 0) * 1.4;
     }
 
     return {
@@ -517,9 +497,6 @@ export const ReportService = {
     };
   },
 
-  /**
-   * Generates Staff activity and cashier log report.
-   */
   async getStaffActivityReport(storeId: string): Promise<StaffActivitySummary> {
     let staffMembers: Array<{ staffId: string; name: string; role: string; totalTransactionsLogged: number; stockMovementsPerformed: number; salesAssisted: number }> = [];
 

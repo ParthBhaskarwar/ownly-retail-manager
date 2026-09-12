@@ -5,10 +5,6 @@ import type { ExecuteRestockInput, RestockResult, RestockReminder, RestockVarian
 import type { ProductDetail } from '@/modules/product/types';
 
 export const RestockService = {
-  /**
-   * Execute manual restocking for a product across selected sizes/variants.
-   * Generates new unique barcodes for each physical item and logs 'PURCHASE'/'RESTOCK' movements.
-   */
   async executeRestock(input: ExecuteRestockInput): Promise<RestockResult> {
     const { storeId, storeCode, productId, lines, performedBy, notes } = input;
 
@@ -30,7 +26,6 @@ export const RestockService = {
       const costPrice = line.costPriceOverride ?? product.baseCostPrice;
       const sellingPrice = line.sellingPriceOverride ?? product.baseSellingPrice;
 
-      // Update variant prices if overridden
       if (
         line.costPriceOverride !== undefined ||
         line.sellingPriceOverride !== undefined
@@ -41,7 +36,6 @@ export const RestockService = {
         });
       }
 
-      // Add stock items and movements
       const items = await InventoryItemService.addStock(
         {
           storeId,
@@ -61,7 +55,6 @@ export const RestockService = {
       expectedSalesValue += sellingPrice * line.restockQty;
     }
 
-    // If product supplier was updated or confirmed
     if (input.supplierId && input.supplierId !== product.supplierId) {
       await Adapters.product.update(productId, {
         supplierId: input.supplierId,
@@ -92,10 +85,6 @@ export const RestockService = {
     };
   },
 
-  /**
-   * Scans inventory for low-stock and out-of-stock variants across all products.
-   * Produces actionable Restock Reminders with suggested reorder quantities.
-   */
   async getRestockReminders(storeId: string, minStockThreshold = 5): Promise<RestockReminder[]> {
     const { items: products } = await Adapters.product.search({ storeId, pageSize: 200 });
     const reminders: RestockReminder[] = [];
@@ -111,9 +100,7 @@ export const RestockService = {
       for (const v of variants) {
         const stock = await Adapters.inventoryItem.getStockSummary(v.id);
         if (stock.inStock <= minStockThreshold) {
-          const sizeAttr = await Adapters.attribute.getVariantAttributeValues(v.id);
           const sizeName = v.displayName.split('—').pop()?.trim() || 'Standard';
-
           const suggestedQuantity = Math.max(10, minStockThreshold * 3 - stock.inStock);
 
           reminders.push({
@@ -136,7 +123,6 @@ export const RestockService = {
       }
     }
 
-    // Sort: OUT_OF_STOCK first, then lowest stock count
     return reminders.sort((a, b) => {
       if (a.urgency !== b.urgency) {
         return a.urgency === 'OUT_OF_STOCK' ? -1 : 1;
@@ -145,9 +131,6 @@ export const RestockService = {
     });
   },
 
-  /**
-   * Prepares restock lines for a specific product.
-   */
   async getRestockLinesForProduct(productId: string): Promise<{
     product: ProductDetail;
     lines: RestockVariantLine[];

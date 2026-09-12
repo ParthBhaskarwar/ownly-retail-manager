@@ -93,6 +93,15 @@ const ALL_NAV_ITEMS: NavItem[] = [
     id: 'nav-inventory',
     label: 'Inventory Ledger',
     href: '/inventory',
+    icon: '▦',
+    permissionKey: 'inventory:view',
+    section: 'store',
+  },
+  // Inventory
+  {
+    id: 'nav-inventory',
+    label: 'Inventory Ledger',
+    href: '/inventory',
     icon: '📦',
     permissionKey: 'inventory:view',
     section: 'store',
@@ -115,7 +124,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'reports:view',
     section: 'insights',
   },
-  // Backup & Storage Health
+  // Backup & Safety
   {
     id: 'nav-backup',
     label: 'Backup & Safety',

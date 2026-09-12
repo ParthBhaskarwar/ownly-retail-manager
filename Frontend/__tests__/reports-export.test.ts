@@ -1,17 +1,12 @@
 import { ExportService } from '../src/modules/reports/services/ExportService';
 
 describe('ExportService — CSV & Excel Generation', () => {
-  let createdBlobs: Array<{ content: string; type: string }> = [];
   let clickedLinks: Array<{ href: string; download: string }> = [];
 
   beforeAll(() => {
-    // Mock Blob and URL.createObjectURL in jsdom
-    global.URL.createObjectURL = jest.fn((blob: Blob) => {
-      return 'blob:mock-url';
-    });
+    global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
     global.URL.revokeObjectURL = jest.fn();
 
-    // Mock document.createElement('a')
     const origCreateElement = document.createElement.bind(document);
     document.createElement = ((tagName: string) => {
       const el = origCreateElement(tagName);
@@ -25,7 +20,6 @@ describe('ExportService — CSV & Excel Generation', () => {
   });
 
   beforeEach(() => {
-    createdBlobs = [];
     clickedLinks = [];
   });
 

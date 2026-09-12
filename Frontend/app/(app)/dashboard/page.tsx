@@ -120,7 +120,6 @@ export default function DashboardPage() {
   return (
     <PermissionGuard permissionKey="dashboard:view">
       <div className="dashboard animate-fade-in-up">
-        {/* Welcome Header */}
         <div className="dashboard__welcome" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h1 className="dashboard__greeting" style={{ margin: 0 }}>
@@ -129,7 +128,6 @@ export default function DashboardPage() {
             {store && <p className="dashboard__store-name" style={{ margin: '4px 0 0' }}>{store.name} — Retail Operations</p>}
           </div>
 
-          {/* Quick Action Launchpad */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <Link href="/products/new" id="dash-quick-add" className="btn btn--primary btn--sm">
               + Add Product
@@ -149,7 +147,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Backup Reminder Banner */}
         {storageHealth?.backupDue && (
           <div className="alert alert--warning" style={{ margin: 'var(--space-4) 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '8px' }}>
@@ -163,14 +160,12 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Onboarding checklist (shown until setup is complete) */}
         {showChecklist && steps.length > 0 && (
           <div className="dashboard__onboarding" style={{ margin: 'var(--space-4) 0' }}>
             <OnboardingChecklist steps={steps} />
           </div>
         )}
 
-        {/* Operational KPI Metric Cards */}
         <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', margin: 'var(--space-5) 0' }}>
           <div className="stat-card card">
             <div className="stat-card__icon">💰</div>
@@ -201,14 +196,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Grid: Restock Reminders & Stock Health */}
         <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
-          {/* Actionable Restock Reminders */}
           <div>
             <RestockRemindersCard storeId={storeId} />
           </div>
 
-          {/* Stock Ageing & Dead Stock Alert Widget */}
           <div className="card">
             <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 className="card__title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -258,7 +250,6 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Slow Movers Callout */}
               {ageing && ageing.slowMovingProducts.length > 0 && (
                 <div style={{ fontSize: 'var(--text-xs)', background: 'var(--color-paper)', padding: 'var(--space-3)', borderRadius: '6px' }}>
                   <strong>Oldest Garment in Store:</strong> {ageing.slowMovingProducts[0].productName} ({ageing.slowMovingProducts[0].oldestItemAgeDays} days in inventory).
@@ -268,7 +259,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Top Selling Garments Table */}
         <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
           <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="card__title">Top-Selling Garments &amp; Performance</h2>

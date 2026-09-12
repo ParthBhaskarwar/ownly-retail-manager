@@ -15,22 +15,17 @@ function calculateSimpleChecksum(data: string): string {
   for (let i = 0; i < data.length; i++) {
     const char = data.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash |= 0; // Convert to 32bit integer
+    hash |= 0;
   }
   return Math.abs(hash).toString(16).padStart(8, '0');
 }
 
 export const BackupService = {
-  /**
-   * Generates a complete JSON backup payload of all Dexie database tables
-   * and relevant localStorage configuration.
-   */
   async createFullBackup(storeId: string, storeName: string): Promise<FullBackupPayload> {
     if (!db) {
       throw new Error('Database is not initialized.');
     }
 
-    // 1. Fetch all Dexie table data
     const [
       products,
       productVariants,
@@ -55,7 +50,6 @@ export const BackupService = {
       db.variantAttributeValues.toArray(),
     ]);
 
-    // 2. Fetch localStorage items safely in browser
     let users = [];
     let sessions = [];
     let store = null;
@@ -137,7 +131,6 @@ export const BackupService = {
       },
     };
 
-    // Update last backup timestamp
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem(`ownly_last_backup_${storeId}`, timestamp);
     }
@@ -151,9 +144,6 @@ export const BackupService = {
     return payload;
   },
 
-  /**
-   * Triggers a browser download of the backup payload as a .json file.
-   */
   downloadBackupFile(payload: FullBackupPayload): void {
     if (typeof window === 'undefined') return;
 
@@ -179,9 +169,6 @@ export const BackupService = {
     URL.revokeObjectURL(url);
   },
 
-  /**
-   * Validates a JSON string representing a backup payload.
-   */
   validateBackup(jsonString: string): RestoreValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -224,9 +211,6 @@ export const BackupService = {
     }
   },
 
-  /**
-   * Restores database and localStorage records from a validated payload.
-   */
   async restoreBackup(payload: FullBackupPayload, currentUserId?: string): Promise<{ success: boolean; restoredCounts: Record<string, number> }> {
     if (!db) {
       throw new Error('Database is not available.');
@@ -234,7 +218,6 @@ export const BackupService = {
 
     const { dexie: d, localStorage: ls, metadata } = payload;
 
-    // Use Dexie transaction across all tables
     await db.transaction(
       'rw',
       [
@@ -250,7 +233,6 @@ export const BackupService = {
         db.variantAttributeValues,
       ],
       async () => {
-        // Clear all Dexie tables
         await Promise.all([
           db.products.clear(),
           db.productVariants.clear(),
@@ -264,7 +246,6 @@ export const BackupService = {
           db.variantAttributeValues.clear(),
         ]);
 
-        // Bulk insert restored records
         if (d.categories?.length) await db.categories.bulkAdd(d.categories);
         if (d.subcategories?.length) await db.subcategories.bulkAdd(d.subcategories);
         if (d.suppliers?.length) await db.suppliers.bulkAdd(d.suppliers);
@@ -278,7 +259,6 @@ export const BackupService = {
       }
     );
 
-    // Restore localStorage entities if present
     if (typeof window !== 'undefined' && window.localStorage && ls) {
       try {
         if (ls.users && ls.users.length > 0) {
@@ -312,9 +292,6 @@ export const BackupService = {
     };
   },
 
-  /**
-   * Retrieves storage metrics, IndexedDB quota estimates, and backup status.
-   */
   async getStorageHealth(storeId?: string): Promise<StorageHealthStatus> {
     let quotaBytes = 0;
     let usageBytes = 0;

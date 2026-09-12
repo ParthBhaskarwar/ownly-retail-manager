@@ -87,7 +87,6 @@ export default function InventoryPage() {
   return (
     <AuthGuard>
       <div className="page-content animate-fade-in">
-        {/* Page Header */}
         <div className="page-header">
           <div className="page-header__left">
             <h1 className="page-header__title">Physical Inventory Ledger</h1>
@@ -103,14 +102,12 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        {/* Restock Reminders Alert Card */}
         {storeId && (
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <RestockRemindersCard storeId={storeId} compact />
           </div>
         )}
 
-        {/* Stats Row */}
         <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
           <div className="stat-card card">
             <div className="stat-card__icon">📦</div>
@@ -134,7 +131,6 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        {/* Filter Toolbar */}
         <div className="product-toolbar" style={{ marginBottom: 'var(--space-4)' }}>
           <input
             type="text"
@@ -164,7 +160,6 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        {/* Inventory Item Ledger Table */}
         <div className="card">
           <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="card__title">Item-Level Tracking ({filteredItems.length} items)</h2>
@@ -229,7 +224,6 @@ export default function InventoryPage() {
           )}
         </div>
 
-        {/* Item Movement History Modal */}
         {selectedItemHistory && (
           <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div className="modal card animate-fade-in-up" style={{ maxWidth: 600, width: '90%', padding: 'var(--space-6)' }}>

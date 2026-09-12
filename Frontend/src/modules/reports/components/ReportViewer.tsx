@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { Adapters } from '@/adapters';
 import { ReportService } from '../services/ReportService';
@@ -42,14 +42,12 @@ export function ReportViewer() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load Categories & Suppliers for filters
   useEffect(() => {
     if (!storeId) return;
     Adapters.category.findByTemplate('template_clothing').then(setCategories);
     Adapters.supplier.findByStore(storeId).then(setSuppliers);
   }, [storeId]);
 
-  // Load report data based on active tab and filters
   useEffect(() => {
     if (!storeId) return;
     setIsLoading(true);
@@ -91,7 +89,6 @@ export function ReportViewer() {
     void load();
   }, [storeId, activeTab, datePreset, selectedCategory, selectedSupplier]);
 
-  // Handle Export to CSV
   const handleExportCsv = () => {
     const filename = `ownly-${activeTab.toLowerCase()}-${datePreset.toLowerCase()}`;
 
@@ -168,7 +165,6 @@ export function ReportViewer() {
     }
   };
 
-  // Handle Export to Excel
   const handleExportExcel = () => {
     const filename = `ownly-${activeTab.toLowerCase()}-${datePreset.toLowerCase()}`;
     const sheetName = activeTab.replace('_', ' ').slice(0, 20);
@@ -235,7 +231,6 @@ export function ReportViewer() {
 
   return (
     <div className="reports-container animate-fade-in">
-      {/* Page Header */}
       <div className="page-header" style={{ marginBottom: 'var(--space-4)' }}>
         <div className="page-header__left">
           <h1 className="page-header__title">Reports &amp; Analytics</h1>
@@ -272,7 +267,6 @@ export function ReportViewer() {
         </div>
       </div>
 
-      {/* Report Navigation Tabs */}
       <div className="filter-tabs" role="tablist" style={{ marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
         {[
           { id: 'SALES_PROFIT', label: '💰 Sales & Profit' },
@@ -295,7 +289,6 @@ export function ReportViewer() {
         ))}
       </div>
 
-      {/* Filter Toolbar */}
       <div className="card" style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-3)' }}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
           <div>
@@ -354,7 +347,6 @@ export function ReportViewer() {
         </div>
       </div>
 
-      {/* Report Content */}
       {isLoading ? (
         <div className="card" style={{ padding: 'var(--space-6)' }}>
           <div className="skeleton" style={{ height: 32, width: 250, marginBottom: 16 }} />
@@ -362,7 +354,6 @@ export function ReportViewer() {
         </div>
       ) : (
         <div className="report-body">
-          {/* 1. SALES & PROFIT REPORT */}
           {activeTab === 'SALES_PROFIT' && salesData && (
             <div className="report-section">
               <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
@@ -388,7 +379,6 @@ export function ReportViewer() {
                 </div>
               </div>
 
-              {/* Product breakdown table */}
               <div className="card">
                 <div className="card__header">
                   <h2 className="card__title">Sales by Product Design</h2>
@@ -427,7 +417,6 @@ export function ReportViewer() {
             </div>
           )}
 
-          {/* 2. INVENTORY VALUATION REPORT */}
           {activeTab === 'INVENTORY_VALUATION' && valuationData && (
             <div className="report-section">
               <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
@@ -453,18 +442,16 @@ export function ReportViewer() {
                 </div>
               </div>
 
-              {/* Status Breakdown Pills */}
               <div className="card" style={{ marginBottom: 'var(--space-4)' }}>
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: 'var(--text-sm)' }}>
                   <div>Available: <strong style={{ color: 'var(--color-paid)' }}>{valuationData.availableItemsCount}</strong></div>
                   <div>Sold: <strong>{valuationData.soldItemsCount}</strong></div>
-                  <div>Damaged / Defective: <strong style={{ color: 'var(--color-return)' }}>{valuationData.damagedItemsCount}</strong></div>
+                  <div>Damaged: <strong style={{ color: 'var(--color-return)' }}>{valuationData.damagedItemsCount}</strong></div>
                   <div>Returned: <strong>{valuationData.returnedItemsCount}</strong></div>
                   <div>Missing: <strong>{valuationData.missingItemsCount}</strong></div>
                 </div>
               </div>
 
-              {/* Product Valuation Table */}
               <div className="card">
                 <div className="card__header">
                   <h2 className="card__title">Valuation Breakdown by Garment</h2>
@@ -501,7 +488,6 @@ export function ReportViewer() {
             </div>
           )}
 
-          {/* 3. STOCK AGEING & DEAD STOCK REPORT */}
           {activeTab === 'STOCK_AGEING' && ageingData && (
             <div className="report-section">
               <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: 'var(--space-4)' }}>
@@ -527,7 +513,6 @@ export function ReportViewer() {
                 </div>
               </div>
 
-              {/* Ageing Table */}
               <div className="card">
                 <div className="card__header">
                   <h2 className="card__title">Ageing &amp; Slow-Moving Inventory</h2>
@@ -564,7 +549,6 @@ export function ReportViewer() {
             </div>
           )}
 
-          {/* 4. SUPPLIER PERFORMANCE REPORT */}
           {activeTab === 'SUPPLIERS' && supplierData && (
             <div className="report-section card">
               <div className="card__header">
@@ -601,7 +585,6 @@ export function ReportViewer() {
             </div>
           )}
 
-          {/* 5. RETURNS & DAMAGES REPORT */}
           {activeTab === 'RETURNS' && returnsData && (
             <div className="report-section">
               <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
@@ -625,7 +608,6 @@ export function ReportViewer() {
                 </div>
               </div>
 
-              {/* Reasons Breakdown */}
               <div className="card">
                 <div className="card__header">
                   <h2 className="card__title">Return Reasons Distribution</h2>
@@ -642,7 +624,6 @@ export function ReportViewer() {
             </div>
           )}
 
-          {/* 6. STAFF ACTIVITY REPORT */}
           {activeTab === 'STAFF_ACTIVITY' && staffData && (
             <div className="report-section card">
               <div className="card__header">
