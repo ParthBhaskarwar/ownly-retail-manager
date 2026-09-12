@@ -340,7 +340,7 @@ function NewProductContent() {
                       ({(((sp - cp) / sp) * 100).toFixed(1)}%)
                     </>
                   ) : (
-                    <>⚠ Cost exceeds selling price — you'd be selling at a loss.</>
+                    <>⚠ Cost exceeds selling price — you&apos;d be selling at a loss.</>
                   )}
                 </div>
               )}

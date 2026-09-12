@@ -1790,3 +1790,123 @@ a.checklist-step:hover {
   margin: 0;
 }
 
+/* ── Week 5 UI Component Enhancements ───────────────────────── */
+
+/* Button BEM aliases */
+.btn--primary { background: var(--color-denim); border-color: var(--color-denim); color: var(--color-ink-inverse); }
+.btn--primary:hover:not(:disabled) { background: var(--color-denim-dark); border-color: var(--color-denim-dark); }
+.btn--secondary { background: var(--color-surface); border-color: var(--color-border); color: var(--color-ink); }
+.btn--secondary:hover:not(:disabled) { border-color: var(--color-border-strong); background: var(--color-paper); }
+.btn--ghost { background: transparent; border-color: transparent; color: var(--color-ink-secondary); }
+.btn--ghost:hover:not(:disabled) { background: var(--color-border-subtle); color: var(--color-ink); }
+.btn--sm { min-height: 32px; padding: 4px 12px; font-size: var(--text-xs); }
+
+/* Badge BEM aliases */
+.badge--paid { background: var(--color-paid-tint); color: var(--color-paid); border: 1px solid var(--color-paid-border); }
+.badge--caution { background: var(--color-caution-tint); color: var(--color-caution); border: 1px solid var(--color-caution-border); }
+.badge--return { background: var(--color-return-tint); color: var(--color-return); border: 1px solid var(--color-return-border); }
+.badge--neutral { background: var(--color-paper); color: var(--color-ink-secondary); border: 1px solid var(--color-border); }
+.badge--denim { background: var(--color-denim-tint); color: var(--color-denim); border: 1px solid var(--color-denim-border); }
+.badge--sm { font-size: 11px; padding: 2px 6px; }
+
+/* Restock Reminders UI */
+.restock-reminders-card {
+  border-left: 4px solid var(--color-caution);
+}
+.restock-reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.restock-reminder-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  gap: var(--space-3);
+}
+.restock-reminder-item__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.restock-qty-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+}
+.restock-qty-pill__current {
+  color: var(--color-caution);
+  font-weight: var(--font-semibold);
+}
+.restock-qty-pill__suggested {
+  color: var(--color-paid);
+  font-weight: var(--font-medium);
+  background: var(--color-paid-tint);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.restock-reminder-card--empty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-paid-tint);
+  border: 1px solid var(--color-paid-border);
+}
+.restock-reminder-empty__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-paid);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Stat pills & cards */
+.stat-pill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-paper);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+/* Status pills */
+.status-pill {
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.status-pill--error {
+  background: var(--color-return-tint);
+  color: var(--color-return);
+  border: 1px solid var(--color-return-border);
+}
+.status-pill--warning {
+  background: var(--color-caution-tint);
+  color: var(--color-caution);
+  border: 1px solid var(--color-caution-border);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 25, 23, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: var(--z-modal);
+}
+
+

@@ -43,10 +43,19 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'inventory:view',
     section: 'store',
   },
-  // Inventory (future)
+  // Manual Restock
+  {
+    id: 'nav-restock',
+    label: 'Restock',
+    href: '/restock',
+    icon: '⚡',
+    permissionKey: 'inventory:edit',
+    section: 'store',
+  },
+  // Inventory
   {
     id: 'nav-inventory',
-    label: 'Inventory',
+    label: 'Inventory Ledger',
     href: '/inventory',
     icon: '▦',
     permissionKey: 'inventory:view',
@@ -70,7 +79,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'staff:view',
     section: 'people',
   },
-  // Reports (future)
+  // Reports
   {
     id: 'nav-reports',
     label: 'Reports',
@@ -78,6 +87,15 @@ const ALL_NAV_ITEMS: NavItem[] = [
     icon: '⊗',
     permissionKey: 'reports:view',
     section: 'insights',
+  },
+  // Backup & Safety
+  {
+    id: 'nav-backup',
+    label: 'Backup & Safety',
+    href: '/backup',
+    icon: '💾',
+    permissionKey: 'settings:view',
+    section: 'system',
   },
   // Settings
   {

@@ -121,7 +121,7 @@ export function VerifyForm({
 
       {onResend && (
         <p className="auth-form__footer-text">
-          Didn't receive the code?{' '}
+          Didn&apos;t receive the code?{' '}
           <button
             type="button"
             id="verify-resend-btn"
