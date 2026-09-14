@@ -20,6 +20,9 @@ import type {
   UpdateProductInput,
   UpdateVariantInput,
   ProductSearchFilters,
+  PhotoFingerprintResult,
+  SimilarProduct,
+  ProductPerformanceMetrics,
 } from '@/modules/product/types';
 
 export const ProductService = {
@@ -103,6 +106,64 @@ export const ProductService = {
         pageSize: filters.pageSize,
       },
     });
+  },
+
+  // ── Week 6: Photo intelligence ────────────────────────────────────────────
+
+  /**
+   * Upload a base64 image for a saved product. The backend computes the DCT
+   * fingerprint offline and persists it. Returns quality score, issues, and
+   * attribute suggestions.
+   */
+  async uploadFingerprint(
+    productId: string,
+    base64Image: string
+  ): Promise<PhotoFingerprintResult> {
+    return apiClient.post<PhotoFingerprintResult>(
+      `/api/products/${productId}/fingerprint`,
+      { image: base64Image }
+    );
+  },
+
+  /**
+   * Find products visually similar to the given product (requires fingerprint).
+   * Returns `{ enabled: false }` when the product has no fingerprint.
+   */
+  async getSimilarProducts(
+    productId: string,
+    limit = 5
+  ): Promise<{ enabled: boolean; similar: SimilarProduct[]; duplicateThreshold?: number }> {
+    return apiClient.get<{ enabled: boolean; similar: SimilarProduct[]; duplicateThreshold?: number }>(
+      `/api/products/${productId}/similar`,
+      { query: { limit } }
+    );
+  },
+
+  // ── Week 6: Performance analytics ────────────────────────────────────────
+
+  /**
+   * Get (or compute) performance metrics for a product.
+   * Pass refresh=true to force re-computation from raw data.
+   */
+  async getPerformanceMetrics(
+    productId: string,
+    refresh = false
+  ): Promise<ProductPerformanceMetrics> {
+    const { metrics } = await apiClient.get<{ metrics: ProductPerformanceMetrics }>(
+      `/api/products/${productId}/performance`,
+      { query: refresh ? { refresh: 'true' } : {} }
+    );
+    return metrics;
+  },
+
+  /**
+   * Trigger a full store-wide performance metrics refresh.
+   */
+  async refreshAllPerformanceMetrics(): Promise<{ refreshed: number }> {
+    return apiClient.post<{ refreshed: number }>(
+      '/api/products/performance/refresh',
+      {}
+    );
   },
 };
 

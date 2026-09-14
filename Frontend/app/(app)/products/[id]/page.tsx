@@ -9,6 +9,9 @@ import { AuthGuard } from '@/shared/components/PermissionGuard';
 import { ProductService } from '@/modules/product/services/ProductService';
 import { StockSummaryCard } from '@/modules/inventory/components/StockSummaryCard';
 import { StockEntryForm } from '@/modules/inventory/components/StockEntryForm';
+import PhotoCapture from '@/modules/product/components/PhotoCapture';
+import SimilarProductsPanel from '@/modules/product/components/SimilarProductsPanel';
+import ProductPerformancePanel from '@/modules/product/components/ProductPerformancePanel';
 import type { ProductDetail, VariantWithStock } from '@/modules/product/types';
 import type { Role } from '@/modules/account/types';
 
@@ -178,6 +181,36 @@ function ProductDetailContent() {
             />
           </div>
         )}
+      </section>
+
+      {/* ── Week 6: Product photo & fingerprint ───────────────────────────── */}
+      {canEdit && (
+        <section aria-labelledby="photo-heading" className="card">
+          <h2 id="photo-heading" className="card__title">Product Photo</h2>
+          <PhotoCapture
+            productId={product.id}
+            enabled={true}
+            onFingerprintSaved={() => {
+              // Panels will auto-refresh on next interaction; no reload needed
+            }}
+          />
+        </section>
+      )}
+
+      {/* ── Week 6: Similar products (fingerprint-based) ──────────────────── */}
+      <section aria-labelledby="similar-heading" className="card">
+        <h2 id="similar-heading" className="card__title" style={{ marginBottom: 12 }}>
+          Visual Similarity Search
+        </h2>
+        <SimilarProductsPanel productId={product.id} />
+      </section>
+
+      {/* ── Week 6: Performance metrics ───────────────────────────────────── */}
+      <section aria-labelledby="perf-heading" className="card">
+        <h2 id="perf-heading" className="card__title" style={{ marginBottom: 12 }}>
+          Performance Analytics
+        </h2>
+        <ProductPerformancePanel productId={product.id} />
       </section>
     </div>
   );

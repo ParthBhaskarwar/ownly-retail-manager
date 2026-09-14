@@ -143,3 +143,44 @@ export interface ProductSearchFilters {
   page?: number;            // 1-indexed, default 1
   pageSize?: number;        // default 20
 }
+
+// ─── Week 6 — Photo Intelligence ─────────────────────────────────────────────
+
+export interface PhotoFingerprintResult {
+  fingerprint: number[];
+  qualityScore: number;
+  qualityIssues: string[];
+  attributeSuggestions: {
+    colours: string[];
+    pattern: string;
+  };
+}
+
+export interface SimilarProduct {
+  productId: string;
+  name: string;
+  baseSku: string;
+  similarity: number;
+  isPossibleDuplicate: boolean;
+  imageUrls: string[];
+}
+
+// ─── Week 6 — Product Performance ────────────────────────────────────────────
+
+export interface SizeDemandEntry {
+  size: string;
+  sold: number;
+  inStock: number;
+  sellThroughRate: number;
+}
+
+export interface ProductPerformanceMetrics {
+  productId: string;
+  timeToFirstSaleDays: number | null;
+  salesVelocity30d: number | null;
+  sellThroughRate: number | null;
+  avgStockAgeDays: number | null;
+  sizeDemand: SizeDemandEntry[];
+  computedAt: string;
+}
+

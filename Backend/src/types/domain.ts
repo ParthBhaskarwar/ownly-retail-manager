@@ -459,3 +459,68 @@ export interface RestockBatchResult {
   totalUnits: number;
   lines: RestockBatchLine[];
 }
+
+// ─── Week 6 — Photo Intelligence ──────────────────────────────────────────────
+
+/**
+ * Result of processing a product photo through the offline DCT fingerprinter.
+ * All fields are optional because the photo capture step itself is optional.
+ */
+export interface PhotoFingerprintResult {
+  /** 64-element L2-normalised DCT vector. */
+  fingerprint: number[];
+  /** 0–1 quality score (brightness, contrast, sharpness). */
+  qualityScore: number;
+  /** Human-readable quality issues detected (empty = good quality). */
+  qualityIssues: string[];
+  /** Colour / pattern suggestions to pre-fill product attributes. */
+  attributeSuggestions: {
+    colours: string[];
+    pattern: string;
+  };
+}
+
+/**
+ * A product returned by the similar-product search.
+ * Similarity is the cosine similarity between fingerprint vectors (0–1).
+ */
+export interface SimilarProduct {
+  productId: string;
+  name: string;
+  baseSku: string;
+  similarity: number;
+  /** Warning flag: true when similarity >= DUPLICATE_THRESHOLD (0.92). */
+  isPossibleDuplicate: boolean;
+  imageUrls: string[];
+}
+
+// ─── Week 6 — Product Performance ────────────────────────────────────────────
+
+/** Per-size sell-through breakdown entry. */
+export interface SizeDemandEntry {
+  size: string;
+  sold: number;
+  inStock: number;
+  /** sold / (sold + inStock), 0–1. */
+  sellThroughRate: number;
+}
+
+/**
+ * All performance metrics for a single product.
+ * Any field may be null when insufficient data exists (e.g. never stocked).
+ */
+export interface ProductPerformanceMetrics {
+  productId: string;
+  /** Days from first inventory item to first invoice sale. null = never sold. */
+  timeToFirstSaleDays: number | null;
+  /** Units sold per day averaged over the last 30 days. */
+  salesVelocity30d: number | null;
+  /** sold / (sold + inStock) across all variants, 0–1. null = no stock ever. */
+  sellThroughRate: number | null;
+  /** Average (NOW() - purchase_date) in days for currently in-stock items. */
+  avgStockAgeDays: number | null;
+  /** Per-size sell-through breakdown. Empty when no size attribute exists. */
+  sizeDemand: SizeDemandEntry[];
+  /** ISO timestamp of when these metrics were last computed. */
+  computedAt: string;
+}

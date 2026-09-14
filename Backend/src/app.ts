@@ -46,7 +46,7 @@ app.use(express.json({ limit: '2mb' }));
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', version: '0.5.0', env: config.nodeEnv });
+  res.json({ status: 'ok', version: '0.6.0', env: config.nodeEnv });
 });
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
