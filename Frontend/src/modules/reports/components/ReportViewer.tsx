@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
-import { Adapters } from '@/adapters';
+import { CategoryService, SupplierService } from '@/modules/catalog/services/CategoryService';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
 import type {
@@ -44,8 +44,8 @@ export function ReportViewer() {
 
   useEffect(() => {
     if (!storeId) return;
-    Adapters.category.findByTemplate('template_clothing').then(setCategories);
-    Adapters.supplier.findByStore(storeId).then(setSuppliers);
+    CategoryService.getCategories().then(setCategories);
+    SupplierService.getSuppliers(storeId).then(setSuppliers);
   }, [storeId]);
 
   useEffect(() => {

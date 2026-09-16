@@ -239,7 +239,7 @@ export const BackupService = {
             .insert(chunk)
             .onConflict('id')
             .ignore();
-          inserted += result.rowCount ?? chunk.length;
+          inserted += (result as { rowCount?: number })?.rowCount ?? chunk.length;
         }
 
         rowsInserted[table] = inserted;

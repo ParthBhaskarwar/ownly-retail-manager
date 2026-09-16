@@ -10,6 +10,7 @@
  */
 
 import { apiClient } from '@/lib/apiClient';
+import { AuditService } from '@/shared/audit/AuditService';
 import type {
   Product,
   ProductDetail,
@@ -57,27 +58,16 @@ export const ProductService = {
   async updateProduct(
     id: string,
     updates: UpdateProductInput,
-    storeId: string
+    storeId?: string
   ): Promise<Product> {
-    const before = await Adapters.product.findById(id);
-    if (!before) throw new Error(`Product ${id} not found`);
+    const { product } = await apiClient.put<{ product: Product }>(
+      `/api/products/${id}`,
+      updates
+    );
 
-    const after = await Adapters.product.update(id, updates);
+    AuditService.log('product.update', id, storeId || null, { ...updates });
 
-    // Audit price changes explicitly — they are sensitive
-    if (
-      updates.baseSellingPrice !== undefined ||
-      updates.baseCostPrice !== undefined
-    ) {
-      AuditService.log('product.price_change', id, storeId, {
-        old: { baseSellingPrice: before.baseSellingPrice, baseCostPrice: before.baseCostPrice },
-        new: { baseSellingPrice: after.baseSellingPrice, baseCostPrice: after.baseCostPrice },
-      });
-    } else {
-      AuditService.log('product.update', id, storeId, { ...updates });
-    }
-
-    return after;
+    return product;
   },
 
   async getProductDetail(id: string): Promise<ProductDetail | null> {

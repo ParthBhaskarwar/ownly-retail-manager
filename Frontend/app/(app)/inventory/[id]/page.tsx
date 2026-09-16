@@ -12,6 +12,7 @@ import {
 } from '@/modules/inventory/services/InventoryItemService';
 import { MovementTimeline } from '@/modules/inventory/components/MovementTimeline';
 import { StatusBadge } from '@/modules/inventory/components/StatusBadge';
+import { VisualBarcode } from '@/modules/inventory/components/VisualBarcode';
 import {
   ALL_INVENTORY_STATUSES,
   MOVEMENT_FOR_STATUS,
@@ -130,9 +131,22 @@ function ItemDetailContent() {
           <h1 className="page-header__title mono">{item.barcode}</h1>
           <StatusBadge status={item.status} />
         </div>
-        <Link href={`/products/${item.productId}`} className="btn btn-secondary btn-sm">
-          View Product
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => window.print()}
+          >
+            🖨 Print Label
+          </button>
+          <Link href={`/products/${item.productId}`} className="btn btn-secondary btn-sm">
+            View Product
+          </Link>
+        </div>
+      </div>
+
+      <div className="my-4 flex items-center justify-center p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+        <VisualBarcode value={item.barcode} />
       </div>
 
       {error && (

@@ -17,6 +17,7 @@ export interface AttributeDefinition {
   isRequired: boolean;
   isVariantLevel: boolean;  // true = differentiates variants (e.g. Size); false = product-level
   enumValues: string | null; // JSON-serialized string[]; only for dataType='ENUM'
+  applicableCategories?: string | null; // JSON-serialized string[] of category names, or null/empty for global
   displayOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -27,6 +28,17 @@ export function parseEnumValues(def: AttributeDefinition): string[] {
   if (!def.enumValues) return [];
   try {
     return JSON.parse(def.enumValues) as string[];
+  } catch {
+    return [];
+  }
+}
+
+/** Parses applicableCategories JSON string into an array. Returns [] if null or applicable to all. */
+export function parseApplicableCategories(def: AttributeDefinition): string[] {
+  if (!def.applicableCategories) return [];
+  try {
+    const parsed = typeof def.applicableCategories === 'string' ? JSON.parse(def.applicableCategories) : def.applicableCategories;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }

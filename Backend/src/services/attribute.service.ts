@@ -14,14 +14,16 @@ import type { Knex } from 'knex';
 import { db } from '@/db/client';
 import type { AttributeDefinition, AttributeValueInput } from '@/types/domain';
 
-interface AttributeDefinitionRow extends Omit<AttributeDefinition, 'enumValues'> {
+interface AttributeDefinitionRow extends Omit<AttributeDefinition, 'enumValues' | 'applicableCategories'> {
   enumValues: string[] | null;
+  applicableCategories: string[] | null;
 }
 
 function toDefinition(row: AttributeDefinitionRow): AttributeDefinition {
   return {
     ...row,
     enumValues: row.enumValues ? JSON.stringify(row.enumValues) : null,
+    applicableCategories: row.applicableCategories ? JSON.stringify(row.applicableCategories) : null,
   };
 }
 

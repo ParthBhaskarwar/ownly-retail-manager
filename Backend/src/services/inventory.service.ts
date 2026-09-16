@@ -542,7 +542,7 @@ export const InventoryService = {
             purchaseCostPrice: line.purchaseCostPrice,
             purchaseDate: line.purchaseDate,
             performedBy,
-            notes: notes ?? null,
+            notes: notes ?? undefined,
           },
           sku,
           trx

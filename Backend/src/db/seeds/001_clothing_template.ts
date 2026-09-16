@@ -1,15 +1,7 @@
 /**
  * Seed 001 — Clothing & Fashion retail template.
  *
- * Ports the attribute definitions and category taxonomy that previously lived
- * in Frontend/src/db/seeds/ (Dexie-specific) into Postgres. The data arrays are
- * carried over verbatim.
- *
- * Idempotent: re-running is a no-op once the clothing template exists, so this
- * is safe to run on every deploy.
- *
- * storeId = null on categories/subcategories means "global system category",
- * shared by every store rather than owned by one.
+ * Seed category taxonomy and category-specific attribute definitions.
  */
 
 import type { Knex } from 'knex';
@@ -19,7 +11,7 @@ export const CLOTHING_TEMPLATE_ID = 'tpl_clothing';
 
 // ─── Attribute definitions ────────────────────────────────────────────────────
 
-const CLOTHING_ATTRIBUTES = [
+export const CLOTHING_ATTRIBUTES = [
   // ── Variant-level (differentiates a ProductVariant) ──────────────────────
   {
     name: 'Size',
@@ -27,27 +19,32 @@ const CLOTHING_ATTRIBUTES = [
     isRequired: true,
     isVariantLevel: true,
     enumValues: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Free Size'],
+    applicableCategories: null,
     displayOrder: 1,
   },
 
-  // ── Product-level attributes ──────────────────────────────────────────────
-  { name: 'Colour',   dataType: 'TEXT', isRequired: false, isVariantLevel: false, enumValues: null, displayOrder: 2 },
-  { name: 'Material', dataType: 'TEXT', isRequired: false, isVariantLevel: false, enumValues: null, displayOrder: 3 },
+  // ── Global Product-level attributes ──────────────────────────────────────
+  { name: 'Colour',   dataType: 'TEXT', isRequired: false, isVariantLevel: false, enumValues: null, applicableCategories: null, displayOrder: 2 },
+  { name: 'Material', dataType: 'TEXT', isRequired: false, isVariantLevel: false, enumValues: null, applicableCategories: null, displayOrder: 3 },
   {
     name: 'Pattern',
     dataType: 'ENUM',
     isRequired: false,
     isVariantLevel: false,
     enumValues: ['Solid', 'Striped', 'Checked', 'Printed', 'Embroidered', 'Floral', 'Abstract'],
+    applicableCategories: null,
     displayOrder: 4,
   },
-  { name: 'Brand', dataType: 'TEXT', isRequired: false, isVariantLevel: false, enumValues: null, displayOrder: 5 },
+  { name: 'Brand', dataType: 'TEXT', isRequired: false, isVariantLevel: false, enumValues: null, applicableCategories: null, displayOrder: 5 },
+
+  // ── Topwear & Dresses Attributes ──────────────────────────────────────────
   {
     name: 'Fit',
     dataType: 'ENUM',
     isRequired: false,
     isVariantLevel: false,
-    enumValues: ['Slim Fit', 'Regular Fit', 'Relaxed Fit', 'Oversized'],
+    enumValues: ['Slim Fit', 'Regular Fit', 'Relaxed Fit', 'Oversized', 'Skinny', 'Baggy'],
+    applicableCategories: ['Topwear', 'Bottomwear', 'Dresses & Jumpsuits', 'Activewear', 'Winter Wear'],
     displayOrder: 6,
   },
   {
@@ -55,7 +52,8 @@ const CLOTHING_ATTRIBUTES = [
     dataType: 'ENUM',
     isRequired: false,
     isVariantLevel: false,
-    enumValues: ['Sleeveless', 'Short Sleeve', '3/4 Sleeve', 'Full Sleeve'],
+    enumValues: ['Sleeveless', 'Short Sleeve', '3/4 Sleeve', 'Full Sleeve', 'Cap Sleeve'],
+    applicableCategories: ['Topwear', 'Dresses & Jumpsuits', 'Winter Wear', 'Ethnic Wear'],
     displayOrder: 7,
   },
   {
@@ -63,10 +61,89 @@ const CLOTHING_ATTRIBUTES = [
     dataType: 'ENUM',
     isRequired: false,
     isVariantLevel: false,
-    enumValues: ['Round Neck', 'V-Neck', 'Collared', 'Turtle Neck', 'Square Neck', 'Boat Neck'],
+    enumValues: ['Round Neck', 'V-Neck', 'Collared', 'Turtle Neck', 'Square Neck', 'Boat Neck', 'Polo', 'Henley'],
+    applicableCategories: ['Topwear', 'Dresses & Jumpsuits', 'Ethnic Wear'],
     displayOrder: 8,
   },
-] as const;
+
+  // ── Bottomwear Attributes ────────────────────────────────────────────────
+  {
+    name: 'Rise',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Low Rise', 'Mid Rise', 'High Rise'],
+    applicableCategories: ['Bottomwear', 'Activewear'],
+    displayOrder: 9,
+  },
+  {
+    name: 'Bottom Length',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Full Length', 'Ankle Length', 'Cropped', 'Knee Length', 'Shorts'],
+    applicableCategories: ['Bottomwear', 'Activewear'],
+    displayOrder: 10,
+  },
+  {
+    name: 'Waist Type',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Elasticated', 'Fixed Waist', 'Drawstring', 'High Waist'],
+    applicableCategories: ['Bottomwear', 'Activewear'],
+    displayOrder: 11,
+  },
+
+  // ── Dresses & Outerwear Attributes ────────────────────────────────────────
+  {
+    name: 'Dress Length',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Mini', 'Midi', 'Maxi', 'Knee Length', 'Ankle Length'],
+    applicableCategories: ['Dresses & Jumpsuits'],
+    displayOrder: 12,
+  },
+  {
+    name: 'Collar Type',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Shirt Collar', 'Stand Collar', 'Lapel', 'Hooded', 'Mandarin'],
+    applicableCategories: ['Winter Wear', 'Topwear'],
+    displayOrder: 13,
+  },
+  {
+    name: 'Closure Type',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Zipper', 'Button', 'Drawstring', 'Elastic', 'Hook & Eye', 'Open Front'],
+    applicableCategories: ['Winter Wear', 'Bottomwear', 'Dresses & Jumpsuits'],
+    displayOrder: 14,
+  },
+
+  // ── Ethnic Wear Attributes ────────────────────────────────────────────────
+  {
+    name: 'Work / Embellishment',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Zari Work', 'Mirror Work', 'Sequins', 'Chikankari', 'Printed', 'Plain / Solid'],
+    applicableCategories: ['Ethnic Wear', 'Dresses & Jumpsuits'],
+    displayOrder: 15,
+  },
+  {
+    name: 'Occasion',
+    dataType: 'ENUM',
+    isRequired: false,
+    isVariantLevel: false,
+    enumValues: ['Casual', 'Formal', 'Party', 'Festive', 'Wedding'],
+    applicableCategories: ['Ethnic Wear', 'Dresses & Jumpsuits', 'Topwear'],
+    displayOrder: 16,
+  },
+];
 
 // ─── Category taxonomy ────────────────────────────────────────────────────────
 
@@ -74,8 +151,7 @@ const CLOTHING_TAXONOMY = [
   {
     name: 'Topwear',
     subcategories: [
-      'T-Shirts', 'Shirts', 'Sweatshirts & Hoodies', 'Jackets', 'Blazers',
-      'Kurtas & Kurtis', 'Blouses', 'Crop Tops', 'Sweaters', 'Vests & Waistcoats',
+      'T-Shirts', 'Shirts', 'Sweatshirts & Hoodies', 'Kurtas & Kurtis', 'Blouses', 'Crop Tops', 'Sweaters', 'Vests & Waistcoats',
     ],
   },
   {
@@ -115,7 +191,7 @@ const CLOTHING_TAXONOMY = [
   {
     name: 'Winter Wear',
     subcategories: [
-      'Overcoats', 'Leather Jackets', 'Puffer Jackets', 'Shawls & Wraps', 'Mufflers & Scarves',
+      'Jackets', 'Blazers', 'Overcoats', 'Leather Jackets', 'Puffer Jackets', 'Shawls & Wraps', 'Mufflers & Scarves',
     ],
   },
   {
@@ -131,27 +207,29 @@ const CLOTHING_TAXONOMY = [
 
 export async function seed(knex: Knex): Promise<void> {
   await knex.transaction(async (trx) => {
-    // ── Attribute definitions ────────────────────────────────────────────────
-    const existingAttrs = await trx('attribute_definitions')
-      .where({ retail_template_id: CLOTHING_TEMPLATE_ID })
-      .count<{ count: number }[]>('* as count')
-      .first();
+    // ── Upsert Attribute definitions ──────────────────────────────────────────
+    for (const attr of CLOTHING_ATTRIBUTES) {
+      const existing = await trx('attribute_definitions')
+        .where({ retail_template_id: CLOTHING_TEMPLATE_ID, name: attr.name })
+        .first();
 
-    if (!Number(existingAttrs?.count)) {
-      await trx('attribute_definitions').insert(
-        CLOTHING_ATTRIBUTES.map((attr) => ({
-          id: randomUUID(),
-          retail_template_id: CLOTHING_TEMPLATE_ID,
-          name: attr.name,
-          data_type: attr.dataType,
-          is_required: attr.isRequired,
-          is_variant_level: attr.isVariantLevel,
-          // jsonb column — pass JSON text, or null when the attribute is free-form
-          enum_values: attr.enumValues ? JSON.stringify(attr.enumValues) : null,
-          display_order: attr.displayOrder,
-          is_active: true,
-        }))
-      );
+      const data = {
+        retail_template_id: CLOTHING_TEMPLATE_ID,
+        name: attr.name,
+        data_type: attr.dataType,
+        is_required: attr.isRequired,
+        is_variant_level: attr.isVariantLevel,
+        enum_values: attr.enumValues ? JSON.stringify(attr.enumValues) : null,
+        applicable_categories: attr.applicableCategories ? JSON.stringify(attr.applicableCategories) : null,
+        display_order: attr.displayOrder,
+        is_active: true,
+      };
+
+      if (existing) {
+        await trx('attribute_definitions').where({ id: existing.id }).update(data);
+      } else {
+        await trx('attribute_definitions').insert({ id: randomUUID(), ...data });
+      }
     }
 
     // ── Categories + subcategories ───────────────────────────────────────────
@@ -168,7 +246,7 @@ export async function seed(knex: Knex): Promise<void> {
       await trx('categories').insert({
         id: categoryId,
         retail_template_id: CLOTHING_TEMPLATE_ID,
-        store_id: null, // global system category
+        store_id: null,
         name: entry.name,
         is_system: true,
         is_active: true,

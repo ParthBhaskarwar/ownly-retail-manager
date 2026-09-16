@@ -3,7 +3,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
-import { Adapters } from '@/adapters';
+import { ProductService } from '@/modules/product/services/ProductService';
+import { SupplierService } from '@/modules/catalog/services/CategoryService';
 import { RestockService } from '../services/RestockService';
 import type { ProductSummary } from '@/modules/product/types';
 import type { Supplier } from '@/modules/catalog/types';
@@ -38,8 +39,8 @@ export function RestockForm() {
 
   useEffect(() => {
     if (!storeId) return;
-    Adapters.product.search({ storeId, pageSize: 200 }).then((res) => setProducts(res.items));
-    Adapters.supplier.findByStore(storeId).then(setSuppliers);
+    ProductService.searchProducts({ storeId, pageSize: 200 }).then((res) => setProducts(res.items));
+    SupplierService.getSuppliers(storeId).then(setSuppliers);
   }, [storeId]);
 
   useEffect(() => {

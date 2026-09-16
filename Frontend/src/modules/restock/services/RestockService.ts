@@ -1,4 +1,5 @@
-import { Adapters } from '@/adapters';
+import { ProductService, VariantService } from '@/modules/product/services/ProductService';
+import { SupplierService } from '@/modules/catalog/services/CategoryService';
 import { InventoryItemService } from '@/modules/inventory/services/InventoryItemService';
 import { AuditService } from '@/shared/audit/AuditService';
 import type { ExecuteRestockInput, RestockResult, RestockReminder, RestockVariantLine } from '../types';
@@ -8,7 +9,7 @@ export const RestockService = {
   async executeRestock(input: ExecuteRestockInput): Promise<RestockResult> {
     const { storeId, storeCode, productId, lines, performedBy, notes } = input;
 
-    const product = await Adapters.product.findById(productId);
+    const product = await ProductService.getProductDetail(productId);
     if (!product) {
       throw new Error(`Product ${productId} not found.`);
     }
@@ -30,10 +31,14 @@ export const RestockService = {
         line.costPriceOverride !== undefined ||
         line.sellingPriceOverride !== undefined
       ) {
-        await Adapters.productVariant.update(line.variantId, {
-          costPriceOverride: line.costPriceOverride,
-          sellingPriceOverride: line.sellingPriceOverride,
-        });
+        await VariantService.updateVariant(
+          line.variantId,
+          {
+            costPriceOverride: line.costPriceOverride,
+            sellingPriceOverride: line.sellingPriceOverride,
+          },
+          productId
+        );
       }
 
       const items = await InventoryItemService.addStock(
@@ -43,6 +48,7 @@ export const RestockService = {
           quantity: line.restockQty,
           purchaseCostPrice: costPrice,
           purchaseDate: new Date().toISOString(),
+          performedBy: performedBy || 'system',
           notes: notes ? `Restock: ${notes}` : `Manual Restock (${line.displayName})`,
         },
         line.sku
@@ -54,9 +60,9 @@ export const RestockService = {
     }
 
     if (input.supplierId && input.supplierId !== product.supplierId) {
-      await Adapters.product.update(productId, {
+      await ProductService.updateProduct(productId, {
         supplierId: input.supplierId,
-        updatedBy: performedBy,
+        updatedBy: performedBy || 'system',
       });
     }
 
@@ -69,7 +75,7 @@ export const RestockService = {
       totalQuantity,
       totalPurchaseCost,
       linesCount: activeLines.length,
-      barcodesSummary: `${barcodes[0]} ... ${barcodes[barcodes.length - 1]}`,
+      barcodesSummary: barcodes.length > 0 ? `${barcodes[0]} ... ${barcodes[barcodes.length - 1]}` : '',
     });
 
     return {
@@ -84,22 +90,23 @@ export const RestockService = {
   },
 
   async getRestockReminders(storeId: string, minStockThreshold = 5): Promise<RestockReminder[]> {
-    const { items: products } = await Adapters.product.search({ storeId, pageSize: 200 });
+    const { items: products } = await ProductService.searchProducts({ storeId, pageSize: 200 });
     const reminders: RestockReminder[] = [];
 
-    for (const p of products) {
-      const variants = await Adapters.productVariant.findByProductId(p.id);
-      let supplierName: string | undefined;
-      if (p.supplierId) {
-        const supp = await Adapters.supplier.findById(p.supplierId);
-        supplierName = supp?.name;
-      }
+    const allSuppliers = await SupplierService.getSuppliers(storeId);
+    const supplierMap = new Map(allSuppliers.map((s) => [s.id, s.name]));
 
-      for (const v of variants) {
-        const stock = await Adapters.inventoryItem.getStockSummary(v.id);
-        if (stock.inStock <= minStockThreshold) {
+    for (const p of products) {
+      const detail = await ProductService.getProductDetail(p.id);
+      if (!detail) continue;
+
+      const supplierName = p.supplierId ? supplierMap.get(p.supplierId) : undefined;
+
+      for (const v of detail.variants) {
+        const inStock = v.stock?.inStock ?? 0;
+        if (inStock <= minStockThreshold) {
           const sizeName = v.displayName.split('—').pop()?.trim() || 'Standard';
-          const suggestedQuantity = Math.max(10, minStockThreshold * 3 - stock.inStock);
+          const suggestedQuantity = Math.max(10, minStockThreshold * 3 - inStock);
 
           reminders.push({
             productId: p.id,
@@ -108,14 +115,14 @@ export const RestockService = {
             variantId: v.id,
             variantSku: v.sku,
             sizeName,
-            currentStock: stock.inStock,
+            currentStock: inStock,
             minThreshold: minStockThreshold,
             suggestedQuantity,
             supplierId: p.supplierId,
             supplierName,
             costPrice: v.costPriceOverride ?? p.baseCostPrice,
             sellingPrice: v.sellingPriceOverride ?? p.baseSellingPrice,
-            urgency: stock.inStock === 0 ? 'OUT_OF_STOCK' : 'LOW_STOCK',
+            urgency: inStock === 0 ? 'OUT_OF_STOCK' : 'LOW_STOCK',
           });
         }
       }

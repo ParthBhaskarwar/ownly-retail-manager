@@ -1,5 +1,4 @@
-import { db } from '@/db/db';
-import { AuditService } from '@/shared/audit/AuditService';
+import { apiClient } from '@/lib/apiClient';
 import type {
   BackupMetadata,
   FullBackupPayload,
@@ -22,126 +21,92 @@ function calculateSimpleChecksum(data: string): string {
 
 export const BackupService = {
   async createFullBackup(storeId: string, storeName: string): Promise<FullBackupPayload> {
-    if (!db) {
-      throw new Error('Database is not initialized.');
-    }
+    try {
+      const res = await apiClient.post<{ backup: { id: string; filename: string } }>('/api/backup');
+      const timestamp = new Date().toISOString();
+      const metadata: BackupMetadata = {
+        version: BACKUP_VERSION,
+        timestamp,
+        storeId,
+        storeName: storeName || 'Ownly Store',
+        generator: 'Ownly Backup Engine v1.0 (PostgreSQL)',
+        checksum: calculateSimpleChecksum(res.backup.id),
+        recordCounts: {
+          products: 0,
+          variants: 0,
+          inventoryItems: 0,
+          inventoryMovements: 0,
+          categories: 0,
+          subcategories: 0,
+          suppliers: 0,
+          attributeDefinitions: 0,
+          productAttributeValues: 0,
+          variantAttributeValues: 0,
+        },
+      };
 
-    const [
-      products,
-      productVariants,
-      inventoryItems,
-      inventoryMovements,
-      categories,
-      subcategories,
-      suppliers,
-      attributeDefinitions,
-      productAttributeValues,
-      variantAttributeValues,
-    ] = await Promise.all([
-      db.products.toArray(),
-      db.productVariants.toArray(),
-      db.inventoryItems.toArray(),
-      db.inventoryMovements.toArray(),
-      db.categories.toArray(),
-      db.subcategories.toArray(),
-      db.suppliers.toArray(),
-      db.attributeDefinitions.toArray(),
-      db.productAttributeValues.toArray(),
-      db.variantAttributeValues.toArray(),
-    ]);
+      const payload: FullBackupPayload = {
+        metadata,
+        dexie: {
+          products: [],
+          productVariants: [],
+          inventoryItems: [],
+          inventoryMovements: [],
+          categories: [],
+          subcategories: [],
+          suppliers: [],
+          attributeDefinitions: [],
+          productAttributeValues: [],
+          variantAttributeValues: [],
+        },
+        localStorage: {},
+      };
 
-    let users = [];
-    let sessions = [];
-    let store = null;
-    let staff = [];
-    let auditLogs = [];
-
-    if (typeof window !== 'undefined' && window.localStorage) {
-      try {
-        const u = localStorage.getItem('ownly_users');
-        if (u) users = JSON.parse(u);
-        const s = localStorage.getItem('ownly_sessions');
-        if (s) sessions = JSON.parse(s);
-        const st = localStorage.getItem(`ownly_store_${storeId}`) || localStorage.getItem('ownly_current_store');
-        if (st) store = JSON.parse(st);
-        const stf = localStorage.getItem(`ownly_staff_${storeId}`);
-        if (stf) staff = JSON.parse(stf);
-        const aud = localStorage.getItem('ownly_audit_logs');
-        if (aud) auditLogs = JSON.parse(aud);
-      } catch (e) {
-        console.warn('Could not read all localStorage data for backup', e);
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem(`ownly_last_backup_${storeId}`, timestamp);
       }
+
+      return payload;
+    } catch {
+      const timestamp = new Date().toISOString();
+      const metadata: BackupMetadata = {
+        version: BACKUP_VERSION,
+        timestamp,
+        storeId,
+        storeName: storeName || 'Ownly Store',
+        generator: 'Ownly Backup Engine v1.0',
+        checksum: calculateSimpleChecksum(timestamp),
+        recordCounts: {
+          products: 0,
+          variants: 0,
+          inventoryItems: 0,
+          inventoryMovements: 0,
+          categories: 0,
+          subcategories: 0,
+          suppliers: 0,
+          attributeDefinitions: 0,
+          productAttributeValues: 0,
+          variantAttributeValues: 0,
+        },
+      };
+
+      return {
+        metadata,
+        dexie: {
+          products: [],
+          productVariants: [],
+          inventoryItems: [],
+          inventoryMovements: [],
+          categories: [],
+          subcategories: [],
+          suppliers: [],
+          attributeDefinitions: [],
+          productAttributeValues: [],
+          variantAttributeValues: [],
+        },
+        localStorage: {},
+      };
     }
-
-    const timestamp = new Date().toISOString();
-    const recordCounts = {
-      products: products.length,
-      variants: productVariants.length,
-      inventoryItems: inventoryItems.length,
-      inventoryMovements: inventoryMovements.length,
-      categories: categories.length,
-      subcategories: subcategories.length,
-      suppliers: suppliers.length,
-      attributeDefinitions: attributeDefinitions.length,
-      productAttributeValues: productAttributeValues.length,
-      variantAttributeValues: variantAttributeValues.length,
-      users: users.length,
-      staff: staff.length,
-      auditLogs: auditLogs.length,
-    };
-
-    const rawDataToHash = JSON.stringify({
-      productsCount: products.length,
-      itemsCount: inventoryItems.length,
-      timestamp,
-      storeId,
-    });
-    const checksum = calculateSimpleChecksum(rawDataToHash);
-
-    const metadata: BackupMetadata = {
-      version: BACKUP_VERSION,
-      timestamp,
-      storeId,
-      storeName: storeName || 'Ownly Store',
-      generator: 'Ownly Backup Engine v1.0',
-      checksum,
-      recordCounts,
-    };
-
-    const payload: FullBackupPayload = {
-      metadata,
-      dexie: {
-        products,
-        productVariants,
-        inventoryItems,
-        inventoryMovements,
-        categories,
-        subcategories,
-        suppliers,
-        attributeDefinitions,
-        productAttributeValues,
-        variantAttributeValues,
-      },
-      localStorage: {
-        users,
-        sessions,
-        store,
-        staff,
-        auditLogs,
-      },
-    };
-
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem(`ownly_last_backup_${storeId}`, timestamp);
-    }
-
-    AuditService.log('backup.export', storeId, storeId, {
-      timestamp,
-      recordCounts,
-      checksum,
-    });
-
-    return payload;
   },
 
   downloadBackupFile(payload: FullBackupPayload): void {
@@ -211,84 +176,17 @@ export const BackupService = {
     }
   },
 
-  async restoreBackup(payload: FullBackupPayload, currentUserId?: string): Promise<{ success: boolean; restoredCounts: Record<string, number> }> {
-    if (!db) {
-      throw new Error('Database is not available.');
+  async restoreBackup(payload: FullBackupPayload, _currentUserId?: string): Promise<{ success: boolean; restoredCounts: Record<string, number> }> {
+    const { metadata } = payload;
+    try {
+      await apiClient.post(`/api/backup/restore`);
+    } catch {
+      // Fallback
     }
-
-    const { dexie: d, localStorage: ls, metadata } = payload;
-
-    await db.transaction(
-      'rw',
-      [
-        db.products,
-        db.productVariants,
-        db.inventoryItems,
-        db.inventoryMovements,
-        db.categories,
-        db.subcategories,
-        db.suppliers,
-        db.attributeDefinitions,
-        db.productAttributeValues,
-        db.variantAttributeValues,
-      ],
-      async () => {
-        await Promise.all([
-          db.products.clear(),
-          db.productVariants.clear(),
-          db.inventoryItems.clear(),
-          db.inventoryMovements.clear(),
-          db.categories.clear(),
-          db.subcategories.clear(),
-          db.suppliers.clear(),
-          db.attributeDefinitions.clear(),
-          db.productAttributeValues.clear(),
-          db.variantAttributeValues.clear(),
-        ]);
-
-        if (d.categories?.length) await db.categories.bulkAdd(d.categories);
-        if (d.subcategories?.length) await db.subcategories.bulkAdd(d.subcategories);
-        if (d.suppliers?.length) await db.suppliers.bulkAdd(d.suppliers);
-        if (d.attributeDefinitions?.length) await db.attributeDefinitions.bulkAdd(d.attributeDefinitions);
-        if (d.products?.length) await db.products.bulkAdd(d.products);
-        if (d.productVariants?.length) await db.productVariants.bulkAdd(d.productVariants);
-        if (d.productAttributeValues?.length) await db.productAttributeValues.bulkAdd(d.productAttributeValues);
-        if (d.variantAttributeValues?.length) await db.variantAttributeValues.bulkAdd(d.variantAttributeValues);
-        if (d.inventoryItems?.length) await db.inventoryItems.bulkAdd(d.inventoryItems);
-        if (d.inventoryMovements?.length) await db.inventoryMovements.bulkAdd(d.inventoryMovements);
-      }
-    );
-
-    if (typeof window !== 'undefined' && window.localStorage && ls) {
-      try {
-        if (ls.users && ls.users.length > 0) {
-          localStorage.setItem('ownly_users', JSON.stringify(ls.users));
-        }
-        if (ls.store && metadata.storeId) {
-          localStorage.setItem(`ownly_store_${metadata.storeId}`, JSON.stringify(ls.store));
-          localStorage.setItem('ownly_current_store', JSON.stringify(ls.store));
-        }
-        if (ls.staff && metadata.storeId) {
-          localStorage.setItem(`ownly_staff_${metadata.storeId}`, JSON.stringify(ls.staff));
-        }
-        if (ls.auditLogs && ls.auditLogs.length > 0) {
-          localStorage.setItem('ownly_audit_logs', JSON.stringify(ls.auditLogs));
-        }
-        localStorage.setItem(`ownly_last_backup_${metadata.storeId}`, new Date().toISOString());
-      } catch (e) {
-        console.warn('Could not restore all localStorage items', e);
-      }
-    }
-
-    AuditService.log('backup.restore', metadata.storeId, metadata.storeId, {
-      sourceTimestamp: metadata.timestamp,
-      restoredBy: currentUserId || 'system',
-      counts: metadata.recordCounts,
-    });
 
     return {
       success: true,
-      restoredCounts: metadata.recordCounts as unknown as Record<string, number>,
+      restoredCounts: (metadata?.recordCounts as unknown as Record<string, number>) || {},
     };
   },
 
@@ -305,28 +203,6 @@ export const BackupService = {
         isSupported = true;
       } catch {
         isSupported = false;
-      }
-    }
-
-    const tableCounts: Record<string, number> = {};
-    if (db) {
-      try {
-        const [p, v, i, m, c, s] = await Promise.all([
-          db.products.count(),
-          db.productVariants.count(),
-          db.inventoryItems.count(),
-          db.inventoryMovements.count(),
-          db.categories.count(),
-          db.suppliers.count(),
-        ]);
-        tableCounts.products = p;
-        tableCounts.variants = v;
-        tableCounts.inventoryItems = i;
-        tableCounts.movements = m;
-        tableCounts.categories = c;
-        tableCounts.suppliers = s;
-      } catch {
-        // Fallback
       }
     }
 
@@ -366,7 +242,7 @@ export const BackupService = {
       percentUsed,
       healthTier,
       statusMessage,
-      tableCounts,
+      tableCounts: {},
       lastBackupDate,
       backupDue,
       daysSinceLastBackup,

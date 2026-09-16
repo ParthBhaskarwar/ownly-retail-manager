@@ -56,10 +56,8 @@ function toCsv(rows: Record<string, unknown>[]): string {
 // ─── Helper: stream as XLSX ───────────────────────────────────────────────────
 
 async function toXlsx(rows: Record<string, unknown>[], sheetName: string): Promise<Buffer> {
-  // Dynamic import so the server still starts if xlsx hasn't been installed yet
-  // (it will throw a clear error at export time rather than at startup).
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const XLSX = require('xlsx') as typeof import('xlsx');
+  const XLSX: any = require('xlsx');
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, sheetName);

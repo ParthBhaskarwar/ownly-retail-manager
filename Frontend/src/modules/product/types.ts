@@ -63,6 +63,9 @@ export interface ProductSummary extends Product {
 
 /** Full product detail: product + attributes + variants + stock counts per variant. */
 export interface ProductDetail extends Product {
+  categoryName?: string;
+  subcategoryName?: string;
+  supplierName?: string;
   attributes: ResolvedAttribute[];
   variants: VariantWithStock[];
 }

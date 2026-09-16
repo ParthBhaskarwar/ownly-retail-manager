@@ -26,6 +26,7 @@ function ProductDetailContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stockFormVariant, setStockFormVariant] = useState<VariantWithStock | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
   const loadProduct = async () => {
     setIsLoading(true);
@@ -55,6 +56,9 @@ function ProductDetailContent() {
     return <div className="page-content"><div className="alert alert--error">{error}</div></div>;
   }
 
+  const images = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : [];
+  const currentPhoto = images[selectedPhotoIndex] || null;
+
   const totalInStock = product.variants.reduce((sum, v) => sum + v.stock.inStock, 0);
   const totalSold = product.variants.reduce((sum, v) => sum + v.stock.sold, 0);
   const totalDamaged = product.variants.reduce((sum, v) => sum + v.stock.damaged, 0);
@@ -70,7 +74,7 @@ function ProductDetailContent() {
   };
 
   return (
-    <div className="page-content">
+    <div className="page-content space-y-6">
       {/* Breadcrumb */}
       <nav className="breadcrumb" aria-label="Breadcrumb">
         <Link href="/products" className="breadcrumb__link">Products</Link>
@@ -78,35 +82,106 @@ function ProductDetailContent() {
         <span className="breadcrumb__current">{product.name}</span>
       </nav>
 
-      {/* Product header */}
-      <div className="product-detail__header">
+      {/* Product header & title */}
+      <div className="product-detail__header flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="product-detail__title-row">
-            <h1 className="product-detail__name">{product.name}</h1>
+          <div className="product-detail__title-row flex items-center gap-3">
+            <h1 className="product-detail__name text-2xl font-bold">{product.name}</h1>
             <span className={`status-badge status-badge--${product.status === 'ACTIVE' ? 'success' : 'warning'}`}>
               {product.status}
             </span>
           </div>
-          <code className="sku-badge sku-badge--large">{product.baseSku}</code>
+          <div className="flex items-center gap-2 mt-1">
+            <code className="sku-badge sku-badge--large">{product.baseSku}</code>
+            <span className="badge badge--denim">{product.categoryName}</span>
+            {product.subcategoryName && <span className="badge badge--neutral">{product.subcategoryName}</span>}
+          </div>
         </div>
         {canEdit && (
           <Link href={`/products/${product.id}/edit`} id="edit-product-btn" className="btn btn--secondary">
-            Edit Product
+            ✎ Edit Product
           </Link>
         )}
       </div>
 
-      {/* Overall stock summary */}
-      <section aria-labelledby="stock-summary-heading" className="card">
-        <h2 id="stock-summary-heading" className="card__title">Stock Overview</h2>
-        <StockSummaryCard summary={overallSummary} />
-      </section>
+      {/* Photo Gallery & Top Details Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Photo Gallery */}
+        <div className="card md:col-span-1 space-y-3">
+          <h2 className="card__title">Product Photos</h2>
+          {currentPhoto ? (
+            <div className="space-y-3">
+              <div className="aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
+                <img src={currentPhoto} alt={product.name} className="w-full h-full object-cover" />
+              </div>
+              {images.length > 1 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`w-14 h-14 rounded-lg overflow-hidden border transition-all ${
+                        selectedPhotoIndex === idx ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-slate-800 opacity-60 hover:opacity-100'
+                      }`}
+                      onClick={() => setSelectedPhotoIndex(idx)}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="aspect-square rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-500 text-sm">
+              <span className="text-3xl mb-1">📷</span>
+              <span>No Photo Uploaded</span>
+            </div>
+          )}
+        </div>
 
-      {/* Product attributes */}
+        {/* Overview & Stock Card */}
+        <div className="md:col-span-2 space-y-6">
+          <section aria-labelledby="stock-summary-heading" className="card">
+            <h2 id="stock-summary-heading" className="card__title">Stock Overview</h2>
+            <StockSummaryCard summary={overallSummary} />
+          </section>
+
+          {/* Pricing & Supplier Summary */}
+          <section className="card">
+            <h2 className="card__title">Pricing &amp; Info</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm mt-3">
+              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
+                <span className="text-xs text-slate-400 block">Selling Price</span>
+                <span className="text-lg font-bold text-emerald-400">₹{product.baseSellingPrice.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
+                <span className="text-xs text-slate-400 block">Cost Price</span>
+                <span className="text-lg font-bold text-slate-200">₹{product.baseCostPrice.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
+                <span className="text-xs text-slate-400 block">Supplier</span>
+                <span className="text-sm font-semibold text-slate-200">{product.supplierName || '—'}</span>
+              </div>
+              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
+                <span className="text-xs text-slate-400 block">Total Variants</span>
+                <span className="text-lg font-bold text-violet-400">{product.variants.length}</span>
+              </div>
+            </div>
+
+            {product.description && (
+              <p className="text-sm text-slate-300 mt-4 pt-3 border-t border-slate-800">
+                {product.description}
+              </p>
+            )}
+          </section>
+        </div>
+      </div>
+
+      {/* Category-Specific Attributes */}
       {product.attributes.length > 0 && (
         <section aria-labelledby="attributes-heading" className="card">
-          <h2 id="attributes-heading" className="card__title">Product Details</h2>
-          <dl className="attribute-display-list">
+          <h2 id="attributes-heading" className="card__title">Category Attributes ({product.categoryName})</h2>
+          <dl className="attribute-display-list mt-3">
             {product.attributes.map((attr) => (
               <div key={attr.definition.id} className="attribute-display-item">
                 <dt className="attribute-display-item__label">{attr.definition.name}</dt>
@@ -117,10 +192,10 @@ function ProductDetailContent() {
         </section>
       )}
 
-      {/* Variants */}
+      {/* Variants & Size Stock Grid */}
       <section aria-labelledby="variants-heading" className="card">
         <div className="card__header">
-          <h2 id="variants-heading" className="card__title">Variants ({product.variants.length})</h2>
+          <h2 id="variants-heading" className="card__title">Variants &amp; Size Breakdown ({product.variants.length})</h2>
           {canEdit && (
             <Link href={`/products/${product.id}/stock`} id="add-stock-link" className="btn btn--secondary btn--sm">
               + Add Stock
@@ -172,10 +247,9 @@ function ProductDetailContent() {
               variantSku={stockFormVariant.sku}
               variantDisplayName={stockFormVariant.displayName}
               storeId={user.storeId}
-              onSuccess={(count) => {
+              onSuccess={() => {
                 setStockFormVariant(null);
                 void loadProduct();
-                // TODO: show toast
               }}
               onCancel={() => setStockFormVariant(null)}
             />
@@ -186,12 +260,12 @@ function ProductDetailContent() {
       {/* ── Week 6: Product photo & fingerprint ───────────────────────────── */}
       {canEdit && (
         <section aria-labelledby="photo-heading" className="card">
-          <h2 id="photo-heading" className="card__title">Product Photo</h2>
+          <h2 id="photo-heading" className="card__title">Photo Intelligence Capture</h2>
           <PhotoCapture
             productId={product.id}
             enabled={true}
             onFingerprintSaved={() => {
-              // Panels will auto-refresh on next interaction; no reload needed
+              void loadProduct();
             }}
           />
         </section>
@@ -199,7 +273,7 @@ function ProductDetailContent() {
 
       {/* ── Week 6: Similar products (fingerprint-based) ──────────────────── */}
       <section aria-labelledby="similar-heading" className="card">
-        <h2 id="similar-heading" className="card__title" style={{ marginBottom: 12 }}>
+        <h2 id="similar-heading" className="card__title mb-3">
           Visual Similarity Search
         </h2>
         <SimilarProductsPanel productId={product.id} />
@@ -207,7 +281,7 @@ function ProductDetailContent() {
 
       {/* ── Week 6: Performance metrics ───────────────────────────────────── */}
       <section aria-labelledby="perf-heading" className="card">
-        <h2 id="perf-heading" className="card__title" style={{ marginBottom: 12 }}>
+        <h2 id="perf-heading" className="card__title mb-3">
           Performance Analytics
         </h2>
         <ProductPerformancePanel productId={product.id} />

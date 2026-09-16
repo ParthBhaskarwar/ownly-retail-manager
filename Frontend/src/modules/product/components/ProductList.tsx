@@ -64,9 +64,22 @@ export function ProductList({ products, isLoading, canEdit }: ProductListProps) 
           {products.map((product) => (
             <tr key={product.id}>
               <td>
-                <Link href={`/products/${product.id}`} style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
-                  {product.name}
-                </Link>
+                <div className="flex items-center gap-3">
+                  {product.imageUrls && product.imageUrls.length > 0 ? (
+                    <img
+                      src={product.imageUrls[0]}
+                      alt=""
+                      className="w-10 h-10 rounded-lg object-cover bg-slate-900 border border-slate-800 flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600 flex-shrink-0 text-xs font-mono">
+                      IMG
+                    </div>
+                  )}
+                  <Link href={`/products/${product.id}`} style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+                    {product.name}
+                  </Link>
+                </div>
               </td>
               <td>
                 <code className="sku-badge">{product.baseSku}</code>
