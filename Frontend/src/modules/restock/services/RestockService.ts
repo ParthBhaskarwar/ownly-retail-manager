@@ -43,10 +43,8 @@ export const RestockService = {
           quantity: line.restockQty,
           purchaseCostPrice: costPrice,
           purchaseDate: new Date().toISOString(),
-          performedBy,
           notes: notes ? `Restock: ${notes}` : `Manual Restock (${line.displayName})`,
         },
-        storeCode || 'OWN',
         line.sku
       );
 

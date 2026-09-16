@@ -219,235 +219,236 @@ export function RestockForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="pe-layout" noValidate>
-      <div className="pe-main">
-        <div className="pe-page-header">
-          <h1 className="page-title">Manual Restocking</h1>
+    <form onSubmit={handleSubmit} className="page-content" noValidate>
+      <div className="page-header">
+        <div className="page-header__left">
+          <h1 className="page-header__title">Manual Restocking</h1>
           <p className="page-subtitle">
             Select an existing garment design, update cost/selling prices if changed, and enter restock quantities per size.
           </p>
         </div>
+      </div>
 
-        {error && (
-          <div className="form-server-error" role="alert">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
+      {error && (
+        <div className="form-server-error" role="alert">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
 
-        <section className="card" style={{ marginBottom: 'var(--space-4)' }}>
-          <div className="card__header">
-            <h2 className="card__title">1. Select Garment to Restock</h2>
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px', marginBottom: 'var(--space-4)' }}>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Search product by name or SKU..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ flex: 1 }}
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-label">Product</label>
-            <select
-              className="form-select"
-              value={selectedProductId}
-              onChange={(e) => setSelectedProductId(e.target.value)}
-            >
-              <option value="">-- Choose a product --</option>
-              {filteredProducts.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.baseSku}) — Current Stock: {p.totalInStock}
-                </option>
-              ))}
-            </select>
-          </div>
-        </section>
-
-        {productDetail && (
-          <section className="card" style={{ marginBottom: 'var(--space-4)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 'var(--space-6)', alignItems: 'start' }}>
+        <div className="pe-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          <section className="card">
             <div className="card__header">
-              <h2 className="card__title">2. Supplier &amp; Batch Details</h2>
+              <h2 className="card__title">1. Select Garment to Restock</h2>
             </div>
+            
+            <div className="card__body" style={{ padding: 'var(--space-4)' }}>
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Search product by name or SKU..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '100%', maxWidth: 400 }}
+                />
+              </div>
 
-            <div className="form-grid">
               <div className="form-field">
-                <label className="form-label">Supplier</label>
+                <label className="form-label">Product</label>
                 <select
                   className="form-select"
-                  value={selectedSupplierId}
-                  onChange={(e) => setSelectedSupplierId(e.target.value)}
+                  value={selectedProductId}
+                  onChange={(e) => setSelectedProductId(e.target.value)}
+                  style={{ maxWidth: 400 }}
                 >
-                  <option value="">-- No supplier assigned --</option>
-                  {suppliers.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} ({s.code})
+                  <option value="">-- Choose a product --</option>
+                  {filteredProducts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.baseSku}) — Current Stock: {p.totalInStock}
                     </option>
                   ))}
                 </select>
               </div>
-
-              <div className="form-field">
-                <label className="form-label">Restock Notes / Invoice No.</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Invoice #PO-2026-89 from Mumbai Mill"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
-              </div>
             </div>
           </section>
-        )}
 
-        {productDetail && (
-          <section className="card" style={{ marginBottom: 'var(--space-4)' }}>
-            <div className="card__header">
-              <h2 className="card__title">3. Size-Wise Restock Quantities &amp; Rates</h2>
-            </div>
-
-            <table className="table" style={{ width: '100%', fontSize: 'var(--text-sm)' }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left' }}>Size / Variant</th>
-                  <th style={{ textAlign: 'center' }}>Current Stock</th>
-                  <th style={{ textAlign: 'right', width: 120 }}>Cost (₹)</th>
-                  <th style={{ textAlign: 'right', width: 120 }}>Selling (₹)</th>
-                  <th style={{ textAlign: 'center', width: 130 }}>+ Restock Qty</th>
-                  <th style={{ textAlign: 'right' }}>Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lines.map((line) => {
-                  const cp = line.costPriceOverride ?? productDetail.baseCostPrice;
-                  const sp = line.sellingPriceOverride ?? productDetail.baseSellingPrice;
-                  const lineTotal = (line.restockQty || 0) * cp;
-
-                  return (
-                    <tr key={line.variantId}>
-                      <td>
-                        <strong>{line.sizeName}</strong>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
-                          {line.sku}
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <span className={`badge ${line.currentStock === 0 ? 'badge--return' : line.currentStock <= 5 ? 'badge--caution' : 'badge--neutral'}`}>
-                          {line.currentStock}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <input
-                          type="number"
-                          className="form-input form-input--sm"
-                          value={cp}
-                          onChange={(e) => handleCostChange(line.variantId, parseFloat(e.target.value) || 0)}
-                          style={{ textAlign: 'right' }}
-                        />
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <input
-                          type="number"
-                          className="form-input form-input--sm"
-                          value={sp}
-                          onChange={(e) => handlePriceChange(line.variantId, parseFloat(e.target.value) || 0)}
-                          style={{ textAlign: 'right' }}
-                        />
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <input
-                          type="number"
-                          min={0}
-                          className="form-input form-input--sm"
-                          value={line.restockQty || ''}
-                          placeholder="0"
-                          onChange={(e) => handleQtyChange(line.variantId, parseInt(e.target.value) || 0)}
-                          style={{ textAlign: 'center', fontWeight: 'bold' }}
-                        />
-                      </td>
-                      <td style={{ textAlign: 'right', fontWeight: 'var(--font-semibold)' }}>
-                        {line.restockQty > 0 ? fmt(lineTotal) : '—'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </section>
-        )}
-
-        {productDetail && (
-          <div className="form-actions">
-            <button
-              type="button"
-              className="btn btn--secondary"
-              onClick={() => router.push('/products')}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn--primary"
-              disabled={isSubmitting || summary.totalQty === 0}
-            >
-              {isSubmitting ? 'Generating Barcodes & Adding Stock...' : `Complete Restock (${summary.totalQty} Units)`}
-            </button>
-          </div>
-        )}
-      </div>
-
-      <aside className="pe-summary" aria-label="Restock summary">
-        <div className="pe-summary__inner">
-          <h3 className="pe-summary__title">Restock Summary</h3>
-          <dl className="pe-summary__rows">
-            <div className="pe-summary__row">
-              <dt className="pe-summary__label">Total Restock Qty</dt>
-              <dd className="pe-summary__value pe-summary__value--qty">
-                {summary.totalQty > 0 ? summary.totalQty : '—'}
-              </dd>
-            </div>
-            <div className="pe-summary__row">
-              <dt className="pe-summary__label">Purchase Spend</dt>
-              <dd className="pe-summary__value">
-                {summary.totalCost > 0 ? fmt(summary.totalCost) : '—'}
-              </dd>
-            </div>
-            <div className="pe-summary__row">
-              <dt className="pe-summary__label">Expected Revenue</dt>
-              <dd className="pe-summary__value">
-                {summary.expectedSales > 0 ? fmt(summary.expectedSales) : '—'}
-              </dd>
-            </div>
-            <div className="pe-summary__row pe-summary__row--profit">
-              <dt className="pe-summary__label">Potential Margin</dt>
-              <dd className="pe-summary__value pe-summary__value--profit">
-                {summary.profit > 0 ? fmt(summary.profit) : '—'}
-              </dd>
-            </div>
-          </dl>
-
-          {summary.totalQty > 0 && (
-            <div className="pe-summary__margin-bar">
-              <div className="pe-summary__margin-track">
-                <div className="pe-summary__margin-fill" style={{ width: `${Math.min(100, Math.max(0, summary.margin))}%` }} />
+          {productDetail && (
+            <section className="card">
+              <div className="card__header">
+                <h2 className="card__title">2. Supplier &amp; Batch Details</h2>
               </div>
-              <span className="pe-summary__margin-label">
-                {summary.margin.toFixed(1)}% projected gross margin
-              </span>
-            </div>
+
+              <div className="card__body" style={{ padding: 'var(--space-4)' }}>
+                <div className="form-grid">
+                  <div className="form-field">
+                    <label className="form-label">Supplier</label>
+                    <select
+                      className="form-select"
+                      value={selectedSupplierId}
+                      onChange={(e) => setSelectedSupplierId(e.target.value)}
+                    >
+                      <option value="">-- No supplier assigned --</option>
+                      {suppliers.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} ({s.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-label">Restock Notes / Invoice No.</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. Invoice #PO-2026-89 from Mumbai Mill"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
           )}
 
-          {summary.totalQty === 0 && (
-            <p className="pe-summary__empty">
-              Select sizes and enter restock quantities to preview spend and profit margins.
-            </p>
+          {productDetail && (
+            <section className="card">
+              <div className="card__header">
+                <h2 className="card__title">3. Size-Wise Restock Quantities &amp; Rates</h2>
+              </div>
+
+              <table className="table" style={{ width: '100%', fontSize: 'var(--text-sm)' }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left' }}>Size / Variant</th>
+                    <th style={{ textAlign: 'center' }}>Current Stock</th>
+                    <th style={{ textAlign: 'right', width: 120 }}>Cost (₹)</th>
+                    <th style={{ textAlign: 'right', width: 120 }}>Selling (₹)</th>
+                    <th style={{ textAlign: 'center', width: 130 }}>+ Restock Qty</th>
+                    <th style={{ textAlign: 'right' }}>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lines.map((line) => {
+                    const cp = line.costPriceOverride ?? productDetail.baseCostPrice;
+                    const sp = line.sellingPriceOverride ?? productDetail.baseSellingPrice;
+                    const lineTotal = (line.restockQty || 0) * cp;
+
+                    return (
+                      <tr key={line.variantId}>
+                        <td>
+                          <strong>{line.sizeName}</strong>
+                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
+                            {line.sku}
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <span className={`badge ${line.currentStock === 0 ? 'badge--return' : line.currentStock <= 5 ? 'badge--caution' : 'badge--neutral'}`}>
+                            {line.currentStock}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <input
+                            type="number"
+                            className="form-input form-input--sm"
+                            value={cp}
+                            onChange={(e) => handleCostChange(line.variantId, parseFloat(e.target.value) || 0)}
+                            style={{ textAlign: 'right', width: '100%' }}
+                          />
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <input
+                            type="number"
+                            className="form-input form-input--sm"
+                            value={sp}
+                            onChange={(e) => handlePriceChange(line.variantId, parseFloat(e.target.value) || 0)}
+                            style={{ textAlign: 'right', width: '100%' }}
+                          />
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <input
+                            type="number"
+                            min={0}
+                            className="form-input form-input--sm"
+                            value={line.restockQty || ''}
+                            placeholder="0"
+                            onChange={(e) => handleQtyChange(line.variantId, parseInt(e.target.value) || 0)}
+                            style={{ textAlign: 'center', fontWeight: 'bold', width: '100%' }}
+                          />
+                        </td>
+                        <td style={{ textAlign: 'right', fontWeight: 600 }}>
+                          {line.restockQty > 0 ? fmt(lineTotal) : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </section>
+          )}
+
+          {productDetail && (
+            <div className="form-actions" style={{ marginTop: 'var(--space-2)' }}>
+              <button
+                type="button"
+                className="btn btn--secondary"
+                onClick={() => router.push('/products')}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={isSubmitting || summary.totalQty === 0}
+              >
+                {isSubmitting ? 'Processing...' : `Complete Restock (${summary.totalQty} Units)`}
+              </button>
+            </div>
           )}
         </div>
-      </aside>
+
+        <aside className="card" aria-label="Restock summary" style={{ position: 'sticky', top: 'var(--space-6)' }}>
+          <div className="card__header">
+            <h3 className="card__title">Restock Summary</h3>
+          </div>
+          <div className="card__body" style={{ padding: 'var(--space-4)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
+                <span style={{ color: 'var(--color-ink-secondary)' }}>Total Restock Qty</span>
+                <strong style={{ fontSize: 'var(--text-base)' }}>{summary.totalQty > 0 ? summary.totalQty : '—'}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
+                <span style={{ color: 'var(--color-ink-secondary)' }}>Purchase Spend</span>
+                <strong>{summary.totalCost > 0 ? fmt(summary.totalCost) : '—'}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
+                <span style={{ color: 'var(--color-ink-secondary)' }}>Expected Revenue</span>
+                <strong>{summary.expectedSales > 0 ? fmt(summary.expectedSales) : '—'}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '12px', marginTop: '4px' }}>
+                <span style={{ color: 'var(--color-ink-secondary)', fontWeight: 600 }}>Potential Margin</span>
+                <strong style={{ color: 'var(--color-paid)' }}>{summary.profit > 0 ? fmt(summary.profit) : '—'}</strong>
+              </div>
+            </div>
+
+            {summary.totalQty > 0 ? (
+              <div style={{ marginTop: 'var(--space-4)' }}>
+                <div style={{ height: 6, background: 'var(--color-border)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.min(100, Math.max(0, summary.margin))}%`, height: '100%', background: 'var(--color-paid)' }} />
+                </div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', marginTop: '6px', textAlign: 'right' }}>
+                  {summary.margin.toFixed(1)}% projected gross margin
+                </div>
+              </div>
+            ) : (
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-muted)', marginTop: 'var(--space-4)', textAlign: 'center', padding: 'var(--space-2)' }}>
+                Select sizes and enter restock quantities to preview spend and profit margins.
+              </p>
+            )}
+          </div>
+        </aside>
+      </div>
     </form>
   );
 }
