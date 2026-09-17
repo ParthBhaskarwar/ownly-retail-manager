@@ -152,6 +152,10 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
       const sp = parseFloat(baseSellingPrice);
       const cp = parseFloat(baseCostPrice);
 
+      const attributeValues = productAttrDefs
+        .map((d) => ({ attributeDefinitionId: d.id, value: productAttrValues[d.id] ?? '' }))
+        .filter((av) => av.value);
+
       await ProductService.updateProduct(productId, {
         name: name.trim(),
         categoryId,
@@ -161,6 +165,8 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
         baseCostPrice: isNaN(cp) ? undefined : cp,
         description: description.trim() || undefined,
         status,
+        imageUrls: images,
+        attributeValues,
         updatedBy: user?.id || 'system',
       });
 

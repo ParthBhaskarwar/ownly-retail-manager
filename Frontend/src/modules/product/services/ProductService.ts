@@ -46,6 +46,7 @@ export const ProductService = {
       baseSellingPrice: input.baseSellingPrice,
       baseCostPrice: input.baseCostPrice,
       status: input.status,
+      imageUrls: input.imageUrls,
       attributeValues: input.attributeValues,
       variants: input.variants,
     });

@@ -91,6 +91,7 @@ export interface CreateProductInput {
   baseSellingPrice: number;
   baseCostPrice: number;
   status?: ProductStatus;
+  imageUrls?: string[];
   /** Product-level attribute values (isVariantLevel = false) */
   attributeValues: Array<{ attributeDefinitionId: string; value: string }>;
   /** Initial variants to create alongside the product */
@@ -123,6 +124,8 @@ export interface UpdateProductInput {
   baseSellingPrice?: number;
   baseCostPrice?: number;
   status?: ProductStatus;
+  imageUrls?: string[];
+  attributeValues?: Array<{ attributeDefinitionId: string; value: string }>;
   updatedBy: string;
 }
 
