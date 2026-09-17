@@ -135,6 +135,8 @@ export interface AttributeDefinition {
   isVariantLevel: boolean;
   /** JSON-serialized string[] — kept as a string to match the frontend contract. */
   enumValues: string | null;
+  /** JSON-serialized string[] of applicable category names, or null/empty for global. */
+  applicableCategories?: string | null;
   displayOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -234,6 +236,7 @@ export interface CreateProductInput {
   baseSellingPrice: number;
   baseCostPrice: number;
   status?: ProductStatus;
+  imageUrls?: string[];
   attributeValues: AttributeValueInput[];
   variants: CreateVariantInput[];
   createdBy: string;
@@ -248,6 +251,8 @@ export interface UpdateProductInput {
   baseSellingPrice?: number;
   baseCostPrice?: number;
   status?: ProductStatus;
+  imageUrls?: string[];
+  attributeValues?: AttributeValueInput[];
   updatedBy: string;
 }
 

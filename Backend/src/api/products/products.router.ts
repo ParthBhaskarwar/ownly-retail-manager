@@ -58,6 +58,7 @@ const createProductSchema = z.object({
   baseSellingPrice: z.number().min(0, 'Enter a valid selling price.'),
   baseCostPrice: z.number().min(0, 'Enter a valid cost price.'),
   status: z.enum(['ACTIVE', 'INACTIVE', 'DISCONTINUED']).optional(),
+  imageUrls: z.array(z.string()).optional(),
   attributeValues: z.array(attributeValueSchema).default([]),
   variants: z.array(createVariantSchema).min(1, 'Select at least one size.'),
 });
@@ -119,6 +120,7 @@ productsRouter.put('/:id', requirePermission('inventory:edit'), async (req, res,
       .pick({
         name: true, description: true, categoryId: true, subcategoryId: true,
         supplierId: true, baseSellingPrice: true, baseCostPrice: true, status: true,
+        imageUrls: true, attributeValues: true,
       })
       .parse(req.body);
     const product = await ProductService.updateProduct(storeId, param(req.params, 'id'), {
@@ -195,11 +197,11 @@ productsRouter.post('/:id/fingerprint', requirePermission('inventory:edit'), asy
     const { score: qualityScore, issues: qualityIssues } = FingerprintService.checkPhotoQuality(image);
     const attributeSuggestions = FingerprintService.suggestAttributes(image);
 
-    // Persist fingerprint as PostgreSQL FLOAT8[] (stored as JSON-compatible array)
+    // Persist fingerprint as PostgreSQL FLOAT8[]
     await db('products')
       .where({ id: productId })
       .update({
-        photo_fingerprint: JSON.stringify(fingerprint),
+        photo_fingerprint: '{' + fingerprint.join(',') + '}',
         photo_quality_score: qualityScore,
         updated_at: new Date(),
       });

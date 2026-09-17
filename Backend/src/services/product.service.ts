@@ -22,6 +22,7 @@ import { AppError } from '@/shared/AppError';
 import { AuditService } from './audit.service';
 import { AttributeService, toDefinition, type AttributeDefinitionRow } from './attribute.service';
 import { InventoryService } from './inventory.service';
+import { FingerprintService } from './fingerprint.service';
 import type {
   CreateProductInput,
   CreateVariantInput,
@@ -52,6 +53,21 @@ export const ProductService = {
 
       const productId = randomUUID();
 
+      const imageUrls = input.imageUrls || [];
+      let photoFingerprint: string | null = null;
+      let photoQualityScore: number | null = null;
+
+      if (imageUrls.length > 0 && imageUrls[0]) {
+        try {
+          const fp = FingerprintService.computeFingerprint(imageUrls[0]);
+          const quality = FingerprintService.checkPhotoQuality(imageUrls[0]);
+          photoFingerprint = '{' + fp.join(',') + '}';
+          photoQualityScore = quality.score;
+        } catch {
+          // Graceful fallback if image decoding fails
+        }
+      }
+
       await trx('products').insert({
         id: productId,
         store_id: input.storeId,
@@ -65,12 +81,14 @@ export const ProductService = {
         base_selling_price: input.baseSellingPrice,
         base_cost_price: input.baseCostPrice,
         status: input.status ?? 'ACTIVE',
-        image_urls: JSON.stringify([]),
+        image_urls: JSON.stringify(imageUrls),
+        photo_fingerprint: photoFingerprint,
+        photo_quality_score: photoQualityScore,
         created_by: input.createdBy,
         updated_by: input.createdBy,
       });
 
-      await AttributeService.setProductAttributeValues(productId, input.attributeValues, trx);
+      await AttributeService.replaceProductAttributeValues(productId, input.categoryId, input.attributeValues, trx);
 
       for (const [index, variant] of input.variants.entries()) {
         await createVariantInTrx(trx, {
@@ -95,39 +113,67 @@ export const ProductService = {
   },
 
   async updateProduct(storeId: string, id: string, updates: UpdateProductInput): Promise<Product> {
-    const before = (await db('products').where({ id, store_id: storeId }).first()) as Product | undefined;
-    if (!before) throw AppError.notFound(`Product ${id} not found`);
+    return db.transaction(async (trx) => {
+      const before = (await trx('products').where({ id, store_id: storeId }).first()) as Product | undefined;
+      if (!before) throw AppError.notFound(`Product ${id} not found`);
 
-    const patch: Record<string, unknown> = { updated_by: updates.updatedBy, updated_at: new Date() };
-    if (updates.name !== undefined) patch.name = updates.name;
-    if (updates.description !== undefined) patch.description = updates.description;
-    if (updates.categoryId !== undefined) patch.category_id = updates.categoryId;
-    if (updates.subcategoryId !== undefined) patch.subcategory_id = updates.subcategoryId;
-    if (updates.supplierId !== undefined) patch.supplier_id = updates.supplierId;
-    if (updates.baseSellingPrice !== undefined) patch.base_selling_price = updates.baseSellingPrice;
-    if (updates.baseCostPrice !== undefined) patch.base_cost_price = updates.baseCostPrice;
-    if (updates.status !== undefined) patch.status = updates.status;
+      const patch: Record<string, unknown> = { updated_by: updates.updatedBy, updated_at: new Date() };
+      if (updates.name !== undefined) patch.name = updates.name;
+      if (updates.description !== undefined) patch.description = updates.description;
+      if (updates.categoryId !== undefined) patch.category_id = updates.categoryId;
+      if (updates.subcategoryId !== undefined) patch.subcategory_id = updates.subcategoryId;
+      if (updates.supplierId !== undefined) patch.supplier_id = updates.supplierId;
+      if (updates.baseSellingPrice !== undefined) patch.base_selling_price = updates.baseSellingPrice;
+      if (updates.baseCostPrice !== undefined) patch.base_cost_price = updates.baseCostPrice;
+      if (updates.status !== undefined) patch.status = updates.status;
 
-    const [after] = (await db('products').where({ id }).update(patch).returning('*')) as Product[];
+      if (updates.imageUrls !== undefined) {
+        patch.image_urls = JSON.stringify(updates.imageUrls);
+        if (updates.imageUrls.length > 0 && updates.imageUrls[0]) {
+          try {
+            const fp = FingerprintService.computeFingerprint(updates.imageUrls[0]);
+            const quality = FingerprintService.checkPhotoQuality(updates.imageUrls[0]);
+            patch.photo_fingerprint = '{' + fp.join(',') + '}';
+            patch.photo_quality_score = quality.score;
+          } catch {
+            // Keep existing fingerprint if decode fails
+          }
+        }
+      }
 
-    // Price changes are sensitive — audit them with before/after values.
-    if (updates.baseSellingPrice !== undefined || updates.baseCostPrice !== undefined) {
-      await AuditService.log({
-        action: 'product.price_change', userId: updates.updatedBy, storeId,
-        entityType: 'product', entityId: id,
-        meta: {
-          old: { baseSellingPrice: before.baseSellingPrice, baseCostPrice: before.baseCostPrice },
-          new: { baseSellingPrice: after.baseSellingPrice, baseCostPrice: after.baseCostPrice },
-        },
-      });
-    } else {
-      await AuditService.log({
-        action: 'product.update', userId: updates.updatedBy, storeId,
-        entityType: 'product', entityId: id, meta: { ...updates },
-      });
-    }
+      await trx('products').where({ id }).update(patch);
 
-    return after;
+      if (updates.attributeValues !== undefined) {
+        const catId = (updates.categoryId ?? before.categoryId) as string;
+        await AttributeService.replaceProductAttributeValues(id, catId, updates.attributeValues, trx);
+      }
+
+      const after = (await trx('products').where({ id }).first()) as Product;
+
+      if (updates.baseSellingPrice !== undefined || updates.baseCostPrice !== undefined) {
+        await AuditService.log(
+          {
+            action: 'product.price_change', userId: updates.updatedBy, storeId,
+            entityType: 'product', entityId: id,
+            meta: {
+              old: { baseSellingPrice: before.baseSellingPrice, baseCostPrice: before.baseCostPrice },
+              new: { baseSellingPrice: after.baseSellingPrice, baseCostPrice: after.baseCostPrice },
+            },
+          },
+          trx
+        );
+      } else {
+        await AuditService.log(
+          {
+            action: 'product.update', userId: updates.updatedBy, storeId,
+            entityType: 'product', entityId: id, meta: { ...updates },
+          },
+          trx
+        );
+      }
+
+      return after;
+    });
   },
 
   /** Product + resolved attributes + variants with stock, in a fixed number of queries. */
