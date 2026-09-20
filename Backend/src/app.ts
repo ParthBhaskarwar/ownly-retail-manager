@@ -42,7 +42,11 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json({ limit: '2mb' }));
+// Product photos are sent as base64 JSON (~33% larger than the raw file, and a
+// product can carry several 5MB images), so this needs headroom well beyond
+// the old 2mb default — that limit was silently turning photo uploads and
+// edits of photographed products into generic 500s.
+app.use(express.json({ limit: '20mb' }));
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
@@ -83,6 +87,11 @@ app.use((
   res: express.Response,
   _next: express.NextFunction
 ) => {
+  if (typeof err === 'object' && err !== null && (err as { type?: string }).type === 'entity.too.large') {
+    res.status(413).json({ error: 'That upload is too large. Please use a smaller image.' });
+    return;
+  }
+
   if (err instanceof ZodError) {
     // Surface the first validation message — the forms show a single error line.
     const first = err.issues[0];

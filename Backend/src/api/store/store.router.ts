@@ -63,7 +63,7 @@ storeRouter.post('/', async (req, res, next) => {
   }
 });
 
-storeRouter.put('/', requirePermission('store:edit'), async (req, res, next) => {
+storeRouter.put('/', requirePermission('settings:edit'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
     const updates = createSchema.partial().extend({ logoUrl: z.string().optional() }).parse(req.body);

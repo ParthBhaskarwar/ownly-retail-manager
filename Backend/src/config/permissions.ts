@@ -61,7 +61,7 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'billing:create': true,
     'reports:view': true,
     'settings:view': true,
-    'settings:edit': false,
+    'settings:edit': true,
     'audit:view': true,
   },
   CASHIER: {

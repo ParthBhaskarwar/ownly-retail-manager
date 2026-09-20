@@ -43,6 +43,7 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProductStatus>('ACTIVE');
   const [images, setImages] = useState<string[]>([]);
+  const [originalImages, setOriginalImages] = useState<string[]>([]);
 
   // Suppliers, Categories & Attributes
   const [categories, setCategories] = useState<Category[]>([]);
@@ -85,6 +86,7 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
         setDescription(detail.description || '');
         setStatus(detail.status);
         setImages(detail.imageUrls || []);
+        setOriginalImages(detail.imageUrls || []);
 
         setProductAttrDefs(attrDefs);
         setCategories(cats);
@@ -156,6 +158,12 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
         .map((d) => ({ attributeDefinitionId: d.id, value: productAttrValues[d.id] ?? '' }))
         .filter((av) => av.value);
 
+      // Photos are sent as base64 and can be several MB each — only resend
+      // them when the user actually changed something, so a plain price/name
+      // edit on a product that already has photos doesn't re-upload them.
+      const imagesChanged =
+        images.length !== originalImages.length || images.some((img, i) => img !== originalImages[i]);
+
       await ProductService.updateProduct(productId, {
         name: name.trim(),
         categoryId,
@@ -165,7 +173,7 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
         baseCostPrice: isNaN(cp) ? undefined : cp,
         description: description.trim() || undefined,
         status,
-        imageUrls: images,
+        ...(imagesChanged ? { imageUrls: images } : {}),
         attributeValues,
         updatedBy: user?.id || 'system',
       });

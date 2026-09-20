@@ -83,7 +83,7 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'credit_notes:manage': true,
     'reports:view': true,
     'settings:view': true,
-    'settings:edit': false,
+    'settings:edit': true,
     'audit:view': true,
   },
   CASHIER: {

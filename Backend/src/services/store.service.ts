@@ -84,6 +84,7 @@ export const StoreService = {
       name: string;
       address: string;
       phone: string;
+      retailType: string;
       gstNumber: string;
       currency: string;
       logoUrl: string;
@@ -95,6 +96,7 @@ export const StoreService = {
     if (updates.name !== undefined) patch.name = updates.name;
     if (updates.address !== undefined) patch.address = updates.address;
     if (updates.phone !== undefined) patch.phone = updates.phone;
+    if (updates.retailType !== undefined) patch.retail_type = updates.retailType;
     if (updates.gstNumber !== undefined) patch.gst_number = updates.gstNumber;
     if (updates.currency !== undefined) patch.currency = updates.currency;
     if (updates.logoUrl !== undefined) patch.logo_url = updates.logoUrl;
