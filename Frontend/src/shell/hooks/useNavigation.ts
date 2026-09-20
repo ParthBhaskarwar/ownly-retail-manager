@@ -61,15 +61,6 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'exchanges:create',
     section: 'store',
   },
-  // Store
-  {
-    id: 'nav-store',
-    label: 'Store Settings',
-    href: '/store',
-    icon: '⊡',
-    permissionKey: 'store:view',
-    section: 'store',
-  },
   // Products
   {
     id: 'nav-products',
