@@ -13,7 +13,7 @@ import { AttributeService, SupplierService, CategoryService } from '@/modules/ca
 import type { AttributeDefinition } from '@/modules/attributes/types';
 import type { CreateProductInput } from '@/modules/product/types';
 import type { Supplier, Category } from '@/modules/catalog/types';
-import type { AttributeSuggestions } from '@/modules/product/services/FingerprintService';
+import type { AttributeSuggestions } from '@/modules/product/types';
 import { CLOTHING_TEMPLATE_ID } from '@/config/retail-templates';
 
 // Standard clothing sizes
@@ -145,7 +145,7 @@ function NewProductContent() {
     }
     if (patternDef && suggestions.pattern && !updated[patternDef.id]) {
       // Find matching pattern enum option
-      updated[patternDef.id] = suggestions.pattern.includes('solid') ? 'Solid' : 'Printed';
+      updated[patternDef.id] = suggestions.pattern;
     }
 
     setProductAttrValues(updated);

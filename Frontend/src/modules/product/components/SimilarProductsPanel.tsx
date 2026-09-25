@@ -5,9 +5,9 @@
  *
  * Fetches GET /api/products/:id/similar and renders up to 5 product cards
  * ordered by cosine similarity. Products flagged as possible duplicates
- * (similarity >= 0.92) are highlighted with a red border.
+ * (above the duplicate threshold) are highlighted with a red border.
  *
- * When the product has no fingerprint (photo AI was skipped), the panel
+ * When the product has no photo embeddings (photo AI skipped or off), the panel
  * renders nothing — no empty state noise.
  */
 
@@ -101,7 +101,7 @@ export default function SimilarProductsPanel({ productId }: Props) {
         ))}
       </div>
       <p style={{ margin: 0, fontSize: 11, color: '#9ca3af' }}>
-        Similarity computed using offline DCT perceptual hash (cosine distance).
+        Similarity computed offline from CLIP image embeddings (cosine similarity).
         Threshold for duplicate warning: {Math.round(data.duplicateThreshold * 100)}%.
       </p>
     </section>

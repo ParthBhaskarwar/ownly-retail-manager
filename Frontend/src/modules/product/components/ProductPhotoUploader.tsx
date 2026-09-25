@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FingerprintService, type PhotoQualityResult, type AttributeSuggestions } from '@/modules/product/services/FingerprintService';
 import { ProductService } from '@/modules/product/services/ProductService';
-import type { SimilarProduct } from '@/modules/product/types';
+import type { AttributeSuggestions, PhotoQualityResult, SimilarProduct } from '@/modules/product/types';
 
 interface ProductPhotoUploaderProps {
   productId?: string;
@@ -29,6 +28,7 @@ export function ProductPhotoUploader({
   const [aiSuggestions, setAiSuggestions] = useState<AttributeSuggestions | null>(null);
   const [similarProducts, setSimilarProducts] = useState<SimilarProduct[]>([]);
   const [possibleDuplicate, setPossibleDuplicate] = useState<SimilarProduct | null>(null);
+  const [aiNote, setAiNote] = useState<string | null>(null);
 
   const handleFiles = async (fileList: FileList | File[]) => {
     setErrorMsg(null);
@@ -54,31 +54,20 @@ export function ProductPhotoUploader({
         const base64 = await readFileAsBase64(file);
         newImages.push(base64);
 
-        // Process Week 6 Photo Intelligence on primary/first upload
+        // Photo intelligence on the first (primary) photo: quality, suggestions,
+        // duplicate check. Optional — any failure here never blocks the upload.
         if (images.length === 0 && newImages.length === 1) {
-          const q = FingerprintService.checkPhotoQuality(base64);
-          setQuality(q);
-          if (onQualityCheck) onQualityCheck(q);
-
-          const suggestions = FingerprintService.suggestAttributes(base64);
-          setAiSuggestions(suggestions);
-
-          // If productId exists, call backend fingerprint API
-          if (productId) {
-            try {
-              const fpRes = await ProductService.uploadFingerprint(productId, base64);
-              if (fpRes.attributeSuggestions) {
-                setAiSuggestions(fpRes.attributeSuggestions);
-              }
-              const simRes = await ProductService.getSimilarProducts(productId);
-              if (simRes.enabled && simRes.similar) {
-                setSimilarProducts(simRes.similar);
-                const dup = simRes.similar.find((s) => s.isPossibleDuplicate);
-                setPossibleDuplicate(dup || null);
-              }
-            } catch {
-              // Gracefully handle server offline in dev mode
-            }
+          try {
+            const result = await ProductService.analyzePhoto(base64, productId);
+            const q: PhotoQualityResult = { score: result.qualityScore, issues: result.qualityIssues };
+            setQuality(q);
+            if (onQualityCheck) onQualityCheck(q);
+            setAiSuggestions(result.attributeSuggestions);
+            setSimilarProducts(result.similar);
+            setPossibleDuplicate(result.similar.find((s) => s.isPossibleDuplicate) ?? null);
+            setAiNote(result.aiAvailable ? null : result.message ?? null);
+          } catch {
+            // Server offline or photo AI failing: the photo is still added.
           }
         }
       } catch (e) {
@@ -98,6 +87,7 @@ export function ProductPhotoUploader({
       setAiSuggestions(null);
       setSimilarProducts([]);
       setPossibleDuplicate(null);
+      setAiNote(null);
     }
   };
 
@@ -138,7 +128,7 @@ export function ProductPhotoUploader({
       >
         <span className="pe-dropzone__icon" aria-hidden="true">📷</span>
         <span className="pe-dropzone__label">Drop product photos here, or click to browse</span>
-        <span className="pe-dropzone__hint">Supports JPG, PNG, WEBP · Max 5 MB each · Auto DCT AI Analysis</span>
+        <span className="pe-dropzone__hint">Supports JPG, PNG, WEBP · Max 5 MB each · Offline photo AI (optional)</span>
 
         {isProcessing && (
           <div className="mt-2 text-violet-400 text-xs font-semibold flex items-center justify-center gap-2">
@@ -224,7 +214,7 @@ export function ProductPhotoUploader({
         <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-xl space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-violet-400 flex items-center gap-2">
-              ⚡ Week 6 Photo Intelligence
+              ⚡ Photo Intelligence
             </span>
             <span className="text-xs text-slate-400">
               Quality Score: <strong className={quality.score > 0.7 ? 'text-emerald-400' : 'text-amber-400'}>{Math.round(quality.score * 100)}%</strong>
@@ -239,10 +229,15 @@ export function ProductPhotoUploader({
             </ul>
           )}
 
+          {aiNote && (
+            <p className="text-xs text-slate-400">{aiNote}</p>
+          )}
+
+
           {aiSuggestions && (
             <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
               <div className="text-slate-300">
-                <strong>AI Suggestions:</strong> Color: <em>{aiSuggestions.colours.join(', ')}</em> · Pattern: <em>{aiSuggestions.pattern}</em>
+                <strong>AI Suggestions:</strong> Colour: <em>{aiSuggestions.colours.join(', ')}</em> · Pattern: <em>{aiSuggestions.pattern}</em>
               </div>
               {onAISuggestions && (
                 <button

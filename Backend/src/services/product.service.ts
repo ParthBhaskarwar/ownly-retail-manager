@@ -22,7 +22,8 @@ import { AppError } from '@/shared/AppError';
 import { AuditService } from './audit.service';
 import { AttributeService, toDefinition, type AttributeDefinitionRow } from './attribute.service';
 import { InventoryService } from './inventory.service';
-import { FingerprintService } from './fingerprint.service';
+import { EmbeddingService } from './embedding.service';
+import { ProductEmbeddingRepository } from './product-embedding.repository';
 import type {
   CreateProductInput,
   CreateVariantInput,
@@ -37,13 +38,24 @@ import type {
   VariantWithStock,
 } from '@/types/domain';
 
+/**
+ * Photo AI is optional and slow relative to a save, so embeddings are synced
+ * after the product is committed and never block or fail the request.
+ */
+function syncEmbeddingsInBackground(storeId: string, productId: string, images: string[]): void {
+  if (!EmbeddingService.isEnabled()) return;
+  ProductEmbeddingRepository.syncProductEmbeddings(storeId, productId, images).catch((err) => {
+    console.error('[embedding] background sync failed for product', productId, err);
+  });
+}
+
 export const ProductService = {
   /**
    * Creates a product, its attribute values, its variants, and each variant's
    * opening stock (with unique barcodes) as a single atomic unit.
    */
   async createProduct(input: CreateProductInput): Promise<Product> {
-    return db.transaction(async (trx) => {
+    const created = await db.transaction(async (trx) => {
       const clash = await trx('products')
         .where({ store_id: input.storeId, base_sku: input.baseSku })
         .first();
@@ -54,19 +66,6 @@ export const ProductService = {
       const productId = randomUUID();
 
       const imageUrls = input.imageUrls || [];
-      let photoFingerprint: string | null = null;
-      let photoQualityScore: number | null = null;
-
-      if (imageUrls.length > 0 && imageUrls[0]) {
-        try {
-          const fp = FingerprintService.computeFingerprint(imageUrls[0]);
-          const quality = FingerprintService.checkPhotoQuality(imageUrls[0]);
-          photoFingerprint = '{' + fp.join(',') + '}';
-          photoQualityScore = quality.score;
-        } catch {
-          // Graceful fallback if image decoding fails
-        }
-      }
 
       await trx('products').insert({
         id: productId,
@@ -82,8 +81,6 @@ export const ProductService = {
         base_cost_price: input.baseCostPrice,
         status: input.status ?? 'ACTIVE',
         image_urls: JSON.stringify(imageUrls),
-        photo_fingerprint: photoFingerprint,
-        photo_quality_score: photoQualityScore,
         created_by: input.createdBy,
         updated_by: input.createdBy,
       });
@@ -110,10 +107,15 @@ export const ProductService = {
 
       return (await trx('products').where({ id: productId }).first()) as Product;
     });
+
+    if (input.imageUrls && input.imageUrls.length > 0) {
+      syncEmbeddingsInBackground(input.storeId, created.id, input.imageUrls);
+    }
+    return created;
   },
 
   async updateProduct(storeId: string, id: string, updates: UpdateProductInput): Promise<Product> {
-    return db.transaction(async (trx) => {
+    const updated = await db.transaction(async (trx) => {
       const before = (await trx('products').where({ id, store_id: storeId }).first()) as Product | undefined;
       if (!before) throw AppError.notFound(`Product ${id} not found`);
 
@@ -129,16 +131,6 @@ export const ProductService = {
 
       if (updates.imageUrls !== undefined) {
         patch.image_urls = JSON.stringify(updates.imageUrls);
-        if (updates.imageUrls.length > 0 && updates.imageUrls[0]) {
-          try {
-            const fp = FingerprintService.computeFingerprint(updates.imageUrls[0]);
-            const quality = FingerprintService.checkPhotoQuality(updates.imageUrls[0]);
-            patch.photo_fingerprint = '{' + fp.join(',') + '}';
-            patch.photo_quality_score = quality.score;
-          } catch {
-            // Keep existing fingerprint if decode fails
-          }
-        }
       }
 
       await trx('products').where({ id }).update(patch);
@@ -174,6 +166,11 @@ export const ProductService = {
 
       return after;
     });
+
+    if (updates.imageUrls !== undefined) {
+      syncEmbeddingsInBackground(storeId, id, updates.imageUrls);
+    }
+    return updated;
   },
 
   /** Product + resolved attributes + variants with stock, in a fixed number of queries. */

@@ -92,20 +92,21 @@ export const ProductPerformanceService = {
     if (cached) {
       return {
         productId,
-        timeToFirstSaleDays: cached.time_to_first_sale_days !== null
-          ? Number(cached.time_to_first_sale_days) : null,
-        salesVelocity30d: cached.sales_velocity_30d !== null
-          ? Number(cached.sales_velocity_30d) : null,
-        sellThroughRate: cached.sell_through_rate !== null
-          ? Number(cached.sell_through_rate) : null,
-        avgStockAgeDays: cached.avg_stock_age_days !== null
-          ? Number(cached.avg_stock_age_days) : null,
-        sizeDemand: (typeof cached.size_demand === 'string'
-          ? JSON.parse(cached.size_demand)
-          : cached.size_demand) as SizeDemandEntry[],
-        computedAt: cached.computed_at instanceof Date
-          ? cached.computed_at.toISOString()
-          : String(cached.computed_at),
+        // db rows arrive camelCased (see pg-mapping), so read camelCase keys here.
+        timeToFirstSaleDays: cached.timeToFirstSaleDays != null
+          ? Number(cached.timeToFirstSaleDays) : null,
+        salesVelocity30d: cached.salesVelocity30d != null
+          ? Number(cached.salesVelocity30d) : null,
+        sellThroughRate: cached.sellThroughRate != null
+          ? Number(cached.sellThroughRate) : null,
+        avgStockAgeDays: cached.avgStockAgeDays != null
+          ? Number(cached.avgStockAgeDays) : null,
+        sizeDemand: ((typeof cached.sizeDemand === 'string'
+          ? JSON.parse(cached.sizeDemand)
+          : cached.sizeDemand) ?? []) as SizeDemandEntry[],
+        computedAt: cached.computedAt instanceof Date
+          ? cached.computedAt.toISOString()
+          : String(cached.computedAt),
       };
     }
 
@@ -242,7 +243,7 @@ export const ProductPerformanceService = {
     if (!product) return [];
 
     const sizeAttrDef = await db('attribute_definitions')
-      .where({ retail_template_id: product.retail_template_id })
+      .where({ retail_template_id: product.retailTemplateId })
       .whereILike('name', 'size')
       .first();
 

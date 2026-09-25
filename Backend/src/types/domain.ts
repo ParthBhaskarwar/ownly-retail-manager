@@ -468,33 +468,41 @@ export interface RestockBatchResult {
 // ─── Week 6 — Photo Intelligence ──────────────────────────────────────────────
 
 /**
- * Result of processing a product photo through the offline DCT fingerprinter.
- * All fields are optional because the photo capture step itself is optional.
+ * Result of analysing one product photo (POST /api/products/analyze-photo).
+ * Quality checks need no model, so they are present even when photo AI is
+ * unavailable; suggestions and similar products need the embedding model.
  */
-export interface PhotoFingerprintResult {
-  /** 64-element L2-normalised DCT vector. */
-  fingerprint: number[];
-  /** 0–1 quality score (brightness, contrast, sharpness). */
+export interface PhotoAnalysisResult {
+  /** false when the CLIP model is disabled or failed to load. */
+  aiAvailable: boolean;
+  /** 0–1 quality score (resolution, brightness, contrast, sharpness). */
   qualityScore: number;
   /** Human-readable quality issues detected (empty = good quality). */
   qualityIssues: string[];
-  /** Colour / pattern suggestions to pre-fill product attributes. */
+  /** Colour / pattern suggestions to pre-fill product attributes (null without AI). */
   attributeSuggestions: {
     colours: string[];
     pattern: string;
-  };
+    patternConfidence: number;
+  } | null;
+  /** Existing products that look like this photo, best first. */
+  similar: SimilarProduct[];
+  /** Similarity at/above which a match is flagged as a possible duplicate. */
+  duplicateThreshold: number;
+  /** Why AI parts are missing, when they are. */
+  message?: string;
 }
 
 /**
  * A product returned by the similar-product search.
- * Similarity is the cosine similarity between fingerprint vectors (0–1).
+ * Similarity is the cosine similarity between CLIP image embeddings.
  */
 export interface SimilarProduct {
   productId: string;
   name: string;
   baseSku: string;
   similarity: number;
-  /** Warning flag: true when similarity >= DUPLICATE_THRESHOLD (0.92). */
+  /** Warning flag: true when similarity >= the configured duplicate threshold. */
   isPossibleDuplicate: boolean;
   imageUrls: string[];
 }

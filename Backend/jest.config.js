@@ -5,6 +5,7 @@ const config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  setupFiles: ['<rootDir>/tests/setup-env.ts'],
   testMatch: ['**/tests/**/*.test.ts'],
   // Integration tests share one Postgres database, so they must not run
   // concurrently — see the --runInBand flag in package.json's test script.

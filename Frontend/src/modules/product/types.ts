@@ -152,14 +152,28 @@ export interface ProductSearchFilters {
 
 // ─── Week 6 — Photo Intelligence ─────────────────────────────────────────────
 
-export interface PhotoFingerprintResult {
-  fingerprint: number[];
+export interface PhotoQualityResult {
+  score: number;
+  issues: string[];
+}
+
+export interface AttributeSuggestions {
+  colours: string[];
+  /** One of the product form's pattern options (Solid, Striped, Checked, ...). */
+  pattern: string;
+  patternConfidence: number;
+}
+
+/** Response of POST /api/products/analyze-photo. */
+export interface PhotoAnalysisResult {
+  /** false when the offline model is off/unavailable (quality is still returned). */
+  aiAvailable: boolean;
   qualityScore: number;
   qualityIssues: string[];
-  attributeSuggestions: {
-    colours: string[];
-    pattern: string;
-  };
+  attributeSuggestions: AttributeSuggestions | null;
+  similar: SimilarProduct[];
+  duplicateThreshold: number;
+  message?: string;
 }
 
 export interface SimilarProduct {

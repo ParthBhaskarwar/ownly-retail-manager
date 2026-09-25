@@ -21,7 +21,7 @@ import type {
   UpdateProductInput,
   UpdateVariantInput,
   ProductSearchFilters,
-  PhotoFingerprintResult,
+  PhotoAnalysisResult,
   SimilarProduct,
   ProductPerformanceMetrics,
 } from '@/modules/product/types';
@@ -102,23 +102,21 @@ export const ProductService = {
   // ── Week 6: Photo intelligence ────────────────────────────────────────────
 
   /**
-   * Upload a base64 image for a saved product. The backend computes the DCT
-   * fingerprint offline and persists it. Returns quality score, issues, and
-   * attribute suggestions.
+   * Analyse a photo (base64) with the offline photo AI: quality check, colour and
+   * pattern suggestions, and existing products that look like it. Nothing is
+   * saved — embeddings are stored when the product's photos are saved.
+   * Pass excludeProductId for a saved product so it never matches itself.
    */
-  async uploadFingerprint(
-    productId: string,
-    base64Image: string
-  ): Promise<PhotoFingerprintResult> {
-    return apiClient.post<PhotoFingerprintResult>(
-      `/api/products/${productId}/fingerprint`,
-      { image: base64Image }
-    );
+  async analyzePhoto(base64Image: string, excludeProductId?: string): Promise<PhotoAnalysisResult> {
+    return apiClient.post<PhotoAnalysisResult>('/api/products/analyze-photo', {
+      image: base64Image,
+      excludeProductId,
+    });
   },
 
   /**
-   * Find products visually similar to the given product (requires fingerprint).
-   * Returns `{ enabled: false }` when the product has no fingerprint.
+   * Find products visually similar to the given product (requires photo embeddings).
+   * Returns `{ enabled: false }` when the product has no photo embeddings.
    */
   async getSimilarProducts(
     productId: string,

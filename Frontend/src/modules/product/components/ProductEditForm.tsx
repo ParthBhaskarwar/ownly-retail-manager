@@ -12,7 +12,7 @@ import { AttributeService, SupplierService, CategoryService } from '@/modules/ca
 import type { AttributeDefinition } from '@/modules/attributes/types';
 import type { ProductDetail, ProductStatus } from '@/modules/product/types';
 import type { Supplier, Category } from '@/modules/catalog/types';
-import type { AttributeSuggestions } from '@/modules/product/services/FingerprintService';
+import type { AttributeSuggestions } from '@/modules/product/types';
 import { CLOTHING_TEMPLATE_ID } from '@/config/retail-templates';
 
 interface ProductEditFormProps {
@@ -134,7 +134,7 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
       updated[colourDef.id] = suggestions.colours[0];
     }
     if (patternDef && suggestions.pattern && !updated[patternDef.id]) {
-      updated[patternDef.id] = suggestions.pattern.includes('solid') ? 'Solid' : 'Printed';
+      updated[patternDef.id] = suggestions.pattern;
     }
 
     setProductAttrValues(updated);

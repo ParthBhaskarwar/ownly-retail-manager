@@ -5,11 +5,11 @@
  *
  * Features:
  *   • File picker + optional live camera capture (getUserMedia)
- *   • Client-side DCT fingerprint computed via <canvas> before upload
+ *   • Sends the photo to POST /api/products/analyze-photo (offline CLIP model)
  *   • Quality score badge (Good / Fair / Poor) with issue list
  *   • Colour / pattern attribute suggestions
- *   • "Possible duplicate" warning banner when similarity ≥ 0.92
- *   • Calls POST /api/products/:id/fingerprint once a product is saved
+ *   • "Possible duplicate" warning banner for near-identical existing products
+ *   • Optional "Add to product photos" so the photo is saved (and embedded) with the product
  *
  * Design principle: the entire component is gated on `enabled` prop.
  * When enabled=false (or when the browser doesn't support File API),
@@ -17,25 +17,27 @@
  */
 
 import React, { useRef, useState, useCallback } from 'react';
-import {
-  computeFingerprintFromFile,
-  checkPhotoQuality,
-  fileToBase64,
-  DUPLICATE_THRESHOLD,
-  type PhotoQualityResult,
-} from '@/lib/visualFingerprint';
-import { apiClient } from '@/lib/apiClient';
-import type { PhotoFingerprintResult, SimilarProduct } from '@/modules/product/types';
+import { ProductService } from '@/modules/product/services/ProductService';
+import type { AttributeSuggestions, PhotoQualityResult, SimilarProduct } from '@/modules/product/types';
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface PhotoCaptureProps {
-  /** The product id to attach the fingerprint to. Undefined while creating. */
+  /** The saved product being looked at (so it never matches itself). Undefined while creating. */
   productId?: string;
   /** Whether photo AI is available. Default true. Set false to hide entirely. */
   enabled?: boolean;
-  /** Called after a successful fingerprint upload. */
-  onFingerprintSaved?: (result: PhotoFingerprintResult) => void;
+  /** When given, shows "Add to product photos"; should save the photo on the product. */
+  onAddPhoto?: (base64: string) => Promise<void>;
 }
 
 type UploadState = 'idle' | 'computing' | 'uploading' | 'done' | 'error';
@@ -68,13 +70,15 @@ function QualityBadge({ score }: { score: number }) {
 export default function PhotoCapture({
   productId,
   enabled = true,
-  onFingerprintSaved,
+  onAddPhoto,
 }: PhotoCaptureProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [quality, setQuality] = useState<PhotoQualityResult | null>(null);
-  const [suggestions, setSuggestions] = useState<PhotoFingerprintResult['attributeSuggestions'] | null>(null);
+  const [suggestions, setSuggestions] = useState<AttributeSuggestions | null>(null);
+  const [aiNote, setAiNote] = useState<string | null>(null);
+  const [added, setAdded] = useState(false);
   const [similar, setSimilar] = useState<SimilarProduct[]>([]);
   const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -90,48 +94,37 @@ export default function PhotoCapture({
     setSimilar([]);
     setSuggestions(null);
     setQuality(null);
+    setAiNote(null);
+    setAdded(false);
 
     try {
-      // Show preview immediately
       const base64 = await fileToBase64(file);
       setPreview(base64);
 
-      // Compute quality + fingerprint client-side
-      const [qualityResult] = await Promise.all([
-        checkPhotoQuality(file),
-        computeFingerprintFromFile(file),
-      ]);
-      if (qualityResult) setQuality(qualityResult);
-
-      if (!productId) {
-        // No product yet (still on create form) — store the base64 for later
-        setUploadState('done');
-        return;
-      }
-
-      // Upload to backend
-      setUploadState('uploading');
-      const result = await apiClient.post<PhotoFingerprintResult>(
-        `/api/products/${productId}/fingerprint`,
-        { image: base64 }
-      );
-      setSuggestions(result.attributeSuggestions);
+      const result = await ProductService.analyzePhoto(base64, productId);
       setQuality({ score: result.qualityScore, issues: result.qualityIssues });
-
-      // Fetch similar products
-      const similarRes = await apiClient.get<{
-        enabled: boolean;
-        similar: SimilarProduct[];
-      }>(`/api/products/${productId}/similar`);
-      if (similarRes.enabled) setSimilar(similarRes.similar);
-
+      setSuggestions(result.attributeSuggestions);
+      setSimilar(result.similar);
+      setAiNote(result.aiAvailable ? null : result.message ?? null);
       setUploadState('done');
-      onFingerprintSaved?.(result);
     } catch (err) {
       setUploadState('error');
-      setError((err as Error).message ?? 'Photo upload failed');
+      setError((err as Error).message ?? 'Photo analysis failed');
     }
-  }, [productId, onFingerprintSaved]);
+  }, [productId]);
+
+  const addToProduct = async () => {
+    if (!preview || !onAddPhoto) return;
+    setUploadState('uploading');
+    try {
+      await onAddPhoto(preview);
+      setAdded(true);
+      setUploadState('done');
+    } catch (err) {
+      setUploadState('error');
+      setError((err as Error).message ?? 'Could not add the photo');
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -227,7 +220,7 @@ export default function PhotoCapture({
       {(uploadState === 'computing' || uploadState === 'uploading') && (
         <div style={{ color: '#6b7280', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span>
-          {uploadState === 'computing' ? 'Analysing image offline…' : 'Saving fingerprint…'}
+          {uploadState === 'computing' ? 'Analysing photo offline…' : 'Saving photo…'}
         </div>
       )}
 
@@ -275,9 +268,13 @@ export default function PhotoCapture({
                 {suggestions.colours.join(', ')} · {suggestions.pattern}
               </div>
             )}
-            {uploadState === 'done' && !hasDuplicates && (
-              <span style={{ fontSize: 12, color: '#16a34a' }}>✓ Fingerprint saved</span>
+            {aiNote && <div style={{ fontSize: 12, color: '#6b7280' }}>{aiNote}</div>}
+            {onAddPhoto && !added && uploadState === 'done' && (
+              <button type="button" onClick={addToProduct} style={btnStyle('#2563eb')}>
+                Add to product photos
+              </button>
             )}
+            {added && <span style={{ fontSize: 12, color: '#16a34a' }}>✓ Photo added to this product</span>}
           </div>
         </div>
       )}

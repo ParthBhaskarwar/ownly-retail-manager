@@ -1,7 +1,7 @@
 /**
  * Products routes — search, create (with variants + opening stock), detail,
- * update; Week 6 adds photo fingerprint, similar-product search, and
- * product-performance endpoints.
+ * update; Week 6 adds photo analysis (CLIP embeddings + pgvector similar-product
+ * search) and product-performance endpoints.
  *
  * storeId always comes from the caller's token, never the body, so a client
  * cannot read or write another store's products.
@@ -15,13 +15,16 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { ProductService, VariantService } from '@/services/product.service';
 import {
-  FingerprintService,
-} from '@/services/fingerprint.service';
+  EmbeddingService,
+  EmbeddingUnavailableError,
+  InvalidImageError,
+} from '@/services/embedding.service';
+import { ProductEmbeddingRepository } from '@/services/product-embedding.repository';
 import { ProductPerformanceService } from '@/services/product-performance.service';
 import { db } from '@/db/client';
 import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
 import { AppError, param } from '@/shared/AppError';
-import type { SimilarProduct } from '@/types/domain';
+import type { PhotoAnalysisResult } from '@/types/domain';
 
 export const productsRouter = Router();
 productsRouter.use(authenticate);
@@ -168,50 +171,69 @@ productsRouter.put('/:id/variants/:variantId', requirePermission('inventory:edit
 // ── Week 6: Photo fingerprint ─────────────────────────────────────────────────
 
 /**
- * POST /api/products/:id/fingerprint
+ * POST /api/products/analyze-photo
  *
- * Body: { image: string }  — base64-encoded image (with or without data-URI prefix).
+ * Body: { image: string, excludeProductId?: uuid } — base64 image (data-URI prefix optional).
  *
- * Computes the DCT perceptual hash offline, runs quality checks and attribute
- * suggestions, persists the fingerprint on the product row, then returns
- * the full result so the frontend can show quality feedback and suggestions
- * without a second round-trip.
+ * Works before a product exists (Add Product) and for saved products (pass
+ * excludeProductId so a product never matches itself). Returns:
+ *   - photo quality (real pixel checks; needs no model)
+ *   - colour / pattern suggestions (CLIP zero-shot)
+ *   - existing products that look like this photo, with a duplicate flag
  *
- * Optional endpoint — skipping it never affects product CRUD.
+ * Nothing is saved here — embeddings are stored when the product itself is
+ * saved. Every AI part degrades gracefully: with the model off or the pgvector
+ * migration not applied you still get quality feedback and HTTP 200.
  */
-productsRouter.post('/:id/fingerprint', requirePermission('inventory:edit'), async (req, res, next) => {
+productsRouter.post('/analyze-photo', requirePermission('inventory:edit'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
-    const productId = param(req.params, 'id');
-
-    // Confirm product belongs to this store
-    const product = await db('products').where({ id: productId, store_id: storeId }).first();
-    if (!product) throw AppError.notFound('Product not found.');
-
-    const { image } = z.object({
+    const { image, excludeProductId } = z.object({
       image: z.string().min(100, 'image must be a non-empty base64 string'),
+      excludeProductId: z.string().uuid().optional(),
     }).parse(req.body);
 
-    // All computation is offline — no external calls
-    const fingerprint = FingerprintService.computeFingerprint(image);
-    const { score: qualityScore, issues: qualityIssues } = FingerprintService.checkPhotoQuality(image);
-    const attributeSuggestions = FingerprintService.suggestAttributes(image);
+    let quality;
+    try {
+      quality = await EmbeddingService.checkPhotoQuality(image);
+    } catch (err) {
+      if (err instanceof InvalidImageError) throw AppError.badRequest('That file could not be read as an image.');
+      throw err;
+    }
 
-    // Persist fingerprint as PostgreSQL FLOAT8[]
-    await db('products')
-      .where({ id: productId })
-      .update({
-        photo_fingerprint: '{' + fingerprint.join(',') + '}',
-        photo_quality_score: qualityScore,
-        updated_at: new Date(),
-      });
+    const result: PhotoAnalysisResult = {
+      aiAvailable: false,
+      qualityScore: quality.score,
+      qualityIssues: quality.issues,
+      attributeSuggestions: null,
+      similar: [],
+      duplicateThreshold: EmbeddingService.DUPLICATE_THRESHOLD,
+    };
 
-    res.json({
-      fingerprint,
-      qualityScore,
-      qualityIssues,
-      attributeSuggestions,
-    });
+    try {
+      const embedding = await EmbeddingService.embedImage(image);
+      result.aiAvailable = true;
+      result.attributeSuggestions = await EmbeddingService.suggestAttributes(embedding);
+      try {
+        result.similar = await ProductEmbeddingRepository.searchByVector(storeId, embedding, {
+          excludeProductId,
+          limit: 5,
+        });
+      } catch (err) {
+        console.warn('[embedding] similar-product search failed (is migration 008 applied?):', (err as Error).message);
+        result.message = 'Similar-product search is not ready yet.';
+      }
+    } catch (err) {
+      if (err instanceof EmbeddingUnavailableError) {
+        result.message = 'Photo AI is not available — colour suggestions and duplicate check are off.';
+      } else if (err instanceof InvalidImageError) {
+        throw AppError.badRequest('That file could not be read as an image.');
+      } else {
+        throw err;
+      }
+    }
+
+    res.json(result);
   } catch (err) {
     next(err);
   }
@@ -220,11 +242,9 @@ productsRouter.post('/:id/fingerprint', requirePermission('inventory:edit'), asy
 /**
  * GET /api/products/:id/similar
  *
- * Returns up to 5 products (excluding the queried product itself) whose stored
- * fingerprint has cosine similarity >= SIMILAR_THRESHOLD (0.50) to the target.
- *
- * Products with no fingerprint are excluded automatically.
- * When the target product has no fingerprint, returns { enabled: false }.
+ * Products whose photos look like this product's photos (best photo pair wins),
+ * from the pgvector index. { enabled: false } when the product has no embeddings
+ * yet (no photo, photo AI off, or migration 008 not applied).
  */
 productsRouter.get('/:id/similar', requirePermission('inventory:view'), async (req, res, next) => {
   try {
@@ -232,71 +252,27 @@ productsRouter.get('/:id/similar', requirePermission('inventory:view'), async (r
     const productId = param(req.params, 'id');
     const limit = Math.min(10, Math.max(1, Number(req.query.limit ?? 5)));
 
-    // Fetch the target fingerprint
-    const target = (await db('products')
-      .where({ id: productId, store_id: storeId })
-      .select('id', 'photo_fingerprint')
-      .first()) as { id: string; photoFingerprint: string | null } | undefined;
+    const exists = await db('products').where({ id: productId, store_id: storeId }).first('id');
+    if (!exists) throw AppError.notFound('Product not found.');
 
-    if (!target) throw AppError.notFound('Product not found.');
-
-    if (!target.photoFingerprint) {
-      res.json({ enabled: false, similar: [] });
-      return;
-    }
-
-    let targetVec: number[];
+    let similar;
     try {
-      targetVec = JSON.parse(target.photoFingerprint) as number[];
-    } catch {
+      similar = await ProductEmbeddingRepository.findSimilarToProduct(storeId, productId, limit);
+    } catch (err) {
+      console.warn('[embedding] similar lookup failed (is migration 008 applied?):', (err as Error).message);
       res.json({ enabled: false, similar: [] });
       return;
     }
 
-    // Load all other fingerprinted products in this store
-    const candidates = (await db('products')
-      .where('store_id', storeId)
-      .whereNot('id', productId)
-      .whereNotNull('photo_fingerprint')
-      .select('id', 'name', 'base_sku', 'photo_fingerprint', 'image_urls')) as Array<{
-        id: string;
-        name: string;
-        baseSku: string;
-        photoFingerprint: string;
-        imageUrls: string;
-      }>;
-
-    // Compute cosine similarity and filter
-    const results: SimilarProduct[] = [];
-    for (const c of candidates) {
-      let vec: number[];
-      try {
-        vec = JSON.parse(c.photoFingerprint) as number[];
-      } catch {
-        continue;
-      }
-      const similarity = FingerprintService.cosineSimilarity(targetVec, vec);
-      if (similarity >= FingerprintService.SIMILAR_THRESHOLD) {
-        results.push({
-          productId: c.id,
-          name: c.name,
-          baseSku: c.baseSku,
-          similarity: Math.round(similarity * 1000) / 1000,
-          isPossibleDuplicate: similarity >= FingerprintService.DUPLICATE_THRESHOLD,
-          imageUrls: (() => {
-            try { return JSON.parse(c.imageUrls) as string[]; } catch { return []; }
-          })(),
-        });
-      }
+    if (similar === null) {
+      res.json({ enabled: false, similar: [] });
+      return;
     }
-
-    // Sort by descending similarity, return top N
-    results.sort((a, b) => b.similarity - a.similarity);
 
     res.json({
       enabled: true,
-      similar: results.slice(0, limit),
-      duplicateThreshold: FingerprintService.DUPLICATE_THRESHOLD,
+      similar,
+      duplicateThreshold: EmbeddingService.DUPLICATE_THRESHOLD,
     });
   } catch (err) {
     next(err);

@@ -264,8 +264,12 @@ function ProductDetailContent() {
           <PhotoCapture
             productId={product.id}
             enabled={true}
-            onFingerprintSaved={() => {
-              void loadProduct();
+            onAddPhoto={async (base64) => {
+              await ProductService.updateProduct(product.id, {
+                imageUrls: [...(product.imageUrls ?? []), base64],
+                updatedBy: user?.id ?? 'system',
+              });
+              await loadProduct();
             }}
           />
         </section>
