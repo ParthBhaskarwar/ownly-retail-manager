@@ -12,6 +12,7 @@ import { StockEntryForm } from '@/modules/inventory/components/StockEntryForm';
 import PhotoCapture from '@/modules/product/components/PhotoCapture';
 import SimilarProductsPanel from '@/modules/product/components/SimilarProductsPanel';
 import ProductPerformancePanel from '@/modules/product/components/ProductPerformancePanel';
+import { AiProductAnalysisPanel } from '@/modules/ai/components/AiProductAnalysisPanel';
 import type { ProductDetail, VariantWithStock } from '@/modules/product/types';
 import type { Role } from '@/modules/account/types';
 
@@ -21,6 +22,7 @@ function ProductDetailContent() {
   const { user } = useAuthContext();
   const productId = params.id as string;
   const canEdit = user ? evaluatePermission(user.role as Role, 'inventory:edit') : false;
+  const canSeeAi = user ? evaluatePermission(user.role as Role, 'reports:view') : false;
 
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -290,6 +292,16 @@ function ProductDetailContent() {
         </h2>
         <ProductPerformancePanel productId={product.id} />
       </section>
+
+      {/* ── Week 7: AI product analysis ───────────────────────────────────── */}
+      {canSeeAi && (
+        <section aria-labelledby="ai-heading" className="card">
+          <h2 id="ai-heading" className="card__title mb-3">
+            AI Product Analysis
+          </h2>
+          <AiProductAnalysisPanel productId={product.id} canRestock={canEdit} />
+        </section>
+      )}
     </div>
   );
 }

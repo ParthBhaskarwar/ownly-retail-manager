@@ -7,6 +7,9 @@ import { useStoreContext } from '@/context/StoreContext';
 import { StoreService } from '@/modules/store/services/StoreService';
 import { OnboardingChecklist } from '@/modules/store/components/OnboardingChecklist';
 import { RestockRemindersCard } from '@/modules/restock/components/RestockRemindersCard';
+import { AiOverviewCard } from '@/modules/ai/components/AiOverviewCard';
+import { evaluatePermission } from '@/config/permissions';
+import type { Role } from '@/modules/account/types';
 import { ReportService } from '@/modules/reports/services/ReportService';
 import { BackupService } from '@/modules/backup/services/BackupService';
 import { PermissionGuard } from '@/shared/components/PermissionGuard';
@@ -195,6 +198,8 @@ export default function DashboardPage() {
             <div className="stat-card__label">Stock Valuation (Cost)</div>
           </div>
         </div>
+
+        {user && evaluatePermission(user.role as Role, 'reports:view') && <AiOverviewCard />}
 
         <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
           <div>

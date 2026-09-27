@@ -79,6 +79,15 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'inventory:edit',
     section: 'store',
   },
+  // Week 7 — AI-assisted restock
+  {
+    id: 'nav-ai-restock',
+    label: 'AI Restock',
+    href: '/ai-restock',
+    icon: '✦',
+    permissionKey: 'inventory:edit',
+    section: 'store',
+  },
   // Inventory
   {
     id: 'nav-inventory',
@@ -103,6 +112,15 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: 'Reports',
     href: '/reports',
     icon: '⊗',
+    permissionKey: 'reports:view',
+    section: 'insights',
+  },
+  // Week 7 — AI evaluation and prediction history
+  {
+    id: 'nav-ai-insights',
+    label: 'AI Insights',
+    href: '/ai-insights',
+    icon: '◎',
     permissionKey: 'reports:view',
     section: 'insights',
   },

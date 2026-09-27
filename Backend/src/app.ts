@@ -31,6 +31,8 @@ import { restockRouter } from './api/inventory/restock.router';
 import { dashboardRouter } from './api/dashboard/dashboard.router';
 import { reportsRouter } from './api/reports/reports.router';
 import { backupRouter } from './api/backup/backup.router';
+// Week 7 — offline AI scoring and AI-assisted restocking
+import { aiRouter } from './api/ai/ai.router';
 
 const app = express();
 
@@ -50,7 +52,7 @@ app.use(express.json({ limit: '20mb' }));
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', version: '0.6.0', env: config.nodeEnv });
+  res.json({ status: 'ok', version: '0.7.0', env: config.nodeEnv });
 });
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
@@ -71,6 +73,8 @@ app.use('/api/inventory/restock', restockRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/backup', backupRouter);
+// Week 7 routes
+app.use('/api/ai', aiRouter);
 
 // ─── 404 handler ──────────────────────────────────────────────────────────────
 app.use((_req, res) => {
