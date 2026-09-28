@@ -1,4 +1,5 @@
 import { db } from '@/db/db';
+import { apiClient, getToken } from '@/lib/apiClient';
 import type {
   ReportFilter,
   SalesReportSummary,
@@ -162,6 +163,78 @@ export const ReportService = {
   },
 
   async getInventoryValuationReport(storeId: string, filter?: ReportFilter): Promise<InventoryValuationSummary> {
+    if (getToken()) {
+      try {
+        const { valuation } = await apiClient.get<{ valuation: any }>('/api/inventory/valuation');
+        const { rows } = await apiClient.get<{ rows: any[] }>('/api/reports/inventory');
+
+        let available = 0, sold = 0, damaged = 0, returned = 0, missing = 0;
+        const catMap = new Map<string, { inStock: number; costValue: number; retailValue: number; profit: number }>();
+        const prodMap = new Map<string, {
+          productId: string; productName: string; sku: string; categoryName: string;
+          inStock: number; costValue: number; retailValue: number; potentialProfit: number; status: string;
+        }>();
+
+        for (const item of rows) {
+          if (item.status === 'IN_STOCK') {
+            available++;
+            const cp = Number(item.purchaseCostPrice || 0);
+            const sp = Number(item.sellingPrice || 0);
+            const catName = item.categoryName || 'Clothing';
+            const cat = catMap.get(catName) || { inStock: 0, costValue: 0, retailValue: 0, profit: 0 };
+            cat.inStock++;
+            cat.costValue += cp;
+            cat.retailValue += sp;
+            cat.profit += (sp - cp);
+            catMap.set(catName, cat);
+
+            const sku = item.variantSku || item.barcode;
+            const prod = prodMap.get(sku) || {
+              productId: sku,
+              productName: item.productName || 'Garment',
+              sku: item.variantSku || 'SKU',
+              categoryName: catName,
+              inStock: 0,
+              costValue: 0,
+              retailValue: 0,
+              potentialProfit: 0,
+              status: item.status,
+            };
+            prod.inStock++;
+            prod.costValue += cp;
+            prod.retailValue += sp;
+            prod.potentialProfit += (sp - cp);
+            prodMap.set(sku, prod);
+          } else if (item.status === 'SOLD') sold++;
+          else if (item.status === 'DAMAGED' || item.status === 'RETURNED_DAMAGED') damaged++;
+          else if (item.status === 'RETURNED_TO_STOCK') returned++;
+          else if (item.status === 'LOST') missing++;
+        }
+
+        const costVal = valuation ? Number(valuation.stockCostValue) : 0;
+        const retailVal = valuation ? Number(valuation.expectedSalesValue) : 0;
+        const profit = valuation ? Number(valuation.potentialGrossProfit) : (retailVal - costVal);
+        const margin = retailVal > 0 ? (profit / retailVal) * 100 : 0;
+
+        return {
+          totalStockQuantity: valuation ? Number(valuation.itemCount) : available,
+          totalStockCostValue: costVal,
+          totalStockRetailValue: retailVal,
+          potentialGrossProfit: profit,
+          potentialMarginPercent: margin,
+          availableItemsCount: available,
+          soldItemsCount: sold,
+          damagedItemsCount: damaged,
+          returnedItemsCount: returned,
+          missingItemsCount: missing,
+          itemsByCategory: Array.from(catMap.entries()).map(([categoryName, data]) => ({ categoryName, ...data })),
+          itemsByProduct: Array.from(prodMap.values()),
+        };
+      } catch (e) {
+        // Fall back to Dexie
+      }
+    }
+
     if (!db) {
       return {
         totalStockQuantity: 0,
