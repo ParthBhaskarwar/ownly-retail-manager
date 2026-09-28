@@ -1,257 +1,211 @@
 /**
- * Returns, Condition Tracking & Refund Router.
+ * Returns, condition tracking and refunds.
+ *
+ *   GET  /api/returns/eligible/:invoiceNumber   what can still be returned on an invoice
+ *   POST /api/returns                           process a return (refund / credit note)
+ *
+ * Refund amounts are computed here from what the customer actually paid for
+ * the line (price scaled by the bill's discount and tax) — the client cannot
+ * ask for more.
  */
 
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { db } from '../../db/client';
+import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
+import { db } from '@/db/client';
+import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
+import { AppError, param } from '@/shared/AppError';
+import { nextDocNumber } from '@/shared/docNumber';
+import { refundableForLine, round2 } from '@/shared/money';
 
 export const returnsRouter = Router();
-
 returnsRouter.use(authenticate);
 
-async function generateReturnNumber(storeId: string | null | undefined, trx: any): Promise<string> {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const countRes = await trx('returns')
-    .modify((qb: any) => {
-      if (storeId) qb.where('store_id', storeId);
-    })
-    .count('id as count')
-    .first();
-  const count = parseInt((countRes?.count as string) || '0', 10) + 1;
-  return `RET-${dateStr}-${count.toString().padStart(4, '0')}`;
-}
-
-async function generateCreditNoteNumber(storeId: string | null | undefined, trx: any): Promise<string> {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const countRes = await trx('credit_notes')
-    .modify((qb: any) => {
-      if (storeId) qb.where('store_id', storeId);
-    })
-    .count('id as count')
-    .first();
-  const count = parseInt((countRes?.count as string) || '0', 10) + 1;
-  return `CN-${dateStr}-${count.toString().padStart(4, '0')}`;
-}
-
-// GET /api/returns/eligible/:invoiceNumber
-returnsRouter.get('/eligible/:invoiceNumber', async (req, res): Promise<void> => {
+returnsRouter.get('/eligible/:invoiceNumber', requirePermission('returns:create'), async (req, res, next) => {
   try {
-    const { invoiceNumber } = req.params;
-    const storeId = req.user?.storeId;
+    const storeId = requireStoreId(req);
+    const invoiceNumber = param(req.params, 'invoiceNumber');
 
-    let query = db('invoices').where('invoice_number', invoiceNumber);
-    if (storeId) query = query.andWhere('store_id', storeId);
-
-    const invoice = await query.first();
-    if (!invoice) {
-      res.status(404).json({ error: 'Original invoice not found' });
-      return;
-    }
-
+    const invoice = await db('invoices').where({ store_id: storeId, invoice_number: invoiceNumber }).first();
+    if (!invoice) throw AppError.notFound('Invoice not found.');
     if (invoice.status === 'FULLY_RETURNED' || invoice.status === 'CANCELLED') {
-      res.status(400).json({ error: `Invoice is already ${invoice.status}` });
-      return;
+      throw AppError.badRequest(`This invoice is already ${String(invoice.status).replace('_', ' ').toLowerCase()}.`);
     }
 
     const items = await db('invoice_items').where('invoice_id', invoice.id);
-    const existingReturns = await db('return_items')
-      .join('returns', 'return_items.return_id', 'returns.id')
-      .where('returns.original_invoice_id', invoice.id)
-      .select('return_items.original_invoice_item_id');
-
-    const returnedItemIds = new Set(existingReturns.map((r: any) => r.original_invoice_item_id));
-
-    const eligibleItems = items.map((item: any) => ({
-      ...item,
-      isAlreadyReturned: returnedItemIds.has(item.id),
-      eligibleForReturn: item.status === 'ACTIVE' && !returnedItemIds.has(item.id),
-    }));
-
     res.json({
       invoice,
-      items: eligibleItems,
+      items: items.map((item: Record<string, unknown>) => ({
+        ...item,
+        refundableAmount: refundableForLine(invoice, item['finalPrice'] as string),
+        isAlreadyReturned: item['status'] === 'RETURNED',
+        eligibleForReturn: item['status'] === 'ACTIVE',
+      })),
     });
-  } catch (err: any) {
-    res.status(500).json({ error: 'Failed to fetch invoice for return' });
+  } catch (err) {
+    next(err);
   }
 });
 
-// POST /api/returns
-returnsRouter.post('/', async (req, res): Promise<void> => {
-  const storeId = req.user?.storeId;
-  const processedBy = req.user?.userId;
+const returnSchema = z.object({
+  originalInvoiceId: z.string().uuid(),
+  items: z
+    .array(
+      z.object({
+        invoiceItemId: z.string().uuid(),
+        condition: z.enum(['RESELLABLE', 'DAMAGED', 'DEFECTIVE', 'OPENED_USED', 'OTHER']).default('RESELLABLE'),
+        reason: z.string().trim().max(255).nullish(),
+        refundAmount: z.number().min(0).optional(),
+      })
+    )
+    .min(1, 'Select at least one item to return.'),
+  refundMethod: z.enum(['CASH', 'UPI', 'CARD', 'CREDIT_NOTE']),
+  notes: z.string().trim().max(1000).nullish(),
+});
 
-  if (!processedBy) {
-    res.status(401).json({ error: 'Unauthenticated user' });
-    return;
-  }
-
-  const {
-    originalInvoiceId,
-    items,
-    refundMethod,
-    notes,
-  } = req.body;
-
-  if (!originalInvoiceId || !items || !Array.isArray(items) || items.length === 0) {
-    res.status(400).json({ error: 'Invalid return request parameters' });
-    return;
-  }
-
+returnsRouter.post('/', requirePermission('returns:create'), async (req, res, next) => {
   try {
-    const returnResult = await db.transaction(async (trx) => {
-      const invoice = await trx('invoices').where('id', originalInvoiceId).first();
-      if (!invoice) {
-        throw new Error('Original invoice not found');
+    const storeId = requireStoreId(req);
+    const processedBy = req.user!.userId;
+    const input = returnSchema.parse(req.body);
+
+    const ids = input.items.map((i) => i.invoiceItemId);
+    if (new Set(ids).size !== ids.length) throw AppError.badRequest('The same item was selected twice.');
+
+    const result = await db.transaction(async (trx) => {
+      const invoice = await trx('invoices')
+        .where({ id: input.originalInvoiceId, store_id: storeId })
+        .forUpdate()
+        .first();
+      if (!invoice) throw AppError.notFound('Original invoice not found.');
+      if (invoice.status === 'FULLY_RETURNED' || invoice.status === 'CANCELLED') {
+        throw AppError.badRequest('Nothing left to return on this invoice.');
       }
+
+      const invoiceItems = await trx('invoice_items')
+        .whereIn('id', ids)
+        .andWhere('invoice_id', invoice.id)
+        .forUpdate();
+      const itemById = new Map(invoiceItems.map((i: Record<string, unknown>) => [i['id'] as string, i]));
 
       let totalRefundAmount = 0;
-      const returnNumber = await generateReturnNumber(storeId, trx);
-      const returnId = uuidv4();
-
-      const processedReturnItems = [];
-      for (const reqItem of items) {
-        const invItem = await trx('invoice_items')
-          .where('id', reqItem.invoiceItemId)
-          .andWhere('invoice_id', originalInvoiceId)
-          .first();
-
-        if (!invItem) {
-          throw new Error(`Invoice item ${reqItem.invoiceItemId} not found on this invoice`);
+      const processed = input.items.map((reqItem) => {
+        const invItem = itemById.get(reqItem.invoiceItemId);
+        if (!invItem) throw AppError.badRequest('An item does not belong to this invoice.');
+        if (invItem['status'] !== 'ACTIVE') {
+          throw AppError.conflict(`Item ${invItem['barcode']} has already been returned or exchanged.`);
         }
 
-        const alreadyReturned = await trx('return_items')
-          .where('original_invoice_item_id', invItem.id)
-          .first();
-
-        if (alreadyReturned) {
-          throw new Error(`Item ${invItem.barcode} has already been returned`);
+        const maxRefund = refundableForLine(invoice, invItem['finalPrice'] as string);
+        const refundAmount = round2(reqItem.refundAmount ?? maxRefund);
+        if (refundAmount > maxRefund + 0.005) {
+          throw AppError.badRequest(
+            `Refund for ${invItem['barcode']} cannot exceed ₹${maxRefund.toFixed(2)} (what was paid for it).`
+          );
         }
+        totalRefundAmount = round2(totalRefundAmount + refundAmount);
 
-        const refundVal = parseFloat(reqItem.refundAmount ?? invItem.final_price);
-        totalRefundAmount += refundVal;
-
-        const condition = reqItem.condition || 'RESELLABLE';
-        const inventoryAction = condition === 'RESELLABLE' ? 'RETURN_TO_STOCK' : 'RETURN_DAMAGED';
-        const newInventoryStatus = condition === 'RESELLABLE' ? 'RETURNED_TO_STOCK' : 'RETURNED_DAMAGED';
-
-        processedReturnItems.push({
+        const resellable = reqItem.condition === 'RESELLABLE';
+        return {
           id: uuidv4(),
-          returnId,
-          originalInvoiceItemId: invItem.id,
-          inventoryItemId: invItem.inventory_item_id,
-          barcode: invItem.barcode,
-          condition,
+          invItem,
+          condition: reqItem.condition,
           reason: reqItem.reason || null,
-          refundAmount: refundVal,
-          inventoryAction,
-          newInventoryStatus,
-        });
-      }
+          refundAmount,
+          inventoryAction: resellable ? 'RETURN_TO_STOCK' : 'RETURN_DAMAGED',
+          newInventoryStatus: resellable ? 'RETURNED_TO_STOCK' : 'RETURNED_DAMAGED',
+        };
+      });
+
+      const returnId = uuidv4();
+      const returnNumber = await nextDocNumber(trx, 'returns', 'RET', storeId);
 
       await trx('returns').insert({
         id: returnId,
         return_number: returnNumber,
-        store_id: storeId || null,
-        original_invoice_id: originalInvoiceId,
-        customer_id: invoice.customer_id || null,
+        store_id: storeId,
+        original_invoice_id: invoice.id,
+        customer_id: invoice.customerId || null,
         processed_by: processedBy,
         total_refund_amount: totalRefundAmount,
-        refund_method: refundMethod,
-        notes: notes || null,
+        refund_method: input.refundMethod,
+        notes: input.notes || null,
       });
 
-      for (const pItem of processedReturnItems) {
+      for (const p of processed) {
         await trx('return_items').insert({
-          id: pItem.id,
+          id: p.id,
           return_id: returnId,
-          original_invoice_item_id: pItem.originalInvoiceItemId,
-          inventory_item_id: pItem.inventoryItemId,
-          condition: pItem.condition,
-          reason: pItem.reason,
-          refund_amount: pItem.refundAmount,
-          inventory_action: pItem.inventoryAction,
+          original_invoice_item_id: p.invItem['id'],
+          inventory_item_id: p.invItem['inventoryItemId'],
+          condition: p.condition,
+          reason: p.reason,
+          refund_amount: p.refundAmount,
+          inventory_action: p.inventoryAction,
         });
 
-        await trx('invoice_items')
-          .where('id', pItem.originalInvoiceItemId)
-          .update({ status: 'RETURNED' });
+        await trx('invoice_items').where({ id: p.invItem['id'] as string }).update({ status: 'RETURNED' });
 
         await trx('inventory_items')
-          .where('id', pItem.inventoryItemId)
-          .update({
-            status: pItem.newInventoryStatus,
-            updated_at: trx.fn.now(),
-          });
+          .where({ id: p.invItem['inventoryItemId'] as string, store_id: storeId })
+          .update({ status: p.newInventoryStatus, updated_at: trx.fn.now() });
 
         await trx('inventory_movements').insert({
           id: uuidv4(),
-          store_id: storeId || null,
-          inventory_item_id: pItem.inventoryItemId,
-          movement_type: pItem.inventoryAction,
+          store_id: storeId,
+          inventory_item_id: p.invItem['inventoryItemId'],
+          movement_type: p.inventoryAction,
           from_status: 'SOLD',
-          to_status: pItem.newInventoryStatus,
+          to_status: p.newInventoryStatus,
           reference_type: 'RETURN',
           reference_id: returnId,
           performed_by: processedBy,
-          notes: `Returned on return ${returnNumber} (Condition: ${pItem.condition})`,
+          notes: `Returned on return ${returnNumber} (condition: ${p.condition})`,
         });
       }
 
-      let creditNote = null;
-      if (refundMethod === 'CREDIT_NOTE') {
-        const creditNoteNumber = await generateCreditNoteNumber(storeId, trx);
-        const creditNoteId = uuidv4();
-
-        const expiryDate = new Date();
-        expiryDate.setDate(expiryDate.getDate() + 90);
-
+      let creditNote: Record<string, unknown> | null = null;
+      if (input.refundMethod === 'CREDIT_NOTE') {
+        const expiry = new Date();
+        expiry.setDate(expiry.getDate() + 90);
         creditNote = {
-          id: creditNoteId,
-          credit_note_number: creditNoteNumber,
-          store_id: storeId || null,
-          original_invoice_id: originalInvoiceId,
+          id: uuidv4(),
+          credit_note_number: await nextDocNumber(trx, 'credit_notes', 'CN', storeId),
+          store_id: storeId,
+          original_invoice_id: invoice.id,
           return_id: returnId,
-          customer_id: invoice.customer_id || null,
+          customer_id: invoice.customerId || null,
           original_amount: totalRefundAmount,
           remaining_amount: totalRefundAmount,
           status: 'ACTIVE',
-          expiry_date: expiryDate.toISOString().slice(0, 10),
+          expiry_date: expiry.toISOString().slice(0, 10),
         };
-
         await trx('credit_notes').insert(creditNote);
       }
 
-      const totalInvoiceItems = await trx('invoice_items').where('invoice_id', originalInvoiceId);
-      const returnedInvoiceItems = await trx('invoice_items').where('invoice_id', originalInvoiceId).andWhere('status', 'RETURNED');
+      const remainingActive = await trx('invoice_items')
+        .where({ invoice_id: invoice.id, status: 'ACTIVE' })
+        .count('* as n')
+        .first();
+      const newInvoiceStatus = Number((remainingActive as { n: string | number }).n) === 0
+        ? 'FULLY_RETURNED'
+        : 'PARTIALLY_RETURNED';
 
-      let newInvoiceStatus = 'PARTIALLY_RETURNED';
-      if (returnedInvoiceItems.length === totalInvoiceItems.length) {
-        newInvoiceStatus = 'FULLY_RETURNED';
-      }
-
-      await trx('invoices')
-        .where('id', originalInvoiceId)
-        .update({
-          status: newInvoiceStatus,
-          updated_at: trx.fn.now(),
-        });
+      await trx('invoices').where({ id: invoice.id }).update({ status: newInvoiceStatus, updated_at: trx.fn.now() });
 
       await trx('audit_logs').insert({
         id: uuidv4(),
-        store_id: storeId || null,
+        store_id: storeId,
         user_id: processedBy,
-        action: 'RETURN_PROCESSED',
-        entity_type: 'RETURN',
+        action: 'return.processed',
+        entity_type: 'return',
         entity_id: returnId,
-        details: JSON.stringify({
+        meta: JSON.stringify({
           returnNumber,
-          originalInvoiceNumber: invoice.invoice_number,
+          originalInvoiceNumber: invoice.invoiceNumber,
           refundAmount: totalRefundAmount,
-          refundMethod,
-          itemCount: processedReturnItems.length,
+          refundMethod: input.refundMethod,
+          itemCount: processed.length,
         }),
       });
 
@@ -259,15 +213,20 @@ returnsRouter.post('/', async (req, res): Promise<void> => {
         id: returnId,
         returnNumber,
         totalRefundAmount,
-        refundMethod,
-        creditNote,
+        refundMethod: input.refundMethod,
+        creditNote: creditNote
+          ? {
+              creditNoteNumber: creditNote['credit_note_number'],
+              originalAmount: creditNote['original_amount'],
+              expiryDate: creditNote['expiry_date'],
+            }
+          : null,
         invoiceStatus: newInvoiceStatus,
       };
     });
 
-    res.status(201).json(returnResult);
-  } catch (err: any) {
-    console.error('[RETURN_ERROR]', err.message);
-    res.status(400).json({ error: err.message || 'Failed to process return' });
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
   }
 });

@@ -6,7 +6,7 @@ import { VerifyForm } from '@/modules/account/components/VerifyForm';
 import { useAuth } from '@/shared/hooks/useAuth';
 
 export default function VerifyPage() {
-  const { verify } = useAuth();
+  const { verify, resendCode } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState('');
@@ -26,6 +26,17 @@ export default function VerifyPage() {
     setEmail(em);
     setDevCode(code ?? '');
   }, [router]);
+
+  const handleResend = async () => {
+    setServerError('');
+    try {
+      const { devCode: fresh } = await resendCode(userId);
+      setDevCode(fresh ?? '');
+      if (fresh) sessionStorage.setItem('ownly:verify_devCode', fresh);
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : 'Could not send a new code. Please try again.');
+    }
+  };
 
   const handleVerify = async (uid: string, code: string) => {
     setIsLoading(true);
@@ -62,6 +73,7 @@ export default function VerifyPage() {
         onSubmit={handleVerify}
         isLoading={isLoading}
         serverError={serverError}
+        onResend={handleResend}
       />
     </div>
   );

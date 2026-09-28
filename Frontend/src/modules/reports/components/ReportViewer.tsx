@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
+import { useStoreContext } from '@/context/StoreContext';
 import { CategoryService, SupplierService } from '@/modules/catalog/services/CategoryService';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
@@ -23,7 +24,8 @@ function fmt(n: number): string {
 
 export function ReportViewer() {
   const { user } = useAuthContext();
-  const storeId = user?.storeId || '';
+  const { store } = useStoreContext();
+  const storeId = store?.id || user?.storeId || '';
 
   const [activeTab, setActiveTab] = useState<ReportType>('SALES_PROFIT');
   const [datePreset, setDatePreset] = useState<DateRangePreset>('ALL_TIME');
@@ -41,16 +43,21 @@ export function ReportViewer() {
   const [staffData, setStaffData] = useState<StaffActivitySummary | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!storeId) return;
-    CategoryService.getCategories().then(setCategories);
-    SupplierService.getSuppliers(storeId).then(setSuppliers);
+    CategoryService.getCategories().then(setCategories).catch(() => setCategories([]));
+    SupplierService.getSuppliers(storeId).then(setSuppliers).catch(() => setSuppliers([]));
   }, [storeId]);
 
   useEffect(() => {
-    if (!storeId) return;
+    if (!storeId) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
+    setLoadError(null);
 
     const filter = {
       datePreset,
@@ -73,7 +80,7 @@ export function ReportViewer() {
           const res = await ReportService.getSupplierPerformanceReport(storeId);
           setSupplierData(res);
         } else if (activeTab === 'RETURNS') {
-          const res = await ReportService.getReturnsReport(storeId);
+          const res = await ReportService.getReturnsReport(storeId, filter);
           setReturnsData(res);
         } else if (activeTab === 'STAFF_ACTIVITY') {
           const res = await ReportService.getStaffActivityReport(storeId);
@@ -81,6 +88,7 @@ export function ReportViewer() {
         }
       } catch (err) {
         console.error('Failed to load report', err);
+        setLoadError(err instanceof Error ? err.message : 'Could not load this report.');
       } finally {
         setIsLoading(false);
       }
@@ -346,6 +354,12 @@ export function ReportViewer() {
           </div>
         </div>
       </div>
+
+      {loadError && !isLoading && (
+        <div className="alert alert--error" role="alert" style={{ marginBottom: 'var(--space-4)' }}>
+          {loadError}
+        </div>
+      )}
 
       {isLoading ? (
         <div className="card" style={{ padding: 'var(--space-6)' }}>

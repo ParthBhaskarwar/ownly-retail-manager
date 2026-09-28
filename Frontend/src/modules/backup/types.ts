@@ -1,85 +1,34 @@
 /**
- * Backup and Storage Health Types
+ * Backup types — mirror the backend /api/backup responses.
  */
 
-import type { Category, Subcategory, Supplier } from '@/modules/catalog/types';
-import type { AttributeDefinition, ProductAttributeValue, VariantAttributeValue } from '@/modules/attributes/types';
-import type { Product, ProductVariant } from '@/modules/product/types';
-import type { InventoryItem, InventoryMovement } from '@/modules/inventory/types';
-import type { User, Session } from '@/modules/account/types';
-import type { Store } from '@/modules/store/types';
-import type { StaffMember } from '@/modules/staff/types';
-import type { AuditEvent } from '@/shared/audit/AuditService';
-
-export interface BackupMetadata {
-  version: string;
-  timestamp: string;
-  storeId: string;
-  storeName: string;
-  generator: string;
-  checksum: string;
-  recordCounts: {
-    products: number;
-    variants: number;
-    inventoryItems: number;
-    inventoryMovements: number;
-    categories: number;
-    subcategories: number;
-    suppliers: number;
-    attributeDefinitions: number;
-    productAttributeValues: number;
-    variantAttributeValues: number;
-    users?: number;
-    staff?: number;
-    auditLogs?: number;
-  };
+export interface BackupRecord {
+  id: string;
+  filename: string;
+  fileSizeBytes: number;
+  createdBy: string;
+  createdAt: string;
+  /** false when the file was deleted from the server's disk after the record was made. */
+  fileExists: boolean;
 }
 
-export interface FullBackupPayload {
-  metadata: BackupMetadata;
-  dexie: {
-    products: Product[];
-    productVariants: ProductVariant[];
-    inventoryItems: InventoryItem[];
-    inventoryMovements: InventoryMovement[];
-    categories: Category[];
-    subcategories: Subcategory[];
-    suppliers: Supplier[];
-    attributeDefinitions: AttributeDefinition[];
-    productAttributeValues: ProductAttributeValue[];
-    variantAttributeValues: VariantAttributeValue[];
-  };
-  localStorage: {
-    users?: User[];
-    sessions?: Session[];
-    store?: Store | null;
-    staff?: StaffMember[];
-    auditLogs?: AuditEvent[];
-    settings?: Record<string, unknown>;
-  };
+export interface BackupHealth {
+  backupCount: number;
+  latestBackupAt: string | null;
+  totalSizeBytes: number;
+  directoryExists: boolean;
 }
 
-export interface RestoreValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  metadata?: BackupMetadata;
+export interface RestoreSummary {
+  backupId: string;
+  tablesRestored: string[];
+  rowsInserted: Record<string, number>;
+  notes: string;
 }
 
-export interface StorageHealthStatus {
-  isSupported: boolean;
-  quotaBytes: number;
-  usageBytes: number;
-  percentUsed: number;
-  healthTier: 'HEALTHY' | 'WARNING' | 'CRITICAL';
-  statusMessage: string;
-  tableCounts: Record<string, number>;
-  lastBackupDate: string | null;
+export interface BackupStatus {
   backupDue: boolean;
   daysSinceLastBackup: number | null;
-}
-
-export interface BackupReminderConfig {
-  reminderIntervalDays: number;
-  inventoryThresholdWarning: number;
+  tier: 'HEALTHY' | 'WARNING' | 'CRITICAL';
+  message: string;
 }

@@ -4,10 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
 import { ProductService } from '@/modules/product/services/ProductService';
-import { SupplierService } from '@/modules/catalog/services/CategoryService';
+import { SupplierSelect } from '@/modules/catalog/components/SupplierSelect';
 import { RestockService } from '../services/RestockService';
 import type { ProductSummary } from '@/modules/product/types';
-import type { Supplier } from '@/modules/catalog/types';
 import type { RestockVariantLine, RestockResult } from '../types';
 
 function fmt(n: number): string {
@@ -23,7 +22,6 @@ export function RestockForm() {
   const storeId = user?.storeId || '';
 
   const [products, setProducts] = useState<ProductSummary[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [selectedProductId, setSelectedProductId] = useState(initialProductId);
   const [selectedSupplierId, setSelectedSupplierId] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +38,6 @@ export function RestockForm() {
   useEffect(() => {
     if (!storeId) return;
     ProductService.searchProducts({ storeId, pageSize: 200 }).then((res) => setProducts(res.items));
-    SupplierService.getSuppliers(storeId).then(setSuppliers);
   }, [storeId]);
 
   useEffect(() => {
@@ -282,21 +279,13 @@ export function RestockForm() {
 
               <div className="card__body" style={{ padding: 'var(--space-4)' }}>
                 <div className="form-grid">
-                  <div className="form-field">
-                    <label className="form-label">Supplier</label>
-                    <select
-                      className="form-select"
-                      value={selectedSupplierId}
-                      onChange={(e) => setSelectedSupplierId(e.target.value)}
-                    >
-                      <option value="">-- No supplier assigned --</option>
-                      {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.name} ({s.code})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SupplierSelect
+                    id="restock-supplier"
+                    storeId={storeId}
+                    value={selectedSupplierId}
+                    onChange={setSelectedSupplierId}
+                    placeholder="-- No supplier assigned --"
+                  />
 
                   <div className="form-field">
                     <label className="form-label">Restock Notes / Invoice No.</label>

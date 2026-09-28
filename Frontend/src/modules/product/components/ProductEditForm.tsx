@@ -8,10 +8,12 @@ import { ProductService, VariantService } from '@/modules/product/services/Produ
 import { CategorySelect } from '@/modules/catalog/components/CategorySelect';
 import { CategoryAttributeForm } from '@/modules/attributes/components/CategoryAttributeForm';
 import { ProductPhotoUploader } from '@/modules/product/components/ProductPhotoUploader';
-import { AttributeService, SupplierService, CategoryService } from '@/modules/catalog/services/CategoryService';
+import { applyPhotoSuggestions } from '@/modules/attributes/applySuggestions';
+import { AttributeService, CategoryService } from '@/modules/catalog/services/CategoryService';
+import { SupplierSelect } from '@/modules/catalog/components/SupplierSelect';
 import type { AttributeDefinition } from '@/modules/attributes/types';
 import type { ProductDetail, ProductStatus } from '@/modules/product/types';
-import type { Supplier, Category } from '@/modules/catalog/types';
+import type { Category } from '@/modules/catalog/types';
 import type { AttributeSuggestions } from '@/modules/product/types';
 import { CLOTHING_TEMPLATE_ID } from '@/config/retail-templates';
 
@@ -47,7 +49,6 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
 
   // Suppliers, Categories & Attributes
   const [categories, setCategories] = useState<Category[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [productAttrDefs, setProductAttrDefs] = useState<AttributeDefinition[]>([]);
   const [productAttrValues, setProductAttrValues] = useState<Record<string, string>>({});
 
@@ -66,9 +67,8 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
       ProductService.getProductDetail(productId),
       AttributeService.getDefinitions(retailTemplateId, 'product'),
       CategoryService.getCategories(),
-      storeId ? SupplierService.getSuppliers(storeId) : Promise.resolve([]),
     ])
-      .then(([detail, attrDefs, cats, supps]) => {
+      .then(([detail, attrDefs, cats]) => {
         if (!detail) {
           setServerError('Product not found.');
           setIsLoading(false);
@@ -90,7 +90,6 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
 
         setProductAttrDefs(attrDefs);
         setCategories(cats);
-        setSuppliers(supps);
 
         // Map existing product attribute values
         const attrValObj: Record<string, string> = {};
@@ -126,18 +125,7 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
   }, [categories, categoryId]);
 
   const handleAISuggestions = (suggestions: AttributeSuggestions) => {
-    const updated = { ...productAttrValues };
-    const colourDef = productAttrDefs.find((d) => d.name.toLowerCase() === 'colour' || d.name.toLowerCase() === 'color');
-    const patternDef = productAttrDefs.find((d) => d.name.toLowerCase() === 'pattern');
-
-    if (colourDef && suggestions.colours.length > 0 && !updated[colourDef.id]) {
-      updated[colourDef.id] = suggestions.colours[0];
-    }
-    if (patternDef && suggestions.pattern && !updated[patternDef.id]) {
-      updated[patternDef.id] = suggestions.pattern;
-    }
-
-    setProductAttrValues(updated);
+    setProductAttrValues((prev) => applyPhotoSuggestions(productAttrDefs, prev, suggestions));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -279,20 +267,13 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
               />
             </div>
 
-            <div className="form-field">
-              <label className="form-label" htmlFor="edit-supplier">Supplier</label>
-              <select
-                id="edit-supplier"
-                className="form-select"
-                value={supplierId}
-                onChange={(e) => setSupplierId(e.target.value)}
-              >
-                <option value="">-- Select Supplier --</option>
-                {suppliers.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
-                ))}
-              </select>
-            </div>
+            <SupplierSelect
+              id="edit-supplier"
+              storeId={storeId}
+              value={supplierId}
+              onChange={setSupplierId}
+              placeholder="-- Select Supplier --"
+            />
 
             <div className="form-field">
               <label className="form-label" htmlFor="edit-status">Status</label>

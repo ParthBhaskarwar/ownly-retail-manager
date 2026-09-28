@@ -193,8 +193,15 @@ inventoryRouter.get('/:itemId/movements', requirePermission('inventory:view'), a
 
 inventoryRouter.get('/variants/:variantId/stock', requirePermission('inventory:view'), async (req, res, next) => {
   try {
-    requireStoreId(req);
-    res.json({ stock: await InventoryService.getStockSummary(param(req.params, 'variantId')) });
+    const storeId = requireStoreId(req);
+    const variantId = param(req.params, 'variantId');
+    // Tenant check: the variant must belong to a product in the caller's store.
+    const owned = await db('product_variants as v')
+      .join('products as p', 'p.id', 'v.product_id')
+      .where({ 'v.id': variantId, 'p.store_id': storeId })
+      .first('v.id');
+    if (!owned) throw AppError.notFound('Variant not found in this store.');
+    res.json({ stock: await InventoryService.getStockSummary(variantId) });
   } catch (err) {
     next(err);
   }

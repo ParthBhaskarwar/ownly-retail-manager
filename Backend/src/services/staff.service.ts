@@ -17,6 +17,13 @@ import { AppError } from '@/shared/AppError';
 import { AuditService } from './audit.service';
 import type { Role, Session, User } from '@/types/domain';
 
+/** Only the owner may create, promote, edit or deactivate managers. */
+function assertCanManageRole(actorRole: Role, targetRole: Role): void {
+  if (actorRole !== 'OWNER' && (targetRole === 'MANAGER' || targetRole === 'OWNER')) {
+    throw AppError.forbidden('Only the store owner can manage manager accounts.');
+  }
+}
+
 const SAFE_COLUMNS = [
   'id', 'store_id', 'name', 'email', 'phone', 'role',
   'is_active', 'verified_at', 'last_login_at', 'created_at', 'updated_at',
@@ -36,8 +43,10 @@ export const StaffService = {
   async create(
     storeId: string,
     actorId: string,
-    input: { name: string; email: string; phone: string; password: string; role: Role }
+    input: { name: string; email: string; phone: string; password: string; role: Role },
+    actorRole: Role = 'OWNER'
   ): Promise<User> {
+    assertCanManageRole(actorRole, input.role);
     const email = input.email.trim().toLowerCase();
 
     if (input.role === 'OWNER') {
@@ -73,9 +82,12 @@ export const StaffService = {
     storeId: string,
     actorId: string,
     id: string,
-    updates: Partial<{ name: string; phone: string; role: Role; isActive: boolean }>
+    updates: Partial<{ name: string; phone: string; role: Role; isActive: boolean }>,
+    actorRole: Role = 'OWNER'
   ): Promise<User> {
     const target = await this.getById(storeId, id);
+    assertCanManageRole(actorRole, target.role);
+    if (updates.role) assertCanManageRole(actorRole, updates.role);
 
     if (target.role === 'OWNER' && (updates.role || updates.isActive === false)) {
       throw AppError.badRequest('The store owner cannot be demoted or deactivated.');
@@ -97,9 +109,9 @@ export const StaffService = {
     return this.getById(storeId, id);
   },
 
-  async deactivate(storeId: string, actorId: string, id: string): Promise<User> {
+  async deactivate(storeId: string, actorId: string, id: string, actorRole: Role = 'OWNER'): Promise<User> {
     if (id === actorId) throw AppError.badRequest('You cannot deactivate your own account.');
-    return this.update(storeId, actorId, id, { isActive: false });
+    return this.update(storeId, actorId, id, { isActive: false }, actorRole);
   },
 
   /** Login history / active sessions for one staff member (plan §2.2). */

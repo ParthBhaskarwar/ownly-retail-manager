@@ -113,7 +113,34 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return payload as T;
 }
 
+/** Fetches a binary response (e.g. a file download) with the auth header attached. */
+async function requestBlob(path: string): Promise<Blob> {
+  const token = getToken();
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+  } catch {
+    throw new ApiError(0, 'Cannot reach the server. Check your connection and try again.');
+  }
+  if (!response.ok) {
+    let message = `Request failed (${response.status}).`;
+    try {
+      const payload = (await response.json()) as { error?: string };
+      if (payload.error) message = payload.error;
+    } catch {
+      /* not JSON */
+    }
+    if (response.status === 401) clearToken();
+    throw new ApiError(response.status, message);
+  }
+  return response.blob();
+}
+
 export const apiClient = {
+  getBlob: (path: string) => requestBlob(path),
+
   get: <T>(path: string, options?: Omit<RequestOptions, 'method' | 'body'>) =>
     request<T>(path, { ...options, method: 'GET' }),
 

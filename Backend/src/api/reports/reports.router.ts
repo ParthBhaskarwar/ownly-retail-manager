@@ -98,6 +98,32 @@ reportsRouter.get('/sales', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+/** Revenue / COGS / profit summary built from real invoice lines. */
+reportsRouter.get('/sales/summary', async (req, res, next) => {
+  try {
+    const storeId = requireStoreId(req);
+    res.json(await ReportsService.getSalesSummary(storeId, {
+      ...dateFilter(req.query),
+      categoryId: queryParam(req.query.categoryId),
+      supplierId: queryParam(req.query.supplierId),
+    }));
+  } catch (err) { next(err); }
+});
+
+reportsRouter.get('/returns/summary', async (req, res, next) => {
+  try {
+    const storeId = requireStoreId(req);
+    res.json(await ReportsService.getReturnsSummary(storeId, dateFilter(req.query)));
+  } catch (err) { next(err); }
+});
+
+reportsRouter.get('/staff/activity', async (req, res, next) => {
+  try {
+    const storeId = requireStoreId(req);
+    res.json({ staffMembers: await ReportsService.getStaffActivity(storeId) });
+  } catch (err) { next(err); }
+});
+
 reportsRouter.get('/sales/export', async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);

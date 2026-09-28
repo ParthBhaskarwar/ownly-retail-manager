@@ -12,6 +12,7 @@ import { ZodError } from 'zod';
 import { config } from './config/env';
 import { assertDbConnection } from './db/client';
 import { AppError } from './shared/AppError';
+import { EmbeddingService } from './services/embedding.service';
 
 // ─── Routers ─────────────────────────────────────────────────────────────────
 import { authRouter } from './api/auth/auth.router';
@@ -118,6 +119,18 @@ app.use((
     return;
   }
 
+  // Malformed id (e.g. a non-UUID in a path or body) reaching a uuid column.
+  if (typeof err === 'object' && err !== null && (err as { code?: string }).code === '22P02') {
+    res.status(400).json({ error: 'That request contained an invalid identifier.' });
+    return;
+  }
+
+  // Foreign-key violation: the request referenced something that does not exist.
+  if (typeof err === 'object' && err !== null && (err as { code?: string }).code === '23503') {
+    res.status(400).json({ error: 'That request referenced a record that does not exist.' });
+    return;
+  }
+
   console.error('[ERROR]', err);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -135,6 +148,14 @@ async function start(): Promise<void> {
   app.listen(config.port, () => {
     console.log(`🚀 Ownly backend running on http://localhost:${config.port}`);
     console.log(`   Environment: ${config.nodeEnv}`);
+
+    // Load the photo-AI model in the background so the first photo upload is not slow.
+    // Failure is fine — photo AI degrades gracefully and manual entry never depends on it.
+    if (EmbeddingService.isEnabled()) {
+      void EmbeddingService.warmUp().then((ok) => {
+        console.log(ok ? '🧠 Photo AI model ready' : '⚠️  Photo AI model unavailable (manual entry still works)');
+      });
+    }
   });
 }
 

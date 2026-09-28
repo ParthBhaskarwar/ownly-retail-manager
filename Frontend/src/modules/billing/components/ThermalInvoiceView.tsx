@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useStoreContext } from '@/context/StoreContext';
 
 interface ThermalInvoiceProps {
   invoice: any;
@@ -9,6 +10,7 @@ interface ThermalInvoiceProps {
 }
 
 export function ThermalInvoiceView({ invoice, onPrint, onClose }: ThermalInvoiceProps) {
+  const { store } = useStoreContext();
   if (!invoice) return null;
 
   const handlePrint = () => {
@@ -47,10 +49,10 @@ export function ThermalInvoiceView({ invoice, onPrint, onClose }: ThermalInvoice
       <div className="thermal-receipt bg-white text-black font-mono text-xs p-4 max-w-[80mm] mx-auto border border-gray-300 shadow-md print:shadow-none print:border-none print:p-0 print:m-0">
         {/* Header */}
         <div className="text-center mb-3 pb-2 border-b border-dashed border-black">
-          <h2 className="text-base font-bold uppercase tracking-wider">Ownly Retail Store</h2>
-          <p className="text-[10px]">123 Retail Boulevard, Tech Hub</p>
-          <p className="text-[10px]">GSTIN: 27AABCO1234F1Z0</p>
-          <p className="text-[10px]">Ph: +91 98765 43210</p>
+          <h2 className="text-base font-bold uppercase tracking-wider">{store?.name ?? 'Store'}</h2>
+          {store?.address && <p className="text-[10px]">{store.address}</p>}
+          {store?.gstNumber && <p className="text-[10px]">GSTIN: {store.gstNumber}</p>}
+          {store?.phone && <p className="text-[10px]">Ph: {store.phone}</p>}
         </div>
 
         {/* Invoice Metadata */}

@@ -9,10 +9,12 @@ import { ProductService } from '@/modules/product/services/ProductService';
 import { CategorySelect } from '@/modules/catalog/components/CategorySelect';
 import { CategoryAttributeForm } from '@/modules/attributes/components/CategoryAttributeForm';
 import { ProductPhotoUploader } from '@/modules/product/components/ProductPhotoUploader';
-import { AttributeService, SupplierService, CategoryService } from '@/modules/catalog/services/CategoryService';
+import { AttributeService, CategoryService } from '@/modules/catalog/services/CategoryService';
+import { SupplierSelect } from '@/modules/catalog/components/SupplierSelect';
 import type { AttributeDefinition } from '@/modules/attributes/types';
+import { applyPhotoSuggestions } from '@/modules/attributes/applySuggestions';
 import type { CreateProductInput } from '@/modules/product/types';
-import type { Supplier, Category } from '@/modules/catalog/types';
+import type { Category } from '@/modules/catalog/types';
 import type { AttributeSuggestions } from '@/modules/product/types';
 import { CLOTHING_TEMPLATE_ID } from '@/config/retail-templates';
 
@@ -67,7 +69,6 @@ function NewProductContent() {
 
   // Taxonomy & Suppliers Data
   const [categories, setCategories] = useState<Category[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [productAttrDefs, setProductAttrDefs] = useState<AttributeDefinition[]>([]);
   const [productAttrValues, setProductAttrValues] = useState<Record<string, string>>({});
   const [sizeAttrDefId, setSizeAttrDefId] = useState<string | null>(null);
@@ -93,9 +94,6 @@ function NewProductContent() {
 
     CategoryService.getCategories().then(setCategories).catch(() => {});
 
-    if (storeId) {
-      SupplierService.getSuppliers(storeId).then(setSuppliers).catch(() => {});
-    }
   }, [retailTemplateId, storeId]);
 
   // Selected Category Name for filtering attributes
@@ -135,20 +133,7 @@ function NewProductContent() {
   }, []);
 
   const handleAISuggestions = (suggestions: AttributeSuggestions) => {
-    const updated = { ...productAttrValues };
-    // Find colour & pattern attribute def IDs
-    const colourDef = productAttrDefs.find((d) => d.name.toLowerCase() === 'colour' || d.name.toLowerCase() === 'color');
-    const patternDef = productAttrDefs.find((d) => d.name.toLowerCase() === 'pattern');
-
-    if (colourDef && suggestions.colours.length > 0 && !updated[colourDef.id]) {
-      updated[colourDef.id] = suggestions.colours[0];
-    }
-    if (patternDef && suggestions.pattern && !updated[patternDef.id]) {
-      // Find matching pattern enum option
-      updated[patternDef.id] = suggestions.pattern;
-    }
-
-    setProductAttrValues(updated);
+    setProductAttrValues((prev) => applyPhotoSuggestions(productAttrDefs, prev, suggestions));
   };
 
   const validate = (): boolean => {
@@ -320,22 +305,13 @@ function NewProductContent() {
               {fieldErrors.baseSku && <span className="form-error">{fieldErrors.baseSku}</span>}
             </div>
 
-            {suppliers.length > 0 && (
-              <div className="form-field">
-                <label className="form-label" htmlFor="pe-supplier">Supplier</label>
-                <select
-                  id="pe-supplier"
-                  className="form-select"
-                  value={supplierId}
-                  onChange={(e) => setSupplierId(e.target.value)}
-                >
-                  <option value="">-- Select Supplier --</option>
-                  {suppliers.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <SupplierSelect
+              id="pe-supplier"
+              storeId={storeId}
+              value={supplierId}
+              onChange={setSupplierId}
+              placeholder="-- Select Supplier --"
+            />
           </div>
         </section>
 

@@ -12,12 +12,13 @@ import { BillingService } from '@/modules/billing/services/BillingService';
 import { useAuthContext } from '@/context/AuthContext';
 import { useStoreContext } from '@/context/StoreContext';
 import type { CartItem, CustomerInfo, DiscountPolicy, PaymentSplit } from '@/modules/billing/types';
+import { computeTax, round2 } from '@/lib/money';
 
 export default function BillingPage() {
   const { user } = useAuthContext();
   const { store } = useStoreContext();
-  const storeId = store?.id ?? user?.storeId ?? 'default-store';
-  const cashierId = user?.id ?? 'cashier-1';
+  const storeId = store?.id ?? user?.storeId ?? '';
+  const cashierId = user?.id ?? '';
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [customer, setCustomer] = useState<CustomerInfo | null>(null);
@@ -93,9 +94,10 @@ export default function BillingPage() {
   };
 
   // Math Calculations
-  const rawSubtotal = cartItems.reduce((sum, item) => sum + item.finalPrice, 0);
-  const billDiscountAmount = discount ? discount.amount : 0;
-  const grandTotal = Math.max(0, rawSubtotal - billDiscountAmount);
+  const rawSubtotal = round2(cartItems.reduce((sum, item) => sum + item.finalPrice, 0));
+  const billDiscountAmount = discount ? round2(Math.min(discount.amount, rawSubtotal)) : 0;
+  // GST comes from the store's own settings; the server recomputes the same figure at checkout.
+  const { taxAmount, grandTotal } = computeTax(store?.taxSettings, round2(rawSubtotal - billDiscountAmount));
 
   // Complete checkout handler
   const handleConfirmCheckout = async (payments: PaymentSplit[]) => {
@@ -108,21 +110,16 @@ export default function BillingPage() {
         items: cartItems,
         discountType: discount?.type,
         discountValue: discount?.value,
-        discountAmount: billDiscountAmount,
-        discountAppliedBy: discount?.appliedBy,
-        taxAmount: 0,
         payments,
       }, storeId, cashierId);
 
+      // Show what the server actually charged (its prices, discount and tax), not the preview.
       setCompletedInvoice({
         ...result,
-        items: cartItems,
         payments,
-        customer_name: customer?.name,
-        customer_phone: customer?.phone,
-        subtotal: rawSubtotal,
-        discount_amount: billDiscountAmount,
-        grand_total: result.grandTotal || grandTotal,
+        customerName: customer?.name,
+        customerPhone: customer?.phone,
+        cashier_name: user?.name,
       });
 
       // Reset cart and checkout state
@@ -242,6 +239,13 @@ export default function BillingPage() {
               {discount && (
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', textAlign: 'right' }}>
                   {discount.type === 'PERCENTAGE' ? `${discount.value}% Bill Discount` : `₹${discount.value} Flat Discount`}
+                </div>
+              )}
+
+              {taxAmount > 0 && (
+                <div className="bill-card__row">
+                  <span>GST{store?.taxSettings?.inclusiveTax ? ' (included)' : ''}:</span>
+                  <span className="bill-card__row-val">₹{taxAmount.toFixed(2)}</span>
                 </div>
               )}
 

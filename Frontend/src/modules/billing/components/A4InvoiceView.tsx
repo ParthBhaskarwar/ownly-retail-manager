@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useStoreContext } from '@/context/StoreContext';
 
 interface A4InvoiceProps {
   invoice: any;
@@ -9,6 +10,7 @@ interface A4InvoiceProps {
 }
 
 export function A4InvoiceView({ invoice, onPrint, onClose }: A4InvoiceProps) {
+  const { store } = useStoreContext();
   if (!invoice) return null;
 
   const handlePrint = () => {
@@ -49,10 +51,10 @@ export function A4InvoiceView({ invoice, onPrint, onClose }: A4InvoiceProps) {
         <div className="flex justify-between items-start border-b-2 border-primary pb-6 mb-6">
           <div>
             <h1 className="text-2xl font-extrabold uppercase text-primary tracking-wide">TAX INVOICE</h1>
-            <p className="text-sm font-bold text-gray-800 mt-1">OWNLY RETAIL STORE</p>
-            <p className="text-xs text-gray-600">123 Retail Boulevard, Tech Hub, Suite 400</p>
-            <p className="text-xs text-gray-600">Phone: +91 98765 43210 | Email: billing@ownlyretail.com</p>
-            <p className="text-xs text-gray-600 font-mono mt-1">GSTIN: 27AABCO1234F1Z0</p>
+            <p className="text-sm font-bold text-gray-800 mt-1 uppercase">{store?.name ?? 'Store'}</p>
+            {store?.address && <p className="text-xs text-gray-600">{store.address}</p>}
+            {store?.phone && <p className="text-xs text-gray-600">Phone: {store.phone}</p>}
+            {store?.gstNumber && <p className="text-xs text-gray-600 font-mono mt-1">GSTIN: {store.gstNumber}</p>}
           </div>
 
           <div className="text-right text-xs space-y-1">

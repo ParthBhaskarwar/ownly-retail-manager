@@ -1,476 +1,273 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useAuthContext } from '@/context/AuthContext';
-import { useStoreContext } from '@/context/StoreContext';
-import { BackupService } from '../services/BackupService';
-import type { FullBackupPayload, RestoreValidationResult, StorageHealthStatus } from '../types';
+import React, { useCallback, useEffect, useState } from 'react';
+import { BackupService, getBackupStatus } from '../services/BackupService';
+import type { BackupHealth, BackupRecord, RestoreSummary } from '../types';
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
 
 export function BackupManager() {
-  const { user } = useAuthContext();
-  const { store } = useStoreContext();
-  const storeId = user?.storeId || store?.id || '';
-  const storeName = store?.name || 'My Store';
+  const [backups, setBackups] = useState<BackupRecord[]>([]);
+  const [health, setHealth] = useState<BackupHealth | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [health, setHealth] = useState<StorageHealthStatus | null>(null);
-  const [isLoadingHealth, setIsLoadingHealth] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [restoreTarget, setRestoreTarget] = useState<BackupRecord | null>(null);
+  const [restoreSummary, setRestoreSummary] = useState<RestoreSummary | null>(null);
 
-  const [isExporting, setIsExporting] = useState(false);
-  const [exportSuccess, setExportSuccess] = useState(false);
-
-  const [restoreFile, setRestoreFile] = useState<File | null>(null);
-  const [restorePayload, setRestorePayload] = useState<FullBackupPayload | null>(null);
-  const [validationResult, setValidationResult] = useState<RestoreValidationResult | null>(null);
-  const [isRestoring, setIsRestoring] = useState(false);
-  const [restoreStatus, setRestoreStatus] = useState<string | null>(null);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
-
-  const [isGeneratingDemo, setIsGeneratingDemo] = useState(false);
-  const [demoMessage, setDemoMessage] = useState<string | null>(null);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const refreshHealth = async () => {
-    setIsLoadingHealth(true);
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
     try {
-      const data = await BackupService.getStorageHealth(storeId);
-      setHealth(data);
-    } catch (e) {
-      console.error('Failed to get storage health', e);
+      const [list, h] = await Promise.all([BackupService.listBackups(), BackupService.getHealth()]);
+      setBackups(list);
+      setHealth(h);
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Could not load backups.');
     } finally {
-      setIsLoadingHealth(false);
+      setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    void refreshHealth();
-  }, [storeId]);
+    void refresh();
+  }, [refresh]);
 
-  const handleExportBackup = async () => {
-    setIsExporting(true);
-    setExportSuccess(false);
+  const status = getBackupStatus(health?.latestBackupAt ?? null);
+
+  const handleCreate = async () => {
+    setIsCreating(true);
+    setNotice(null);
     try {
-      const payload = await BackupService.createFullBackup(storeId, storeName);
-      BackupService.downloadBackupFile(payload);
-      setExportSuccess(true);
-      await refreshHealth();
-      setTimeout(() => setExportSuccess(false), 5000);
+      const record = await BackupService.createBackup();
+      setNotice({ type: 'success', text: `Backup created (${formatBytes(record.fileSizeBytes)}).` });
+      await refresh();
     } catch (err) {
-      alert(`Backup failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setNotice({ type: 'error', text: `Backup failed: ${err instanceof Error ? err.message : 'Unknown error'}` });
     } finally {
-      setIsExporting(false);
+      setIsCreating(false);
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setRestoreFile(file);
-    setRestoreStatus(null);
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      const validation = BackupService.validateBackup(content);
-      setValidationResult(validation);
-
-      if (validation.isValid) {
-        try {
-          const payload = JSON.parse(content) as FullBackupPayload;
-          setRestorePayload(payload);
-          setShowPreviewModal(true);
-        } catch {
-          setRestorePayload(null);
-        }
-      }
-    };
-    reader.readAsText(file);
+  const handleDownload = async (record: BackupRecord) => {
+    setBusyId(record.id);
+    setNotice(null);
+    try {
+      await BackupService.downloadBackup(record);
+    } catch (err) {
+      setNotice({ type: 'error', text: `Download failed: ${err instanceof Error ? err.message : 'Unknown error'}` });
+    } finally {
+      setBusyId(null);
+    }
   };
 
   const handleConfirmRestore = async () => {
-    if (!restorePayload) return;
-    setIsRestoring(true);
+    if (!restoreTarget) return;
+    setBusyId(restoreTarget.id);
+    setNotice(null);
     try {
-      await BackupService.restoreBackup(restorePayload, user?.id);
-      setRestoreStatus('Database successfully restored from backup! Refreshing...');
-      setShowPreviewModal(false);
-      setRestoreFile(null);
-      setRestorePayload(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      await refreshHealth();
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      const summary = await BackupService.restoreBackup(restoreTarget.id);
+      setRestoreSummary(summary);
+      setRestoreTarget(null);
+      setNotice({ type: 'success', text: 'Restore finished.' });
+      await refresh();
     } catch (err) {
-      alert(`Restore failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setRestoreTarget(null);
+      setNotice({ type: 'error', text: `Restore failed: ${err instanceof Error ? err.message : 'Unknown error'}` });
     } finally {
-      setIsRestoring(false);
+      setBusyId(null);
     }
   };
 
-  const handleGenerateSampleData = async () => {
-    if (!confirm('This will populate sample products, categories, suppliers, and inventory stock to test the system. Continue?')) {
-      return;
-    }
-    setIsGeneratingDemo(true);
-    setDemoMessage(null);
-    try {
-      const { db } = await import('@/db/db');
-      const { v4: uuidv4 } = await import('uuid');
-      if (!db) return;
-
-      const now = new Date().toISOString();
-      const past30d = new Date(Date.now() - 25 * 86400000).toISOString();
-      const past70d = new Date(Date.now() - 75 * 86400000).toISOString();
-
-      const supplierId = uuidv4();
-      await db.suppliers.put({
-        id: supplierId,
-        storeId,
-        name: 'Vogue Mills Mumbai',
-        code: 'VOGUE',
-        address: 'Lower Parel, Mumbai',
-        paymentTerms: 'Net 30',
-        isActive: true,
-        createdAt: now,
-        updatedAt: now,
-      });
-
-      const sampleProds = [
-        { name: 'Slim Fit Oxford Shirt', sku: 'OXFSHIRT', sp: 1890, cp: 850, cat: 'Shirts' },
-        { name: 'Selvedge Denim Jeans', sku: 'SELVDENIM', sp: 2990, cp: 1400, cat: 'Jeans' },
-        { name: 'Linen Summer Kurta', sku: 'LINNKURTA', sp: 1590, cp: 690, cat: 'Kurtas' },
-        { name: 'Casual Pique Polo', sku: 'PIQPOLO', sp: 990, cp: 420, cat: 'T-Shirts' },
-      ];
-
-      for (const p of sampleProds) {
-        const prodId = uuidv4();
-        const catId = uuidv4();
-        await db.categories.put({
-          id: catId,
-          storeId,
-          retailTemplateId: 'template_clothing',
-          name: p.cat,
-          isSystem: false,
-          isActive: true,
-          sortOrder: 0,
-          createdAt: now,
-        });
-
-        await db.products.put({
-          id: prodId,
-          storeId,
-          retailTemplateId: 'template_clothing',
-          categoryId: catId,
-          subcategoryId: null,
-          supplierId,
-          name: p.name,
-          baseSku: p.sku,
-          description: `Premium quality ${p.name.toLowerCase()}`,
-          baseSellingPrice: p.sp,
-          baseCostPrice: p.cp,
-          status: 'ACTIVE',
-          imageUrls: [],
-          createdBy: user?.id || 'admin',
-          updatedBy: user?.id || 'admin',
-          createdAt: now,
-          updatedAt: now,
-        });
-
-        const sizes = ['S', 'M', 'L', 'XL'];
-        for (let i = 0; i < sizes.length; i++) {
-          const sz = sizes[i];
-          const varId = uuidv4();
-          const varSku = `${p.sku}-${sz}`;
-          await db.productVariants.put({
-            id: varId,
-            productId: prodId,
-            sku: varSku,
-            displayName: `${p.name} — ${sz}`,
-            sellingPriceOverride: null,
-            costPriceOverride: null,
-            sortOrder: i,
-            isActive: true,
-            createdAt: now,
-            updatedAt: now,
-          });
-
-          const qty = i === 3 ? 2 : 6;
-          const pDate = i % 2 === 0 ? past70d : past30d;
-
-          const items: import('@/modules/inventory/types').InventoryItem[] = [];
-          const movs: import('@/modules/inventory/types').InventoryMovement[] = [];
-
-          for (let q = 1; q <= qty; q++) {
-            const itemId = uuidv4();
-            const bc = `OWN-${varSku.replace(/[^A-Z0-9]/gi, '').slice(0, 8)}-${String(q).padStart(5, '0')}`;
-            const isSold = q === 1;
-
-            items.push({
-              id: itemId,
-              storeId,
-              variantId: varId,
-              barcode: bc,
-              purchaseCostPrice: p.cp,
-              purchaseDate: pDate,
-              status: isSold ? 'SOLD' : 'IN_STOCK',
-              createdAt: pDate,
-              createdBy: user?.id || 'admin',
-              updatedAt: now,
-            });
-
-            movs.push({
-              id: uuidv4(),
-              storeId,
-              inventoryItemId: itemId,
-              movementType: isSold ? 'SALE' : 'PURCHASE',
-              fromStatus: 'IN_STOCK',
-              toStatus: isSold ? 'SOLD' : 'IN_STOCK',
-              referenceType: isSold ? 'INVOICE' : 'PURCHASE_ENTRY',
-              referenceId: uuidv4(),
-              performedBy: user?.id || 'admin',
-              performedAt: isSold ? now : pDate,
-              notes: isSold ? 'Customer checkout' : 'Initial stock receipt',
-            });
-          }
-
-          await db.inventoryItems.bulkPut(items);
-          await db.inventoryMovements.bulkPut(movs);
-        }
-      }
-
-      setDemoMessage('Sample dataset successfully generated! Products, inventory, and sales are now ready to explore.');
-      await refreshHealth();
-    } catch (e) {
-      alert(`Demo generation failed: ${e instanceof Error ? e.message : 'Error'}`);
-    } finally {
-      setIsGeneratingDemo(false);
-    }
-  };
+  const totalRestored = restoreSummary
+    ? Object.values(restoreSummary.rowsInserted).reduce((a, b) => a + b, 0)
+    : 0;
 
   return (
     <div className="backup-manager animate-fade-in">
       <div className="pe-page-header">
-        <h1 className="page-title">Backup, Restore &amp; Data Safety</h1>
+        <h1 className="page-title">Backup &amp; Restore</h1>
         <p className="page-subtitle">
-          Export full offline backups, restore previous snapshots, monitor local storage health, and safeguard store data without cloud dependencies.
+          Create snapshots of your store data on the server, download a copy to keep safe, and recover missing records.
         </p>
       </div>
 
-      {health?.backupDue && (
+      {!isLoading && !loadError && status.backupDue && (
         <div className="alert alert--warning" style={{ marginBottom: 'var(--space-4)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 12 }}>
             <div>
-              <strong>⚠️ Backup Reminder:</strong>{' '}
-              {health.lastBackupDate
-                ? `Last backup was created ${health.daysSinceLastBackup} days ago. It is recommended to keep weekly backups.`
-                : 'No backup has been created for this store yet. Create a backup now to protect your data.'}
+              <strong>Backup reminder:</strong> {status.message}
             </div>
-            <button
-              type="button"
-              className="btn btn--primary btn--sm"
-              onClick={handleExportBackup}
-              disabled={isExporting}
-            >
-              {isExporting ? 'Exporting...' : 'Export Backup Now'}
+            <button type="button" className="btn btn--primary btn--sm" onClick={handleCreate} disabled={isCreating}>
+              {isCreating ? 'Creating…' : 'Back up now'}
             </button>
           </div>
         </div>
       )}
 
-      {exportSuccess && (
-        <div className="alert alert--success" style={{ marginBottom: 'var(--space-4)' }}>
-          ✓ Backup file successfully generated and downloaded to your computer!
+      {notice && (
+        <div
+          className={`alert ${notice.type === 'success' ? 'alert--success' : 'alert--error'}`}
+          style={{ marginBottom: 'var(--space-4)' }}
+          role="status"
+        >
+          {notice.text}
         </div>
       )}
 
-      {restoreStatus && (
-        <div className="alert alert--success" style={{ marginBottom: 'var(--space-4)' }}>
-          {restoreStatus}
-        </div>
-      )}
-
-      {demoMessage && (
+      {restoreSummary && (
         <div className="alert alert--info" style={{ marginBottom: 'var(--space-4)' }}>
-          ✓ {demoMessage}
+          <strong>Restore result:</strong> {totalRestored} missing record{totalRestored === 1 ? '' : 's'} put back
+          {restoreSummary.tablesRestored.length > 0 && <> in {restoreSummary.tablesRestored.join(', ')}</>}.
+          {restoreSummary.notes && <div style={{ marginTop: 4, fontSize: 'var(--text-xs)' }}>{restoreSummary.notes}</div>}
         </div>
       )}
 
-      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
+      {loadError && (
+        <div className="alert alert--error" style={{ marginBottom: 'var(--space-4)' }}>
+          {loadError}{' '}
+          <button type="button" className="btn btn--ghost btn--sm" onClick={() => void refresh()}>
+            Retry
+          </button>
+        </div>
+      )}
+
+      <div
+        className="dashboard-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 'var(--space-4)',
+          marginBottom: 'var(--space-6)',
+        }}
+      >
         <section className="card">
           <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="card__title">💾 Local Storage Health</h2>
-            <span className={`badge ${health?.healthTier === 'HEALTHY' ? 'badge--paid' : health?.healthTier === 'WARNING' ? 'badge--caution' : 'badge--return'}`}>
-              {health?.healthTier || 'HEALTHY'}
+            <h2 className="card__title">Backup status</h2>
+            <span
+              className={`badge ${
+                status.tier === 'HEALTHY' ? 'badge--paid' : status.tier === 'WARNING' ? 'badge--caution' : 'badge--return'
+              }`}
+            >
+              {status.tier}
             </span>
           </div>
-
-          <div style={{ padding: 'var(--space-2) 0' }}>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)', margin: '0 0 var(--space-3)' }}>
-              {health?.statusMessage || 'Local IndexedDB storage is operational.'}
-            </p>
-
-            {health?.isSupported && (
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-xs)', marginBottom: '4px' }}>
-                  <span>Used: {((health.usageBytes || 0) / (1024 * 1024)).toFixed(2)} MB</span>
-                  <span>Quota: {((health.quotaBytes || 0) / (1024 * 1024 * 1024)).toFixed(1)} GB</span>
-                </div>
-                <div style={{ height: '8px', background: 'var(--color-paper)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      width: `${Math.max(2, Math.min(100, health.percentUsed))}%`,
-                      background: health.healthTier === 'HEALTHY' ? 'var(--color-paid)' : 'var(--color-caution)',
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: 'var(--text-xs)' }}>
-              <div className="stat-pill">Products: <strong>{health?.tableCounts?.products ?? 0}</strong></div>
-              <div className="stat-pill">Variants: <strong>{health?.tableCounts?.variants ?? 0}</strong></div>
-              <div className="stat-pill">Inventory Items: <strong>{health?.tableCounts?.inventoryItems ?? 0}</strong></div>
-              <div className="stat-pill">Movements: <strong>{health?.tableCounts?.movements ?? 0}</strong></div>
-              <div className="stat-pill">Categories: <strong>{health?.tableCounts?.categories ?? 0}</strong></div>
-              <div className="stat-pill">Suppliers: <strong>{health?.tableCounts?.suppliers ?? 0}</strong></div>
-            </div>
-
-            <div style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
-              Last Backup: {health?.lastBackupDate ? new Date(health.lastBackupDate).toLocaleString() : 'Never'}
-            </div>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)' }}>{status.message}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, fontSize: 'var(--text-xs)' }}>
+            <div className="stat-pill">Backups: <strong>{health?.backupCount ?? 0}</strong></div>
+            <div className="stat-pill">Total size: <strong>{formatBytes(health?.totalSizeBytes ?? 0)}</strong></div>
+          </div>
+          <div style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
+            Last backup: {health?.latestBackupAt ? new Date(health.latestBackupAt).toLocaleString() : 'Never'}
           </div>
         </section>
 
         <section className="card">
           <div className="card__header">
-            <h2 className="card__title">📦 Full Database Export</h2>
+            <h2 className="card__title">Create a backup</h2>
           </div>
           <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)', marginBottom: 'var(--space-4)' }}>
-            Downloads an encrypted, self-contained JSON snapshot containing all products, variants, physical items, barcodes, suppliers, movements, staff, and audit history.
+            Saves products, variants, stock and barcodes, suppliers, customers, invoices, returns and audit history for
+            your store.
           </p>
-
           <button
             type="button"
             id="export-backup-btn"
             className="btn btn--primary"
             style={{ width: '100%' }}
-            onClick={handleExportBackup}
-            disabled={isExporting}
+            onClick={handleCreate}
+            disabled={isCreating}
           >
-            {isExporting ? 'Creating Backup Snapshot...' : '⬇ Export Full Backup (.json)'}
-          </button>
-        </section>
-
-        <section className="card">
-          <div className="card__header">
-            <h2 className="card__title">🔄 Restore from Backup</h2>
-          </div>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)', marginBottom: 'var(--space-4)' }}>
-            Upload a verified `.json` backup file to restore your store catalog, physical stock, and barcodes.
-          </p>
-
-          <input
-            type="file"
-            accept=".json"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
-
-          <button
-            type="button"
-            id="select-restore-file-btn"
-            className="btn btn--secondary"
-            style={{ width: '100%' }}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            📂 Select Backup File to Restore
-          </button>
-
-          {validationResult && !validationResult.isValid && (
-            <div className="alert alert--error" style={{ marginTop: 'var(--space-3)', fontSize: 'var(--text-xs)' }}>
-              <strong>Validation Failed:</strong>
-              <ul style={{ margin: '4px 0 0', paddingLeft: '16px' }}>
-                {validationResult.errors.map((err, i) => (
-                  <li key={i}>{err}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </section>
-
-        <section className="card">
-          <div className="card__header">
-            <h2 className="card__title">🧪 Testing &amp; Sample Data</h2>
-          </div>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)', marginBottom: 'var(--space-4)' }}>
-            Generate realistic clothing inventory (Oxford shirts, denim jeans, kurtas, polos) with sales history to evaluate reports and test backup/restore correctness.
-          </p>
-
-          <button
-            type="button"
-            id="generate-sample-data-btn"
-            className="btn btn--ghost"
-            style={{ width: '100%' }}
-            onClick={handleGenerateSampleData}
-            disabled={isGeneratingDemo}
-          >
-            {isGeneratingDemo ? 'Generating Sample Data...' : '⚡ Generate Sample Clothing Store Data'}
+            {isCreating ? 'Creating backup…' : 'Create backup now'}
           </button>
         </section>
       </div>
 
-      {showPreviewModal && restorePayload && (
+      <section className="card">
+        <div className="card__header">
+          <h2 className="card__title">Backup history</h2>
+        </div>
+
+        {isLoading ? (
+          <div className="skeleton" style={{ height: 80 }} />
+        ) : backups.length === 0 ? (
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-muted)' }}>No backups yet.</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="data-table" style={{ width: '100%' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left' }}>Created</th>
+                  <th style={{ textAlign: 'left' }}>File</th>
+                  <th style={{ textAlign: 'right' }}>Size</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {backups.map((b) => (
+                  <tr key={b.id}>
+                    <td>{new Date(b.createdAt).toLocaleString()}</td>
+                    <td style={{ fontSize: 'var(--text-xs)', wordBreak: 'break-all' }}>
+                      {b.filename}
+                      {!b.fileExists && <span className="badge badge--return" style={{ marginLeft: 8 }}>file missing</span>}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>{formatBytes(b.fileSizeBytes)}</td>
+                    <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <button
+                        type="button"
+                        className="btn btn--secondary btn--sm"
+                        disabled={!b.fileExists || busyId === b.id}
+                        onClick={() => void handleDownload(b)}
+                      >
+                        Download
+                      </button>{' '}
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--sm"
+                        disabled={!b.fileExists || busyId === b.id}
+                        onClick={() => setRestoreTarget(b)}
+                      >
+                        Restore
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {restoreTarget && (
         <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="modal card animate-fade-in-up" style={{ maxWidth: 540, width: '90%', padding: 'var(--space-6)' }}>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xl)', marginTop: 0 }}>
-              Confirm Database Restore
-            </h2>
+          <div className="modal card animate-fade-in-up" style={{ maxWidth: 520, width: '90%', padding: 'var(--space-6)' }}>
+            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xl)', marginTop: 0 }}>Restore this backup?</h2>
             <p style={{ color: 'var(--color-ink-secondary)', fontSize: 'var(--text-sm)' }}>
-              You are about to restore data from backup snapshot created on{' '}
-              <strong>{new Date(restorePayload.metadata.timestamp).toLocaleString()}</strong>.
+              Snapshot from <strong>{new Date(restoreTarget.createdAt).toLocaleString()}</strong>.
             </p>
-
-            <div className="card" style={{ background: 'var(--color-paper)', padding: 'var(--space-3)', margin: 'var(--space-4) 0' }}>
-              <div style={{ fontSize: 'var(--text-xs)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                <div>Store: <strong>{restorePayload.metadata.storeName}</strong></div>
-                <div>Version: <strong>{restorePayload.metadata.version}</strong></div>
-                <div>Products: <strong>{restorePayload.metadata.recordCounts.products}</strong></div>
-                <div>Variants: <strong>{restorePayload.metadata.recordCounts.variants}</strong></div>
-                <div>Physical Items: <strong>{restorePayload.metadata.recordCounts.inventoryItems}</strong></div>
-                <div>Movements: <strong>{restorePayload.metadata.recordCounts.inventoryMovements}</strong></div>
-                <div>Categories: <strong>{restorePayload.metadata.recordCounts.categories}</strong></div>
-                <div>Suppliers: <strong>{restorePayload.metadata.recordCounts.suppliers}</strong></div>
-              </div>
-            </div>
-
             <div className="alert alert--warning" style={{ fontSize: 'var(--text-xs)', margin: 'var(--space-3) 0' }}>
-              ⚠️ Restoring will replace current local database items with this backup snapshot.
+              Restore only adds records that are <strong>missing</strong> from the database. Records that still exist —
+              including anything you changed after this backup — are left exactly as they are.
             </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: 'var(--space-4)' }}>
-              <button
-                type="button"
-                className="btn btn--secondary"
-                onClick={() => {
-                  setShowPreviewModal(false);
-                  setRestoreFile(null);
-                  setRestorePayload(null);
-                }}
-              >
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 'var(--space-4)' }}>
+              <button type="button" className="btn btn--secondary" onClick={() => setRestoreTarget(null)}>
                 Cancel
               </button>
               <button
                 type="button"
                 id="confirm-restore-btn"
                 className="btn btn--primary"
-                onClick={handleConfirmRestore}
-                disabled={isRestoring}
+                onClick={() => void handleConfirmRestore()}
+                disabled={busyId === restoreTarget.id}
               >
-                {isRestoring ? 'Restoring Database...' : 'Confirm & Restore Data'}
+                {busyId === restoreTarget.id ? 'Restoring…' : 'Restore missing records'}
               </button>
             </div>
           </div>

@@ -22,6 +22,8 @@ export type PermissionKey =
   | 'inventory:edit'
   | 'billing:view'
   | 'billing:create'
+  | 'returns:create'
+  | 'exchanges:create'
   | 'reports:view'
   | 'settings:view'
   | 'settings:edit'
@@ -42,6 +44,8 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': true,
     'billing:view': true,
     'billing:create': true,
+    'returns:create': true,
+    'exchanges:create': true,
     'reports:view': true,
     'settings:view': true,
     'settings:edit': true,
@@ -59,6 +63,8 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': true,
     'billing:view': true,
     'billing:create': true,
+    'returns:create': true,
+    'exchanges:create': true,
     'reports:view': true,
     'settings:view': true,
     'settings:edit': false,
@@ -76,6 +82,8 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': false,
     'billing:view': true,
     'billing:create': true,
+    'returns:create': true,
+    'exchanges:create': true,
     'reports:view': false,
     'settings:view': false,
     'settings:edit': false,
@@ -93,6 +101,8 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': true,
     'billing:view': false,
     'billing:create': false,
+    'returns:create': false,
+    'exchanges:create': false,
     'reports:view': false,
     'settings:view': false,
     'settings:edit': false,
@@ -110,6 +120,8 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': false,
     'billing:view': true,
     'billing:create': false,
+    'returns:create': false,
+    'exchanges:create': false,
     'reports:view': true,
     'settings:view': false,
     'settings:edit': false,
@@ -127,6 +139,8 @@ export const PERMISSION_MATRIX: PermissionMatrix = {
     'inventory:edit': false,
     'billing:view': false,
     'billing:create': false,
+    'returns:create': false,
+    'exchanges:create': false,
     'reports:view': false,
     'settings:view': false,
     'settings:edit': false,

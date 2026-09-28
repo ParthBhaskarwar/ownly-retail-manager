@@ -26,6 +26,7 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   signUp: (input: SignUpInput) => Promise<PendingVerification>;
   verify: (userId: string, code: string) => Promise<void>;
+  resendCode: (userId: string) => Promise<{ devCode?: string }>;
   login: (input: LoginInput) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -77,6 +78,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await AuthService.verify(userId, code);
   }, []);
 
+  const resendCode = useCallback(async (userId: string): Promise<{ devCode?: string }> => {
+    return AuthService.resendCode(userId);
+  }, []);
+
   const login = useCallback(async (input: LoginInput): Promise<void> => {
     const result = await AuthService.login(input);
     setState({
@@ -97,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [state.session, state.user]);
 
   return (
-    <AuthContext.Provider value={{ ...state, signUp, verify, login, logout, refreshSession }}>
+    <AuthContext.Provider value={{ ...state, signUp, verify, resendCode, login, logout, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

@@ -142,7 +142,9 @@ hr {
 
 .app-sidebar {
   width: var(--sidebar-width);
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh; /* fixed to the viewport so the nav list can scroll inside it */
+  overflow: hidden;
   background: var(--color-sidebar-bg);
   border-right: 1px solid var(--color-sidebar-border);
   display: flex;

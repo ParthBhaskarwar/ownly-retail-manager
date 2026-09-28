@@ -16,14 +16,21 @@ export default function StaffPage() {
   const { store } = useStoreContext();
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const canCreate = usePermission('staff:create');
 
   const loadStaff = useCallback(async () => {
-    if (!store?.id) return;
+    if (!store?.id) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
+    setLoadError('');
     try {
       const list = await StaffService.listByStore(store.id);
       setStaff(list);
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Could not load staff.');
     } finally {
       setIsLoading(false);
     }
@@ -33,14 +40,22 @@ export default function StaffPage() {
 
   const handleDeactivate = async (id: string) => {
     if (!user?.id || !store?.id) return;
-    await StaffService.deactivate(id, user.id, store.id);
-    await loadStaff();
+    try {
+      await StaffService.deactivate(id, user.id, store.id);
+      await loadStaff();
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Could not deactivate this staff member.');
+    }
   };
 
   const handleReactivate = async (id: string) => {
     if (!user?.id || !store?.id) return;
-    await StaffService.reactivate(id, user.id, store.id);
-    await loadStaff();
+    try {
+      await StaffService.reactivate(id, user.id, store.id);
+      await loadStaff();
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Could not reactivate this staff member.');
+    }
   };
 
   return (
@@ -61,6 +76,15 @@ export default function StaffPage() {
             </Link>
           )}
         </div>
+
+        {loadError && (
+          <div className="alert alert--error" role="alert">
+            {loadError}{' '}
+            <button type="button" className="btn btn--ghost btn--sm" onClick={() => void loadStaff()}>
+              Retry
+            </button>
+          </div>
+        )}
 
         <StaffList
           staff={staff}

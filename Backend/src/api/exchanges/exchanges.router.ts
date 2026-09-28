@@ -1,152 +1,130 @@
 /**
- * Product Exchanges Router.
+ * Product exchanges.
+ *
+ *   POST /api/exchanges   return items from an invoice and sell replacements in one step
+ *
+ * Returned value = what the customer actually paid for the returned lines.
+ * Replacement prices and tax come from the database. The difference is settled
+ * with `paymentMethod` (customer pays more, or is refunded / given a credit note).
  */
 
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { db } from '../../db/client';
+import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
+import { db } from '@/db/client';
+import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
+import { AppError } from '@/shared/AppError';
+import { nextDocNumber } from '@/shared/docNumber';
+import { computeTax, loadTaxSettings, refundableForLine, round2 } from '@/shared/money';
 
 export const exchangesRouter = Router();
-
 exchangesRouter.use(authenticate);
 
-async function generateExchangeNumber(storeId: string | null | undefined, trx: any): Promise<string> {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const countRes = await trx('exchanges')
-    .modify((qb: any) => {
-      if (storeId) qb.where('store_id', storeId);
-    })
-    .count('id as count')
-    .first();
-  const count = parseInt((countRes?.count as string) || '0', 10) + 1;
-  return `EXC-${dateStr}-${count.toString().padStart(4, '0')}`;
-}
+const exchangeSchema = z.object({
+  originalInvoiceId: z.string().uuid(),
+  returnedItems: z
+    .array(
+      z.object({
+        invoiceItemId: z.string().uuid(),
+        condition: z.enum(['RESELLABLE', 'DAMAGED', 'DEFECTIVE', 'OPENED_USED', 'OTHER']).default('RESELLABLE'),
+        reason: z.string().trim().max(255).nullish(),
+      })
+    )
+    .min(1, 'Select at least one item to return.'),
+  replacementItems: z
+    .array(z.object({ inventoryItemId: z.string().uuid() }))
+    .min(1, 'Add at least one replacement item.'),
+  paymentMethod: z.enum(['CASH', 'UPI', 'CARD', 'CREDIT_NOTE']).default('CASH'),
+  transactionReference: z.string().trim().max(255).nullish(),
+  notes: z.string().trim().max(1000).nullish(),
+});
 
-async function generateInvoiceNumber(storeId: string | null | undefined, trx: any): Promise<string> {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const countRes = await trx('invoices')
-    .modify((qb: any) => {
-      if (storeId) qb.where('store_id', storeId);
-    })
-    .count('id as count')
-    .first();
-  const count = parseInt((countRes?.count as string) || '0', 10) + 1;
-  return `INV-${dateStr}-${count.toString().padStart(4, '0')}`;
-}
-
-async function generateReturnNumber(storeId: string | null | undefined, trx: any): Promise<string> {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const countRes = await trx('returns')
-    .modify((qb: any) => {
-      if (storeId) qb.where('store_id', storeId);
-    })
-    .count('id as count')
-    .first();
-  const count = parseInt((countRes?.count as string) || '0', 10) + 1;
-  return `RET-${dateStr}-${count.toString().padStart(4, '0')}`;
-}
-
-// POST /api/exchanges
-exchangesRouter.post('/', async (req, res): Promise<void> => {
-  const storeId = req.user?.storeId;
-  const processedBy = req.user?.userId;
-
-  if (!processedBy) {
-    res.status(401).json({ error: 'Unauthenticated user' });
-    return;
-  }
-
-  const {
-    originalInvoiceId,
-    returnedItems,
-    replacementItems,
-    paymentMethod,
-    transactionReference,
-    notes,
-  } = req.body;
-
-  if (!originalInvoiceId || !returnedItems?.length || !replacementItems?.length) {
-    res.status(400).json({ error: 'Exchange requires original invoice, returned items, and replacement items' });
-    return;
-  }
-
+exchangesRouter.post('/', requirePermission('exchanges:create'), async (req, res, next) => {
   try {
-    const exchangeResult = await db.transaction(async (trx) => {
-      const origInvoice = await trx('invoices').where('id', originalInvoiceId).first();
-      if (!origInvoice) {
-        throw new Error('Original invoice not found');
+    const storeId = requireStoreId(req);
+    const processedBy = req.user!.userId;
+    const input = exchangeSchema.parse(req.body);
+
+    const returnedIds = input.returnedItems.map((i) => i.invoiceItemId);
+    const replacementIds = input.replacementItems.map((i) => i.inventoryItemId);
+    if (new Set(returnedIds).size !== returnedIds.length) throw AppError.badRequest('An item was selected twice.');
+    if (new Set(replacementIds).size !== replacementIds.length) throw AppError.badRequest('A replacement item was added twice.');
+
+    const result = await db.transaction(async (trx) => {
+      const orig = await trx('invoices')
+        .where({ id: input.originalInvoiceId, store_id: storeId })
+        .forUpdate()
+        .first();
+      if (!orig) throw AppError.notFound('Original invoice not found.');
+      if (orig.status === 'FULLY_RETURNED' || orig.status === 'CANCELLED') {
+        throw AppError.badRequest('This invoice can no longer be exchanged.');
       }
+
+      // ── Returned side ────────────────────────────────────────────────────────
+      const invoiceItems = await trx('invoice_items')
+        .whereIn('id', returnedIds)
+        .andWhere('invoice_id', orig.id)
+        .forUpdate();
+      const itemById = new Map(invoiceItems.map((i: Record<string, unknown>) => [i['id'] as string, i]));
 
       let returnedValue = 0;
-      const returnId = uuidv4();
-      const returnNumber = await generateReturnNumber(storeId, trx);
-      const returnItemsData = [];
-
-      for (const reqItem of returnedItems) {
-        const invItem = await trx('invoice_items')
-          .where('id', reqItem.invoiceItemId)
-          .andWhere('invoice_id', originalInvoiceId)
-          .first();
-
-        if (!invItem) {
-          throw new Error(`Invoice item ${reqItem.invoiceItemId} not found`);
+      const returned = input.returnedItems.map((reqItem) => {
+        const invItem = itemById.get(reqItem.invoiceItemId);
+        if (!invItem) throw AppError.badRequest('An item does not belong to this invoice.');
+        if (invItem['status'] !== 'ACTIVE') {
+          throw AppError.conflict(`Item ${invItem['barcode']} has already been returned or exchanged.`);
         }
-
-        const itemVal = parseFloat(invItem.final_price);
-        returnedValue += itemVal;
-
-        const condition = reqItem.condition || 'RESELLABLE';
-        const inventoryAction = condition === 'RESELLABLE' ? 'RETURN_TO_STOCK' : 'RETURN_DAMAGED';
-        const newStatus = condition === 'RESELLABLE' ? 'RETURNED_TO_STOCK' : 'RETURNED_DAMAGED';
-
-        returnItemsData.push({
+        const refundAmount = refundableForLine(orig, invItem['finalPrice'] as string);
+        returnedValue = round2(returnedValue + refundAmount);
+        const resellable = reqItem.condition === 'RESELLABLE';
+        return {
           id: uuidv4(),
-          returnId,
-          originalInvoiceItemId: invItem.id,
-          inventoryItemId: invItem.inventory_item_id,
-          condition,
+          invItem,
+          condition: reqItem.condition,
           reason: reqItem.reason || 'Exchange',
-          refundAmount: itemVal,
-          inventoryAction,
-          newStatus,
-        });
-      }
+          refundAmount,
+          inventoryAction: resellable ? 'RETURN_TO_STOCK' : 'RETURN_DAMAGED',
+          newStatus: resellable ? 'RETURNED_TO_STOCK' : 'RETURNED_DAMAGED',
+        };
+      });
+
+      const returnId = uuidv4();
+      const returnNumber = await nextDocNumber(trx, 'returns', 'RET', storeId);
 
       await trx('returns').insert({
         id: returnId,
         return_number: returnNumber,
-        store_id: storeId || null,
-        original_invoice_id: originalInvoiceId,
-        customer_id: origInvoice.customer_id || null,
+        store_id: storeId,
+        original_invoice_id: orig.id,
+        customer_id: orig.customerId || null,
         processed_by: processedBy,
         total_refund_amount: returnedValue,
         refund_method: 'EXCHANGE',
-        notes: notes || 'Product exchange',
+        notes: input.notes || 'Product exchange',
       });
 
-      for (const rItem of returnItemsData) {
+      for (const r of returned) {
         await trx('return_items').insert({
-          id: rItem.id,
+          id: r.id,
           return_id: returnId,
-          original_invoice_item_id: rItem.originalInvoiceItemId,
-          inventory_item_id: rItem.inventoryItemId,
-          condition: rItem.condition,
-          reason: rItem.reason,
-          refund_amount: rItem.refundAmount,
-          inventory_action: rItem.inventoryAction,
+          original_invoice_item_id: r.invItem['id'],
+          inventory_item_id: r.invItem['inventoryItemId'],
+          condition: r.condition,
+          reason: r.reason,
+          refund_amount: r.refundAmount,
+          inventory_action: r.inventoryAction,
         });
-
-        await trx('invoice_items').where('id', rItem.originalInvoiceItemId).update({ status: 'EXCHANGED' });
-        await trx('inventory_items').where('id', rItem.inventoryItemId).update({ status: rItem.newStatus, updated_at: trx.fn.now() });
-
+        await trx('invoice_items').where({ id: r.invItem['id'] as string }).update({ status: 'EXCHANGED' });
+        await trx('inventory_items')
+          .where({ id: r.invItem['inventoryItemId'] as string, store_id: storeId })
+          .update({ status: r.newStatus, updated_at: trx.fn.now() });
         await trx('inventory_movements').insert({
           id: uuidv4(),
-          store_id: storeId || null,
-          inventory_item_id: rItem.inventoryItemId,
-          movement_type: rItem.inventoryAction,
+          store_id: storeId,
+          inventory_item_id: r.invItem['inventoryItemId'],
+          movement_type: r.inventoryAction,
           from_status: 'SOLD',
-          to_status: rItem.newStatus,
+          to_status: r.newStatus,
           reference_type: 'EXCHANGE',
           reference_id: returnId,
           performed_by: processedBy,
@@ -154,66 +132,76 @@ exchangesRouter.post('/', async (req, res): Promise<void> => {
         });
       }
 
-      let replacementValue = 0;
-      const validatedReplacements = [];
+      // ── Replacement side (prices from the database) ──────────────────────────
+      const repRows = (await trx('inventory_items as ii')
+        .join('product_variants as v', 'v.id', 'ii.variant_id')
+        .join('products as p', 'p.id', 'v.product_id')
+        .where('ii.store_id', storeId)
+        .whereIn('ii.id', replacementIds)
+        .forUpdate('ii')
+        .select(
+          'ii.id',
+          'ii.barcode',
+          'ii.status',
+          db.ref('p.id').as('product_id'),
+          db.ref('p.name').as('product_name'),
+          db.ref('v.id').as('variant_id'),
+          db.ref('v.display_name').as('variant_name'),
+          db.raw('COALESCE(v.selling_price_override, p.base_selling_price) AS unit_price')
+        )) as Array<Record<string, unknown>>;
+      const repById = new Map(repRows.map((r) => [r['id'] as string, r]));
 
-      for (const item of replacementItems) {
-        const invRecord = await trx('inventory_items')
-          .select('inventory_items.*', 'product_variants.product_id', 'product_variants.display_name as variantName', 'products.name as productName')
-          .join('product_variants', 'inventory_items.variant_id', 'product_variants.id')
-          .join('products', 'product_variants.product_id', 'products.id')
-          .where('inventory_items.id', item.inventoryItemId)
-          .forUpdate()
-          .first();
-
-        if (!invRecord) {
-          throw new Error(`Replacement item with barcode ${item.barcode} not found`);
+      let replacementSubtotal = 0;
+      const replacements = replacementIds.map((id) => {
+        const r = repById.get(id);
+        if (!r) throw AppError.badRequest('A replacement item was not found in this store.');
+        const status = r['status'] as string;
+        if (status !== 'IN_STOCK' && status !== 'RETURNED_TO_STOCK') {
+          throw AppError.conflict(`Replacement item ${r['barcode']} is unavailable (status: ${status}).`);
         }
-
-        if (invRecord.status === 'SOLD' || (invRecord.status !== 'IN_STOCK' && invRecord.status !== 'RETURNED_TO_STOCK')) {
-          throw new Error(`Replacement item ${item.barcode} is unavailable (Status: ${invRecord.status})`);
-        }
-
-        const price = parseFloat(item.unitPrice);
-        replacementValue += price;
-
-        validatedReplacements.push({
+        const price = round2(Number(r['unitPrice']));
+        replacementSubtotal = round2(replacementSubtotal + price);
+        return {
           id: uuidv4(),
-          productId: invRecord.product_id,
-          variantId: invRecord.variant_id,
-          inventoryItemId: invRecord.id,
-          barcode: invRecord.barcode,
-          productName: invRecord.productName,
-          variantName: invRecord.variantName,
-          quantity: 1,
-          unitPrice: price,
-          finalPrice: price,
-        });
-      }
+          inventoryItemId: r['id'] as string,
+          previousStatus: status,
+          barcode: r['barcode'] as string,
+          productId: r['productId'] as string,
+          variantId: r['variantId'] as string,
+          productName: r['productName'] as string,
+          variantName: r['variantName'] as string,
+          price,
+        };
+      });
 
-      const differenceAmount = replacementValue - returnedValue;
+      const { taxAmount, grandTotal: replacementValue } = computeTax(
+        await loadTaxSettings(trx, storeId),
+        replacementSubtotal
+      );
+      const differenceAmount = round2(replacementValue - returnedValue);
+
       const replacementInvoiceId = uuidv4();
-      const replacementInvoiceNumber = await generateInvoiceNumber(storeId, trx);
+      const replacementInvoiceNumber = await nextDocNumber(trx, 'invoices', 'INV', storeId);
 
       await trx('invoices').insert({
         id: replacementInvoiceId,
-        store_id: storeId || null,
+        store_id: storeId,
         invoice_number: replacementInvoiceNumber,
-        customer_id: origInvoice.customer_id || null,
-        customer_name: origInvoice.customer_name || null,
-        customer_phone: origInvoice.customer_phone || null,
+        customer_id: orig.customerId || null,
+        customer_name: orig.customerName || null,
+        customer_phone: orig.customerPhone || null,
         cashier_id: processedBy,
-        subtotal: replacementValue,
+        subtotal: replacementSubtotal,
         discount_amount: 0,
-        tax_amount: 0,
+        tax_amount: taxAmount,
         grand_total: replacementValue,
         amount_paid: differenceAmount > 0 ? differenceAmount : 0,
         change_given: 0,
         status: 'COMPLETED',
-        notes: `Exchange for original invoice ${origInvoice.invoice_number}`,
+        notes: `Exchange for original invoice ${orig.invoiceNumber}`,
       });
 
-      for (const rep of validatedReplacements) {
+      for (const rep of replacements) {
         await trx('invoice_items').insert({
           id: rep.id,
           invoice_id: replacementInvoiceId,
@@ -224,20 +212,20 @@ exchangesRouter.post('/', async (req, res): Promise<void> => {
           product_name: rep.productName,
           variant_name: rep.variantName,
           quantity: 1,
-          unit_price: rep.unitPrice,
+          unit_price: rep.price,
           discount_amount: 0,
-          final_price: rep.finalPrice,
+          final_price: rep.price,
           status: 'ACTIVE',
         });
-
-        await trx('inventory_items').where('id', rep.inventoryItemId).update({ status: 'SOLD', updated_at: trx.fn.now() });
-
+        await trx('inventory_items')
+          .where({ id: rep.inventoryItemId })
+          .update({ status: 'SOLD', updated_at: trx.fn.now() });
         await trx('inventory_movements').insert({
           id: uuidv4(),
-          store_id: storeId || null,
+          store_id: storeId,
           inventory_item_id: rep.inventoryItemId,
           movement_type: 'SALE',
-          from_status: 'IN_STOCK',
+          from_status: rep.previousStatus,
           to_status: 'SOLD',
           reference_type: 'EXCHANGE',
           reference_id: replacementInvoiceId,
@@ -246,29 +234,55 @@ exchangesRouter.post('/', async (req, res): Promise<void> => {
         });
       }
 
+      // ── Settle the difference ────────────────────────────────────────────────
       let paymentStatus: 'BALANCED' | 'CUSTOMER_PAID' | 'REFUND_ISSUED' | 'CREDIT_NOTE_ISSUED' = 'BALANCED';
+      let creditNoteNumber: string | null = null;
+
       if (differenceAmount > 0) {
         paymentStatus = 'CUSTOMER_PAID';
+        if (input.paymentMethod === 'CREDIT_NOTE') {
+          throw AppError.badRequest('The extra amount must be paid in cash, UPI or card.');
+        }
         await trx('payments').insert({
           id: uuidv4(),
           invoice_id: replacementInvoiceId,
-          payment_method: paymentMethod || 'CASH',
+          payment_method: input.paymentMethod,
           amount: differenceAmount,
-          transaction_reference: transactionReference || null,
+          transaction_reference: input.transactionReference || null,
           status: 'COMPLETED',
         });
       } else if (differenceAmount < 0) {
-        paymentStatus = paymentMethod === 'CREDIT_NOTE' ? 'CREDIT_NOTE_ISSUED' : 'REFUND_ISSUED';
+        const owed = round2(-differenceAmount);
+        if (input.paymentMethod === 'CREDIT_NOTE') {
+          paymentStatus = 'CREDIT_NOTE_ISSUED';
+          const expiry = new Date();
+          expiry.setDate(expiry.getDate() + 90);
+          creditNoteNumber = await nextDocNumber(trx, 'credit_notes', 'CN', storeId);
+          await trx('credit_notes').insert({
+            id: uuidv4(),
+            credit_note_number: creditNoteNumber,
+            store_id: storeId,
+            original_invoice_id: orig.id,
+            return_id: returnId,
+            customer_id: orig.customerId || null,
+            original_amount: owed,
+            remaining_amount: owed,
+            status: 'ACTIVE',
+            expiry_date: expiry.toISOString().slice(0, 10),
+          });
+        } else {
+          paymentStatus = 'REFUND_ISSUED';
+        }
       }
 
       const exchangeId = uuidv4();
-      const exchangeNumber = await generateExchangeNumber(storeId, trx);
+      const exchangeNumber = await nextDocNumber(trx, 'exchanges', 'EX', storeId);
 
       await trx('exchanges').insert({
         id: exchangeId,
         exchange_number: exchangeNumber,
-        store_id: storeId || null,
-        original_invoice_id: originalInvoiceId,
+        store_id: storeId,
+        original_invoice_id: orig.id,
         return_id: returnId,
         replacement_invoice_id: replacementInvoiceId,
         processed_by: processedBy,
@@ -278,18 +292,27 @@ exchangesRouter.post('/', async (req, res): Promise<void> => {
         payment_status: paymentStatus,
       });
 
-      await trx('invoices').where('id', originalInvoiceId).update({ status: 'EXCHANGED', updated_at: trx.fn.now() });
+      const stillActive = await trx('invoice_items')
+        .where({ invoice_id: orig.id, status: 'ACTIVE' })
+        .count('* as n')
+        .first();
+      await trx('invoices')
+        .where({ id: orig.id })
+        .update({
+          status: Number((stillActive as { n: string | number }).n) === 0 ? 'EXCHANGED' : 'PARTIALLY_RETURNED',
+          updated_at: trx.fn.now(),
+        });
 
       await trx('audit_logs').insert({
         id: uuidv4(),
-        store_id: storeId || null,
+        store_id: storeId,
         user_id: processedBy,
-        action: 'EXCHANGE_PROCESSED',
-        entity_type: 'EXCHANGE',
+        action: 'exchange.processed',
+        entity_type: 'exchange',
         entity_id: exchangeId,
-        details: JSON.stringify({
+        meta: JSON.stringify({
           exchangeNumber,
-          originalInvoiceNumber: origInvoice.invoice_number,
+          originalInvoiceNumber: orig.invoiceNumber,
           replacementInvoiceNumber,
           returnedValue,
           replacementValue,
@@ -301,19 +324,19 @@ exchangesRouter.post('/', async (req, res): Promise<void> => {
       return {
         id: exchangeId,
         exchangeNumber,
-        originalInvoiceId,
+        originalInvoiceId: orig.id,
         replacementInvoiceId,
         replacementInvoiceNumber,
         returnedValue,
         replacementValue,
         differenceAmount,
         paymentStatus,
+        creditNoteNumber,
       };
     });
 
-    res.status(201).json(exchangeResult);
-  } catch (err: any) {
-    console.error('[EXCHANGE_ERROR]', err.message);
-    res.status(400).json({ error: err.message || 'Failed to process exchange' });
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
   }
 });

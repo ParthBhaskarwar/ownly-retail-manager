@@ -11,11 +11,12 @@ import { AiOverviewCard } from '@/modules/ai/components/AiOverviewCard';
 import { evaluatePermission } from '@/config/permissions';
 import type { Role } from '@/modules/account/types';
 import { ReportService } from '@/modules/reports/services/ReportService';
-import { BackupService } from '@/modules/backup/services/BackupService';
+import { BackupService, getBackupStatus } from '@/modules/backup/services/BackupService';
+import { apiClient } from '@/lib/apiClient';
 import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import type { OnboardingStep } from '@/modules/store/types';
 import type { SalesReportSummary, InventoryValuationSummary, StockAgeingSummary } from '@/modules/reports/types';
-import type { StorageHealthStatus } from '@/modules/backup/types';
+import type { BackupStatus } from '@/modules/backup/types';
 
 function fmt(n: number): string {
   return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -30,7 +31,7 @@ export default function DashboardPage() {
   const [salesReport, setSalesReport] = useState<SalesReportSummary | null>(null);
   const [valuation, setValuation] = useState<InventoryValuationSummary | null>(null);
   const [ageing, setAgeing] = useState<StockAgeingSummary | null>(null);
-  const [storageHealth, setStorageHealth] = useState<StorageHealthStatus | null>(null);
+  const [storageHealth, setStorageHealth] = useState<BackupStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const showChecklist = !store?.setupCompleted;
@@ -63,16 +64,12 @@ export default function DashboardPage() {
     // Load dashboard stats from the backend API (PostgreSQL)
     const loadDashboardData = async () => {
       try {
-        const token = typeof window !== 'undefined'
-          ? localStorage.getItem('ownly:token')
-          : null;
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/dashboard/summary`,
-          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
-        );
-        if (!res.ok) return; // silently degrade — dashboard still renders with zeros
-
-        const data = await res.json();
+        // apiClient attaches the token and unwraps errors; a failure just leaves zeros.
+        const data = await apiClient.get<{
+          salesKpi?: { todayRevenue?: number; todayOrders?: number };
+          stockKpi?: { totalProducts?: number; totalInStock?: number; returnsToday?: number };
+          recentInvoices?: any[];
+        }>('/api/dashboard/summary');
 
         setStats({
           todaySales: data.salesKpi?.todayRevenue ?? 0,
@@ -96,21 +93,25 @@ export default function DashboardPage() {
     let isMounted = true;
     setIsLoading(true);
 
-    Promise.all([
-      ReportService.getSalesReport(storeId),
-      ReportService.getInventoryValuationReport(storeId),
-      ReportService.getStockAgeingReport(storeId),
-      BackupService.getStorageHealth(storeId),
+    // Each panel loads on its own and only for roles that may see it, so one
+    // 403 (e.g. a cashier has no reports access) cannot blank the others.
+    const role = user?.role as Role | undefined;
+    const canReports = !!role && evaluatePermission(role, 'reports:view');
+    const canBackup = !!role && evaluatePermission(role, 'settings:edit');
+
+    Promise.allSettled([
+      canReports ? ReportService.getSalesReport(storeId) : Promise.resolve(null),
+      canReports ? ReportService.getInventoryValuationReport(storeId) : Promise.resolve(null),
+      canReports ? ReportService.getStockAgeingReport(storeId) : Promise.resolve(null),
+      canBackup ? BackupService.getHealth() : Promise.resolve(null),
     ])
       .then(([s, v, a, h]) => {
-        if (isMounted) {
-          setSalesReport(s);
-          setValuation(v);
-          setAgeing(a);
-          setStorageHealth(h);
-        }
+        if (!isMounted) return;
+        if (s.status === 'fulfilled') setSalesReport(s.value);
+        if (v.status === 'fulfilled') setValuation(v.value);
+        if (a.status === 'fulfilled') setAgeing(a.value);
+        if (h.status === 'fulfilled' && h.value) setStorageHealth(getBackupStatus(h.value.latestBackupAt));
       })
-      .catch((err) => console.error('Dashboard data load error', err))
       .finally(() => {
         if (isMounted) setIsLoading(false);
       });
@@ -118,7 +119,7 @@ export default function DashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, [storeId]);
+  }, [storeId, user?.role]);
 
   return (
     <PermissionGuard permissionKey="dashboard:view">

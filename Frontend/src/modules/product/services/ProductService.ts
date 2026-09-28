@@ -10,7 +10,6 @@
  */
 
 import { apiClient } from '@/lib/apiClient';
-import { AuditService } from '@/shared/audit/AuditService';
 import type {
   Product,
   ProductDetail,
@@ -65,8 +64,6 @@ export const ProductService = {
       `/api/products/${id}`,
       updates
     );
-
-    AuditService.log('product.update', id, storeId || null, { ...updates });
 
     return product;
   },

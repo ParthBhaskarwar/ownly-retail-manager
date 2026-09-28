@@ -312,7 +312,7 @@ productsRouter.get('/:id/performance', requirePermission('inventory:view'), asyn
  * the store. Returns a count of how many products were refreshed.
  * Runs synchronously (acceptable for stores with < 1000 products).
  */
-productsRouter.post('/performance/refresh', requirePermission('inventory:view'), async (req, res, next) => {
+productsRouter.post('/performance/refresh', requirePermission('inventory:edit'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
     const result = await ProductPerformanceService.computeForStore(storeId);

@@ -1,99 +1,81 @@
 /**
- * Credit Notes Management & Redemption Router.
+ * Credit notes — lookup and manual redemption, scoped to the caller's store.
+ *
+ * (Checkout redeems credit notes itself when a CREDIT_NOTE payment is used;
+ * POST /redeem exists for manual adjustments by staff who can take payments.)
  */
 
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.middleware';
-import { db } from '../../db/client';
+import { z } from 'zod';
+import { db } from '@/db/client';
+import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
+import { AppError, param } from '@/shared/AppError';
+import { round2 } from '@/shared/money';
 
 export const creditNotesRouter = Router();
-
 creditNotesRouter.use(authenticate);
 
-// GET /api/credit-notes/:code
-creditNotesRouter.get('/:code', async (req, res): Promise<void> => {
+creditNotesRouter.get('/:code', requirePermission('billing:view'), async (req, res, next) => {
   try {
-    const { code } = req.params;
-    const storeId = req.user?.storeId;
+    const storeId = requireStoreId(req);
+    const creditNote = await db('credit_notes')
+      .where({ store_id: storeId, credit_note_number: param(req.params, 'code') })
+      .first();
 
-    let query = db('credit_notes').where('credit_note_number', code);
-    if (storeId) query = query.andWhere('store_id', storeId);
-
-    const creditNote = await query.first();
-    if (!creditNote) {
-      res.status(404).json({ error: 'Credit note not found', code: 'CREDIT_NOTE_NOT_FOUND' });
-      return;
+    if (!creditNote) throw AppError.notFound('Credit note not found.');
+    if (creditNote.status !== 'ACTIVE') throw AppError.badRequest(`Credit note is ${creditNote.status}.`);
+    if (creditNote.expiryDate && new Date(creditNote.expiryDate) < new Date()) {
+      throw AppError.badRequest('Credit note has expired.');
     }
-
-    if (creditNote.status !== 'ACTIVE') {
-      res.status(400).json({ error: `Credit note is ${creditNote.status}`, code: 'CREDIT_NOTE_INACTIVE' });
-      return;
-    }
-
-    if (creditNote.expiry_date && new Date(creditNote.expiry_date) < new Date()) {
-      res.status(400).json({ error: 'Credit note has expired', code: 'CREDIT_NOTE_EXPIRED' });
-      return;
-    }
-
-    const remaining = parseFloat(creditNote.remaining_amount);
-    if (remaining <= 0) {
-      res.status(400).json({ error: 'Credit note balance is zero', code: 'CREDIT_NOTE_EXHAUSTED' });
-      return;
-    }
+    if (Number(creditNote.remainingAmount) <= 0) throw AppError.badRequest('Credit note balance is zero.');
 
     res.json(creditNote);
-  } catch (err: any) {
-    res.status(500).json({ error: 'Failed to verify credit note' });
+  } catch (err) {
+    next(err);
   }
 });
 
-// POST /api/credit-notes/redeem
-creditNotesRouter.post('/redeem', async (req, res): Promise<void> => {
-  try {
-    const { creditNoteNumber, amountToRedeem } = req.body;
-    const storeId = req.user?.storeId;
+const redeemSchema = z.object({
+  creditNoteNumber: z.string().trim().min(1),
+  amountToRedeem: z.number().positive(),
+});
 
-    if (!creditNoteNumber || !amountToRedeem || parseFloat(amountToRedeem) <= 0) {
-      res.status(400).json({ error: 'Invalid credit note redemption parameters' });
-      return;
-    }
+creditNotesRouter.post('/redeem', requirePermission('billing:create'), async (req, res, next) => {
+  try {
+    const storeId = requireStoreId(req);
+    const { creditNoteNumber, amountToRedeem } = redeemSchema.parse(req.body);
 
     const result = await db.transaction(async (trx) => {
-      let query = trx('credit_notes').where('credit_note_number', creditNoteNumber).forUpdate();
-      if (storeId) query = query.andWhere('store_id', storeId);
+      const cn = await trx('credit_notes')
+        .where({ store_id: storeId, credit_note_number: creditNoteNumber })
+        .forUpdate()
+        .first();
+      if (!cn) throw AppError.notFound('Credit note not found.');
+      if (cn.status !== 'ACTIVE') throw AppError.badRequest(`Credit note is ${cn.status}.`);
+      if (cn.expiryDate && new Date(cn.expiryDate) < new Date()) throw AppError.badRequest('Credit note has expired.');
 
-      const cn = await query.first();
-      if (!cn) throw new Error('Credit note not found');
-      if (cn.status !== 'ACTIVE') throw new Error(`Credit note is ${cn.status}`);
-
-      const remaining = parseFloat(cn.remaining_amount);
-      const redeem = parseFloat(amountToRedeem);
-
-      if (redeem > remaining) {
-        throw new Error(`Requested redemption ₹${redeem.toFixed(2)} exceeds remaining balance ₹${remaining.toFixed(2)}`);
+      const remaining = Number(cn.remainingAmount);
+      if (amountToRedeem > remaining + 0.001) {
+        throw AppError.badRequest(
+          `Requested ₹${amountToRedeem.toFixed(2)} exceeds the remaining balance of ₹${remaining.toFixed(2)}.`
+        );
       }
 
-      const newRemaining = remaining - redeem;
-      const newStatus = newRemaining === 0 ? 'REDEEMED' : 'ACTIVE';
-
-      await trx('credit_notes')
-        .where('id', cn.id)
-        .update({
-          remaining_amount: newRemaining,
-          status: newStatus,
-        });
+      const newRemaining = round2(remaining - amountToRedeem);
+      const newStatus = newRemaining <= 0 ? 'REDEEMED' : 'ACTIVE';
+      await trx('credit_notes').where({ id: cn.id }).update({ remaining_amount: newRemaining, status: newStatus });
 
       return {
         id: cn.id,
-        creditNoteNumber: cn.credit_note_number,
-        redeemedAmount: redeem,
+        creditNoteNumber: cn.creditNoteNumber,
+        redeemedAmount: amountToRedeem,
         remainingBalance: newRemaining,
         status: newStatus,
       };
     });
 
     res.json(result);
-  } catch (err: any) {
-    res.status(400).json({ error: err.message || 'Failed to redeem credit note' });
+  } catch (err) {
+    next(err);
   }
 });

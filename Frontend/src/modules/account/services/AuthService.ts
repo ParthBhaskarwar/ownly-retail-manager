@@ -101,6 +101,11 @@ export const AuthService = {
     clearPendingVerification();
   },
 
+  /** Asks the server for a fresh verification code (the old one expired or was mistyped too often). */
+  async resendCode(userId: string): Promise<{ devCode?: string }> {
+    return apiClient.post<{ devCode?: string }>('/api/auth/resend-code', { userId }, { auth: false });
+  },
+
   async login(input: LoginInput): Promise<AuthResult> {
     const result = await apiClient.post<AuthResult>(
       '/api/auth/login',

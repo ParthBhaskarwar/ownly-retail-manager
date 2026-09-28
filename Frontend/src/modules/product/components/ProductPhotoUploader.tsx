@@ -29,6 +29,38 @@ export function ProductPhotoUploader({
   const [similarProducts, setSimilarProducts] = useState<SimilarProduct[]>([]);
   const [possibleDuplicate, setPossibleDuplicate] = useState<SimilarProduct | null>(null);
   const [aiNote, setAiNote] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [lastAnalyzed, setLastAnalyzed] = useState<string | null>(null);
+  const [appliedNote, setAppliedNote] = useState<string | null>(null);
+
+  /**
+   * Photo intelligence: quality, colour/pattern suggestions, duplicate check.
+   * Optional — a failure never blocks the upload, but it is now reported (with a
+   * retry) instead of silently leaving the AI panel empty.
+   */
+  const runAnalysis = async (base64: string) => {
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    setAppliedNote(null);
+    setLastAnalyzed(base64);
+    try {
+      const result = await ProductService.analyzePhoto(base64, productId);
+      const q: PhotoQualityResult = { score: result.qualityScore, issues: result.qualityIssues };
+      setQuality(q);
+      if (onQualityCheck) onQualityCheck(q);
+      setAiSuggestions(result.attributeSuggestions);
+      setSimilarProducts(result.similar);
+      setPossibleDuplicate(result.similar.find((s) => s.isPossibleDuplicate) ?? null);
+      setAiNote(result.aiAvailable ? null : result.message ?? 'Photo AI is not available right now.');
+    } catch (err) {
+      setAnalysisError(
+        err instanceof Error ? err.message : 'Photo analysis failed. The photo was still added.'
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleFiles = async (fileList: FileList | File[]) => {
     setErrorMsg(null);
@@ -57,18 +89,7 @@ export function ProductPhotoUploader({
         // Photo intelligence on the first (primary) photo: quality, suggestions,
         // duplicate check. Optional — any failure here never blocks the upload.
         if (images.length === 0 && newImages.length === 1) {
-          try {
-            const result = await ProductService.analyzePhoto(base64, productId);
-            const q: PhotoQualityResult = { score: result.qualityScore, issues: result.qualityIssues };
-            setQuality(q);
-            if (onQualityCheck) onQualityCheck(q);
-            setAiSuggestions(result.attributeSuggestions);
-            setSimilarProducts(result.similar);
-            setPossibleDuplicate(result.similar.find((s) => s.isPossibleDuplicate) ?? null);
-            setAiNote(result.aiAvailable ? null : result.message ?? null);
-          } catch {
-            // Server offline or photo AI failing: the photo is still added.
-          }
+          void runAnalysis(base64);
         }
       } catch (e) {
         setErrorMsg('Failed to process image.');
@@ -88,6 +109,9 @@ export function ProductPhotoUploader({
       setSimilarProducts([]);
       setPossibleDuplicate(null);
       setAiNote(null);
+      setAnalysisError(null);
+      setLastAnalyzed(null);
+      setAppliedNote(null);
     }
   };
 
@@ -98,10 +122,14 @@ export function ProductPhotoUploader({
     onChange([selected, ...remaining]);
   };
 
-  const applySuggestions = () => {
-    if (aiSuggestions && onAISuggestions) {
-      onAISuggestions(aiSuggestions);
-    }
+  const applySuggestions = (picked?: Partial<AttributeSuggestions>) => {
+    if (!aiSuggestions || !onAISuggestions) return;
+    const merged: AttributeSuggestions = { ...aiSuggestions, ...picked } as AttributeSuggestions;
+    onAISuggestions(merged);
+    const parts: string[] = [];
+    if (merged.colours?.[0]) parts.push(`colour ${merged.colours[0]}`);
+    if (merged.pattern) parts.push(`pattern ${merged.pattern}`);
+    setAppliedNote(`Applied to the product form: ${parts.join(', ')}.`);
   };
 
   return (
@@ -130,6 +158,12 @@ export function ProductPhotoUploader({
         <span className="pe-dropzone__label">Drop product photos here, or click to browse</span>
         <span className="pe-dropzone__hint">Supports JPG, PNG, WEBP · Max 5 MB each · Offline photo AI (optional)</span>
 
+        {isAnalyzing && !isProcessing && (
+          <div className="mt-2 text-violet-400 text-xs font-semibold flex items-center justify-center gap-2">
+            <span className="btn-spinner" /> Analysing photo… (the first run can take a moment while the model loads)
+          </div>
+        )}
+
         {isProcessing && (
           <div className="mt-2 text-violet-400 text-xs font-semibold flex items-center justify-center gap-2">
             <span className="btn-spinner" /> Processing photo intelligence...
@@ -140,6 +174,22 @@ export function ProductPhotoUploader({
       {errorMsg && (
         <div className="p-3 bg-red-950/60 border border-red-500/30 text-red-400 text-sm rounded-lg" role="alert">
           {errorMsg}
+        </div>
+      )}
+
+      {analysisError && (
+        <div className="p-3 bg-amber-950/60 border border-amber-500/30 text-amber-300 text-sm rounded-lg flex items-center justify-between gap-3" role="alert">
+          <span>Photo AI could not analyse this picture: {analysisError}</span>
+          {lastAnalyzed && (
+            <button
+              type="button"
+              className="px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600/40 border border-amber-500/30 rounded text-xs"
+              onClick={() => void runAnalysis(lastAnalyzed)}
+              disabled={isAnalyzing}
+            >
+              Try again
+            </button>
+          )}
         </div>
       )}
 
@@ -235,19 +285,46 @@ export function ProductPhotoUploader({
 
 
           {aiSuggestions && (
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+            <div className="pt-2 border-t border-slate-800 space-y-2 text-xs">
               <div className="text-slate-300">
-                <strong>AI Suggestions:</strong> Colour: <em>{aiSuggestions.colours.join(', ')}</em> · Pattern: <em>{aiSuggestions.pattern}</em>
+                <strong>AI Suggestions</strong>
+                {onAISuggestions ? ' — click a suggestion to use it, or apply all:' : ':'}
               </div>
-              {onAISuggestions && (
-                <button
-                  type="button"
-                  className="px-2.5 py-1 bg-violet-600/20 hover:bg-violet-600/40 text-violet-300 border border-violet-500/30 rounded text-xs transition-colors"
-                  onClick={applySuggestions}
-                >
-                  Apply AI Suggestions
-                </button>
-              )}
+              <div className="flex flex-wrap items-center gap-2">
+                {(aiSuggestions.colours ?? []).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    disabled={!onAISuggestions}
+                    className="px-2.5 py-1 bg-slate-800 hover:bg-violet-600/40 text-slate-200 border border-slate-700 rounded-full transition-colors"
+                    onClick={() => applySuggestions({ colours: [c, ...(aiSuggestions.colours ?? []).filter((x) => x !== c)] })}
+                    title="Use this colour"
+                  >
+                    Colour: {c}
+                  </button>
+                ))}
+                {aiSuggestions.pattern && (
+                  <button
+                    type="button"
+                    disabled={!onAISuggestions}
+                    className="px-2.5 py-1 bg-slate-800 hover:bg-violet-600/40 text-slate-200 border border-slate-700 rounded-full transition-colors"
+                    onClick={() => applySuggestions({ pattern: aiSuggestions.pattern })}
+                    title="Use this pattern"
+                  >
+                    Pattern: {aiSuggestions.pattern}
+                  </button>
+                )}
+                {onAISuggestions && (
+                  <button
+                    type="button"
+                    className="ml-auto px-2.5 py-1 bg-violet-600/20 hover:bg-violet-600/40 text-violet-300 border border-violet-500/30 rounded text-xs transition-colors"
+                    onClick={() => applySuggestions()}
+                  >
+                    Apply all
+                  </button>
+                )}
+              </div>
+              {appliedNote && <p className="text-emerald-400">{appliedNote}</p>}
             </div>
           )}
         </div>

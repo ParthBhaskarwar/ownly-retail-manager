@@ -1,7 +1,6 @@
 import { ProductService, VariantService } from '@/modules/product/services/ProductService';
 import { SupplierService } from '@/modules/catalog/services/CategoryService';
 import { InventoryItemService } from '@/modules/inventory/services/InventoryItemService';
-import { AuditService } from '@/shared/audit/AuditService';
 import type { ExecuteRestockInput, RestockResult, RestockReminder, RestockVariantLine } from '../types';
 import type { ProductDetail } from '@/modules/product/types';
 
@@ -69,14 +68,6 @@ export const RestockService = {
     const totalQuantity = allGeneratedItems.length;
     const potentialProfit = expectedSalesValue - totalPurchaseCost;
     const barcodes = allGeneratedItems.map((item) => item.barcode);
-
-    AuditService.log('inventory.restock', productId, storeId, {
-      productName: product.name,
-      totalQuantity,
-      totalPurchaseCost,
-      linesCount: activeLines.length,
-      barcodesSummary: barcodes.length > 0 ? `${barcodes[0]} ... ${barcodes[barcodes.length - 1]}` : '',
-    });
 
     return {
       productId,

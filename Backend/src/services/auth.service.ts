@@ -13,7 +13,7 @@
  * known limitation to disclose at handover.
  */
 
-import { randomUUID } from 'crypto';
+import { randomInt, randomUUID } from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '@/db/client';
@@ -45,8 +45,16 @@ function signToken(user: Pick<User, 'id' | 'storeId' | 'role'>): string {
 }
 
 function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return randomInt(100000, 1000000).toString();
 }
+
+/** A verification code is valid for 30 minutes from when it was issued (users.updated_at). */
+const CODE_TTL_MS = 30 * 60 * 1000;
+const MAX_CODE_ATTEMPTS = 5;
+const ATTEMPT_LOCK_MS = 15 * 60 * 1000;
+
+/** Failed verification attempts per user (in-memory; resets on server restart). */
+const codeAttempts = new Map<string, { count: number; lockedUntil: number }>();
 
 export const AuthService = {
   /**
@@ -92,9 +100,26 @@ export const AuthService = {
     if (!user) throw AppError.notFound('Account not found. Please sign up again.');
     if (user.verifiedAt) return; // already verified — idempotent
 
-    if (!user.verificationCode || user.verificationCode !== code) {
+    const attempt = codeAttempts.get(userId) ?? { count: 0, lockedUntil: 0 };
+    if (attempt.lockedUntil > Date.now()) {
+      throw new AppError(429, 'Too many wrong codes. Please wait a few minutes, then request a new code.');
+    }
+
+    const issuedAt = new Date(user.updatedAt ?? user.createdAt).getTime();
+    if (!user.verificationCode || Date.now() - issuedAt > CODE_TTL_MS) {
+      throw AppError.badRequest('This verification code has expired. Please request a new one.');
+    }
+
+    if (user.verificationCode !== code) {
+      attempt.count++;
+      if (attempt.count >= MAX_CODE_ATTEMPTS) {
+        attempt.count = 0;
+        attempt.lockedUntil = Date.now() + ATTEMPT_LOCK_MS;
+      }
+      codeAttempts.set(userId, attempt);
       throw AppError.badRequest('Invalid verification code. Please try again.');
     }
+    codeAttempts.delete(userId);
 
     await db('users').where({ id: userId }).update({
       verified_at: new Date(),
@@ -103,6 +128,20 @@ export const AuthService = {
     });
 
     await AuditService.log({ action: 'auth.verify', userId });
+  },
+
+  /** Issues a fresh code for an unverified account (the old one expired or was mistyped too often). */
+  async resendCode(userId: string): Promise<{ devCode?: string }> {
+    const user = await db('users').where({ id: userId }).first();
+    if (!user) throw AppError.notFound('Account not found. Please sign up again.');
+    if (user.verifiedAt) throw AppError.badRequest('This account is already verified.');
+
+    const code = generateVerificationCode();
+    await db('users').where({ id: userId }).update({ verification_code: code, updated_at: new Date() });
+    codeAttempts.delete(userId);
+
+    console.info(`[Auth] New verification code for ${user.email}: ${code}`);
+    return { devCode: config.isDev ? code : undefined };
   },
 
   async login(

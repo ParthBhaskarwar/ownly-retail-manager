@@ -1,88 +1,120 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthContext } from '@/context/AuthContext';
+import { useStoreContext } from '@/context/StoreContext';
 import { AuthGuard } from '@/shared/components/PermissionGuard';
-import { db } from '@/db/db';
 import { RestockRemindersCard } from '@/modules/restock/components/RestockRemindersCard';
-import type { InventoryItem, InventoryMovement } from '@/modules/inventory/types';
+import { InventoryItemService, InventoryMovementService } from '@/modules/inventory/services/InventoryItemService';
+import type {
+  InventoryItemRow,
+  InventoryMovement,
+  InventoryStatus,
+  StockValuation,
+} from '@/modules/inventory/types';
+
+const PAGE_SIZE = 50;
 
 function fmt(n: number): string {
   return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0 });
 }
 
+type StatusFilter = InventoryStatus | 'ALL';
+
 export default function InventoryPage() {
   const { user } = useAuthContext();
-  const storeId = user?.storeId || '';
+  const { store } = useStoreContext();
+  const storeId = store?.id || user?.storeId || '';
 
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [products, setProducts] = useState<Map<string, { name: string; sku: string }>>(new Map());
-  const [variants, setVariants] = useState<Map<string, { displayName: string; sku: string; productId: string; price: number }>>(new Map());
+  const [items, setItems] = useState<InventoryItemRow[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [statusFilter, setStatusFilter] = useState<string>('IN_STOCK');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('IN_STOCK');
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItemHistory, setSelectedItemHistory] = useState<{ item: InventoryItem; movements: InventoryMovement[] } | null>(null);
 
-  const loadData = async () => {
-    if (!storeId || !db) return;
+  const [valuation, setValuation] = useState<StockValuation | null>(null);
+  const [soldTotal, setSoldTotal] = useState(0);
+  const [allTotal, setAllTotal] = useState(0);
+
+  const [selectedItemHistory, setSelectedItemHistory] = useState<{
+    item: InventoryItemRow;
+    movements: InventoryMovement[];
+  } | null>(null);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+
+  // Debounce the search box so we do not query on every keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const loadList = useCallback(async () => {
+    if (!storeId) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
+    setLoadError(null);
     try {
-      const [rawItems, rawProds, rawVars] = await Promise.all([
-        db.inventoryItems.where('storeId').equals(storeId).toArray(),
-        db.products.where('storeId').equals(storeId).toArray(),
-        db.productVariants.toArray(),
-      ]);
-
-      const prodMap = new Map(rawProds.map((p) => [p.id, { name: p.name, sku: p.baseSku }]));
-      const varMap = new Map(rawVars.map((v) => [v.id, {
-        displayName: v.displayName,
-        sku: v.sku,
-        productId: v.productId,
-        price: v.sellingPriceOverride ?? 0,
-      }]));
-
-      setProducts(prodMap);
-      setVariants(varMap);
-      setItems(rawItems);
+      const res = await InventoryItemService.search({
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
+        query: searchQuery || undefined,
+        page,
+        pageSize: PAGE_SIZE,
+      });
+      setItems(res.items);
+      setTotal(res.total);
     } catch (err) {
-      console.error('Failed to load inventory', err);
+      setItems([]);
+      setTotal(0);
+      setLoadError(err instanceof Error ? err.message : 'Could not load inventory.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [storeId, statusFilter, searchQuery, page]);
 
   useEffect(() => {
-    void loadData();
+    void loadList();
+  }, [loadList]);
+
+  // Headline numbers come from the server, independent of the current filter/page.
+  useEffect(() => {
+    if (!storeId) return;
+    let cancelled = false;
+    Promise.allSettled([
+      InventoryItemService.getValuation(),
+      InventoryItemService.search({ status: 'SOLD', pageSize: 1 }),
+      InventoryItemService.search({ pageSize: 1 }),
+    ]).then(([v, sold, all]) => {
+      if (cancelled) return;
+      if (v.status === 'fulfilled') setValuation(v.value);
+      if (sold.status === 'fulfilled') setSoldTotal(sold.value.total);
+      if (all.status === 'fulfilled') setAllTotal(all.value.total);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [storeId]);
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) => {
-      if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
-      if (!searchQuery) return true;
-
-      const q = searchQuery.toLowerCase();
-      const variant = variants.get(item.variantId);
-      const prod = variant ? products.get(variant.productId) : null;
-
-      return (
-        item.barcode.toLowerCase().includes(q) ||
-        (prod?.name.toLowerCase().includes(q) ?? false) ||
-        (variant?.sku.toLowerCase().includes(q) ?? false)
-      );
-    });
-  }, [items, statusFilter, searchQuery, variants, products]);
-
-  const viewHistory = async (item: InventoryItem) => {
-    if (!db) return;
-    const movs = await db.inventoryMovements.where('inventoryItemId').equals(item.id).toArray();
-    setSelectedItemHistory({ item, movements: movs });
+  const viewHistory = async (item: InventoryItemRow) => {
+    setHistoryError(null);
+    try {
+      const movements = await InventoryMovementService.getMovementsForItem(item.id);
+      setSelectedItemHistory({ item, movements });
+    } catch (err) {
+      setHistoryError(err instanceof Error ? err.message : 'Could not load the movement history.');
+    }
   };
 
-  const inStockCount = items.filter((i) => i.status === 'IN_STOCK').length;
-  const soldCount = items.filter((i) => i.status === 'SOLD').length;
-  const totalCost = items.filter((i) => i.status === 'IN_STOCK').reduce((sum, i) => sum + (i.purchaseCostPrice || 0), 0);
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <AuthGuard>
@@ -111,22 +143,22 @@ export default function InventoryPage() {
         <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
           <div className="stat-card card">
             <div className="stat-card__icon">📦</div>
-            <div className="stat-card__value">{inStockCount}</div>
+            <div className="stat-card__value">{valuation?.itemCount ?? 0}</div>
             <div className="stat-card__label">In Stock (Available)</div>
           </div>
           <div className="stat-card card">
             <div className="stat-card__icon">💰</div>
-            <div className="stat-card__value">{fmt(totalCost)}</div>
+            <div className="stat-card__value">{fmt(valuation?.stockCostValue ?? 0)}</div>
             <div className="stat-card__label">In-Stock Cost Value</div>
           </div>
           <div className="stat-card card">
             <div className="stat-card__icon">🏷️</div>
-            <div className="stat-card__value">{soldCount}</div>
+            <div className="stat-card__value">{soldTotal}</div>
             <div className="stat-card__label">Units Sold to Date</div>
           </div>
           <div className="stat-card card">
             <div className="stat-card__icon">📊</div>
-            <div className="stat-card__value">{items.length}</div>
+            <div className="stat-card__value">{allTotal}</div>
             <div className="stat-card__label">Total Barcodes Tracked</div>
           </div>
         </div>
@@ -136,23 +168,29 @@ export default function InventoryPage() {
             type="text"
             className="form-input"
             placeholder="Scan or type barcode, SKU, product name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             style={{ maxWidth: 380 }}
           />
 
           <div className="filter-tabs" role="tablist">
-            {[
-              { label: 'In Stock', value: 'IN_STOCK' },
-              { label: 'All', value: 'ALL' },
-              { label: 'Sold', value: 'SOLD' },
-              { label: 'Returned', value: 'RETURNED_TO_STOCK' },
-              { label: 'Damaged', value: 'DAMAGED' },
-            ].map((tab) => (
+            {(
+              [
+                { label: 'In Stock', value: 'IN_STOCK' },
+                { label: 'All', value: 'ALL' },
+                { label: 'Sold', value: 'SOLD' },
+                { label: 'Returned', value: 'RETURNED_TO_STOCK' },
+                { label: 'Damaged', value: 'DAMAGED' },
+              ] as Array<{ label: string; value: StatusFilter }>
+            ).map((tab) => (
               <button
                 key={tab.value}
+                type="button"
                 className={`filter-tab ${statusFilter === tab.value ? 'filter-tab--active' : ''}`}
-                onClick={() => setStatusFilter(tab.value)}
+                onClick={() => {
+                  setStatusFilter(tab.value);
+                  setPage(1);
+                }}
               >
                 {tab.label}
               </button>
@@ -160,67 +198,99 @@ export default function InventoryPage() {
           </div>
         </div>
 
+        {loadError && (
+          <div className="alert alert--error" role="alert" style={{ marginBottom: 'var(--space-4)' }}>
+            {loadError}{' '}
+            <button type="button" className="btn btn--ghost btn--sm" onClick={() => void loadList()}>
+              Retry
+            </button>
+          </div>
+        )}
+
+        {historyError && (
+          <div className="alert alert--error" role="alert" style={{ marginBottom: 'var(--space-4)' }}>
+            {historyError}
+          </div>
+        )}
+
         <div className="card">
           <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="card__title">Item-Level Tracking ({filteredItems.length} items)</h2>
+            <h2 className="card__title">Item-Level Tracking ({total} items)</h2>
           </div>
 
           {isLoading ? (
             <div style={{ padding: 'var(--space-6)' }}>
               <div className="skeleton" style={{ height: 180 }} />
             </div>
-          ) : filteredItems.length === 0 ? (
+          ) : items.length === 0 ? (
             <p style={{ padding: 'var(--space-6)', color: 'var(--color-ink-muted)', textAlign: 'center' }}>
               No inventory items found matching your criteria.
             </p>
           ) : (
-            <table className="table" style={{ width: '100%', fontSize: 'var(--text-sm)' }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left' }}>Unique Barcode</th>
-                  <th style={{ textAlign: 'left' }}>Garment Design</th>
-                  <th style={{ textAlign: 'left' }}>Size / Variant</th>
-                  <th style={{ textAlign: 'right' }}>Cost</th>
-                  <th style={{ textAlign: 'center' }}>Status</th>
-                  <th style={{ textAlign: 'left' }}>Received Date</th>
-                  <th style={{ textAlign: 'center' }}>History</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredItems.slice(0, 100).map((item) => {
-                  const variant = variants.get(item.variantId);
-                  const prod = variant ? products.get(variant.productId) : null;
-
-                  return (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="table" style={{ width: '100%', fontSize: 'var(--text-sm)' }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left' }}>Unique Barcode</th>
+                    <th style={{ textAlign: 'left' }}>Garment Design</th>
+                    <th style={{ textAlign: 'left' }}>Size / Variant</th>
+                    <th style={{ textAlign: 'right' }}>Cost</th>
+                    <th style={{ textAlign: 'center' }}>Status</th>
+                    <th style={{ textAlign: 'left' }}>Received Date</th>
+                    <th style={{ textAlign: 'center' }}>History</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
                     <tr key={item.id}>
                       <td>
                         <code className="sku-badge" style={{ fontWeight: 600 }}>
                           {item.barcode}
                         </code>
                       </td>
-                      <td><strong>{prod?.name || '—'}</strong></td>
-                      <td>{variant?.displayName || '—'}</td>
-                      <td style={{ textAlign: 'right' }}>{fmt(item.purchaseCostPrice || 0)}</td>
+                      <td><strong>{item.productName || '—'}</strong></td>
+                      <td>{item.variantDisplayName || item.size || '—'}</td>
+                      <td style={{ textAlign: 'right' }}>{fmt(Number(item.purchaseCostPrice) || 0)}</td>
                       <td style={{ textAlign: 'center' }}>
                         <span className={`badge ${item.status === 'IN_STOCK' ? 'badge--paid' : item.status === 'SOLD' ? 'badge--neutral' : 'badge--return'}`}>
-                          {item.status.replace('_', ' ')}
+                          {item.status.replace(/_/g, ' ')}
                         </span>
                       </td>
                       <td>{new Date(item.purchaseDate || item.createdAt).toLocaleDateString()}</td>
                       <td style={{ textAlign: 'center' }}>
-                        <button
-                          type="button"
-                          className="btn btn--ghost btn--sm"
-                          onClick={() => viewHistory(item)}
-                        >
+                        <button type="button" className="btn btn--ghost btn--sm" onClick={() => void viewHistory(item)}>
                           📜 Audit Trail
                         </button>
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {total > PAGE_SIZE && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-3) var(--space-4)' }}>
+              <button
+                type="button"
+                className="btn btn--secondary btn--sm"
+                disabled={page <= 1 || isLoading}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                ← Previous
+              </button>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
+                Page {page} of {pageCount}
+              </span>
+              <button
+                type="button"
+                className="btn btn--secondary btn--sm"
+                disabled={page >= pageCount || isLoading}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next →
+              </button>
+            </div>
           )}
         </div>
 
@@ -231,11 +301,7 @@ export default function InventoryPage() {
                 <h2 style={{ margin: 0, fontSize: 'var(--text-lg)' }}>
                   Movement History: <code className="sku-badge">{selectedItemHistory.item.barcode}</code>
                 </h2>
-                <button
-                  type="button"
-                  className="btn btn--ghost btn--sm"
-                  onClick={() => setSelectedItemHistory(null)}
-                >
+                <button type="button" className="btn btn--ghost btn--sm" onClick={() => setSelectedItemHistory(null)}>
                   ✕
                 </button>
               </div>
@@ -264,11 +330,7 @@ export default function InventoryPage() {
               </div>
 
               <div style={{ textAlign: 'right', marginTop: 'var(--space-4)' }}>
-                <button
-                  type="button"
-                  className="btn btn--secondary btn--sm"
-                  onClick={() => setSelectedItemHistory(null)}
-                >
+                <button type="button" className="btn btn--secondary btn--sm" onClick={() => setSelectedItemHistory(null)}>
                   Close
                 </button>
               </div>
