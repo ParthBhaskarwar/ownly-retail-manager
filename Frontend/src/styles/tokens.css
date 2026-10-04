@@ -8,57 +8,59 @@
   /* ── Palette ─────────────────────────────────────────────── */
 
   /* Paper — warm layout-paper grey. App background. */
-  --color-paper:          #F5F2EF;
+  --color-paper:          #FAFAF9;
 
   /* Surface — white. Cards, panels, inputs float against paper. */
   --color-surface:        #FFFFFF;
 
   /* Borders */
-  --color-border:         #DDD8D2;    /* Standard — warm greige */
-  --color-border-subtle:  #EDEBE8;    /* Dividers, table rules  */
-  --color-border-strong:  #C4BDB5;    /* Inputs on focus unfocused, selected rows */
+  --color-border:         #E7E5E4;    /* Standard — warm greige */
+  --color-border-subtle:  #E7E5E4;    /* Dividers, table rules  */
+  --color-border-strong:  #D6D3D1;    /* Inputs on focus unfocused, selected rows */
+
+  /* Muted background for headers, hovers */
+  --color-muted:          #F5F5F4;
 
   /* Ink — warm charcoal, not pure black */
   --color-ink:            #1C1917;    /* Primary text */
-  --color-ink-secondary:  #6B6460;    /* Labels, metadata */
-  --color-ink-muted:      #A09893;    /* Placeholders, disabled, hints */
+  --color-ink-secondary:  #78716C;    /* Labels, metadata */
+  --color-ink-muted:      #A8A29E;    /* Placeholders, disabled, hints */
   --color-ink-inverse:    #FFFFFF;    /* Text on dark/accent fills */
 
-  /* Denim — the one accent colour. Selvedge-denim blue.
-     Grounded in clothing retail. Not SaaS blue, not purple. */
-  --color-denim:          #3B5B8C;
-  --color-denim-dark:     #2D4A78;    /* Hover / pressed */
-  --color-denim-tint:     #EBF0F7;    /* Badge bg, focus ring, active nav bg */
-  --color-denim-border:   #C0CFDE;    /* Accent-tinted border */
+  /* Denim — mapped to Teal */
+  --color-denim:          #0F766E;
+  --color-denim-dark:     #115E59;    /* Hover / pressed */
+  --color-denim-tint:     #F0FDFA;    /* Badge bg, focus ring, active nav bg */
+  --color-denim-border:   #5EEAD4;    /* Accent-tinted border */
 
   /* Semantic — named for their retail meaning, not their hue */
-  --color-paid:           #2D6A4F;    /* Success — forest green like a PAID stamp */
-  --color-paid-tint:      #EBF5F0;
-  --color-paid-border:    #A3CBBA;
+  --color-paid:           #16A34A;    /* Success */
+  --color-paid-tint:      #F0FDF4;
+  --color-paid-border:    #BBF7D0;
 
-  --color-caution:        #92400E;    /* Warning — amber-brown, caution sticker */
-  --color-caution-tint:   #FEF3E8;
-  --color-caution-border: #F3C89B;
+  --color-caution:        #D97706;    /* Warning */
+  --color-caution-tint:   #FFFBEB;
+  --color-caution-border: #FDE68A;
 
-  --color-return:         #9B1C1C;    /* Error — dark tag-red, RETURN label */
-  --color-return-tint:    #FDF0F0;
-  --color-return-border:  #F0B8B8;
+  --color-return:         #DC2626;    /* Error */
+  --color-return-tint:    #FEF2F2;
+  --color-return-border:  rgba(220, 38, 38, 0.2);
 
-  --color-info:           #1E4D8C;    /* Info — darker denim shade */
-  --color-info-tint:      #E8EEF7;
-  --color-info-border:    #B0C4DC;
+  --color-info:           #0F766E;    /* Info */
+  --color-info-tint:      #F0FDFA;
+  --color-info-border:    #5EEAD4;
 
   /* Sidebar — warm grey, slightly darker than paper */
-  --color-sidebar-bg:     #EAE7E3;
-  --color-sidebar-border: #D4CFC9;
+  --color-sidebar-bg:     #FAFAF9;
+  --color-sidebar-border: #E7E5E4;
 
   /* ── Typography ─────────────────────────────────────────── */
 
   /* Body, UI, labels — DM Sans: humanist, legible at small sizes */
   --font-body:    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  /* Headings — Lora: print-quality serif, warm, trustworthy */
-  --font-heading: 'Lora', Georgia, 'Times New Roman', serif;
+  /* Headings — mapped to DM Sans */
+  --font-heading: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* Monospace — data tables, codes only */
   --font-mono:    'DM Mono', 'Fira Code', 'Courier New', monospace;
@@ -102,10 +104,10 @@
 
   /* ── Border radius — restrained, this is a tool ─────────── */
 
-  --radius-xs:   2px;      /* Tag badge pointed end */
+  --radius-xs:   4px;      /* Small */
   --radius-sm:   4px;      /* Inputs, table cells */
-  --radius-md:   6px;      /* Buttons, form controls */
-  --radius-lg:   8px;      /* Cards, panels */
+  --radius-md:   8px;      /* Buttons, form controls */
+  --radius-lg:   12px;      /* Cards, panels */
   --radius-xl:   12px;     /* Modals */
   --radius-full: 9999px;   /* Pill — used sparingly */
 
@@ -113,9 +115,9 @@
 
   /* No decorative shadows. Only modals/dropdowns get shadow. */
   --shadow-card:    none;
-  --shadow-raised:  0 2px 8px rgba(28, 25, 23, 0.06);
-  --shadow-modal:   0 8px 32px rgba(28, 25, 23, 0.12);
-  --shadow-dropdown:0 4px 16px rgba(28, 25, 23, 0.09);
+  --shadow-raised:  0 1px 2px rgba(28, 25, 23, 0.05);
+  --shadow-modal:   0 4px 6px -1px rgba(28, 25, 23, 0.1), 0 2px 4px -1px rgba(28, 25, 23, 0.06);
+  --shadow-dropdown:0 4px 6px -1px rgba(28, 25, 23, 0.1);
 
   /* ── Transitions — minimal, functional ─────────────────── */
 
