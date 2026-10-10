@@ -22,7 +22,6 @@ function fmt(n: number): string {
   return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-import '@/styles/dashboard.css';
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
@@ -40,7 +39,9 @@ export default function DashboardPage() {
   const role = user?.role as Role | undefined;
   const can = (key: Parameters<typeof evaluatePermission>[1]) => !!role && evaluatePermission(role, key);
   const canReports = can('reports:view');
-  const showChecklist = role === 'OWNER' && !store?.setupCompleted;
+  // Only while something required is still outstanding; a finished checklist is just noise.
+  const needsSetup = steps.some((st) => !st.completed && !st.optional && st.key !== 'setup_complete');
+  const showChecklist = role === 'OWNER' && !store?.setupCompleted && needsSetup;
   const ageTotal = ageing
     ? ageing.bins.age0To30Days.count + ageing.bins.age31To60Days.count + ageing.bins.age61To90Days.count + ageing.bins.ageOver90Days.count
     : 0;

@@ -6,10 +6,12 @@ import { useStoreContext } from '@/context/StoreContext';
 import { StoreService } from '@/modules/store/services/StoreService';
 import type { Store, UpdateStoreInput } from '@/modules/store/types';
 import { RetailType } from '@/modules/retail-template/types';
+import { usePermission } from '@/shared/hooks/usePermission';
 
 export function StoreSettingsForm() {
   const { user } = useAuthContext();
   const { store, setStore } = useStoreContext();
+  const canEdit = usePermission('settings:edit');
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -99,168 +101,154 @@ export function StoreSettingsForm() {
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center" role="status">
-        <div className="btn-spinner inline-block mr-2" />
-        <p className="text-gray-400 mt-2">Loading store settings...</p>
+      <div className="settings-loading" role="status">
+        <span className="btn-spinner" /> Loading store settings…
       </div>
     );
   }
 
+  const receiptHeader = [name.toUpperCase(), gstNumber ? `GSTIN: ${gstNumber}` : ''].filter(Boolean).join(' • ');
+
   return (
-    <form className="max-w-4xl mx-auto space-y-6" onSubmit={handleSubmit} noValidate aria-label="Store Settings Form">
-      <div className="flex items-center justify-between">
+    <form className="settings-page" onSubmit={handleSubmit} noValidate aria-label="Store Settings Form">
+      <div className="settings-head">
         <div>
-          <h1 className="page-title">Store Settings</h1>
-          <p className="page-subtitle">Manage your store information, tax setup, and business profile.</p>
+          <h1 className="settings-title">Settings</h1>
+          <p className="settings-subtitle">Store details and tax setup</p>
         </div>
-        <button
-          id="save-store-settings-btn"
-          type="submit"
-          className="btn btn-primary"
-          disabled={isSaving}
-        >
-          {isSaving ? 'Saving...' : 'Save Settings'}
-        </button>
+        {!canEdit && <span className="settings-readonly-pill">Read-only · only the store owner can change these</span>}
       </div>
 
-      {errorMsg && (
-        <div className="form-server-error" role="alert">
-          <strong>Error:</strong> {errorMsg}
-        </div>
-      )}
+      {errorMsg && <div className="settings-alert settings-alert--error" role="alert"><strong>Error:</strong> {errorMsg}</div>}
+      {successMsg && <div className="settings-alert settings-alert--ok" role="status">✓ {successMsg}</div>}
 
-      {successMsg && (
-        <div className="p-4 bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 rounded-lg" role="status">
-          ✓ {successMsg}
-        </div>
-      )}
-
-      {/* Basic Profile Card */}
-      <section className="pe-card">
-        <header className="pe-card__header">
-          <h2 className="pe-card__title">Business Information</h2>
+      <section className="settings-card">
+        <header className="settings-card__head">
+          <span className="settings-card__icon material-symbols-outlined" aria-hidden="true">storefront</span>
+          <div>
+            <h2 className="settings-card__title">Store Details</h2>
+            <p className="settings-card__desc">Identity and contact information shown on customer invoices and receipts.</p>
+          </div>
         </header>
-        <div className="pe-card__body space-y-4">
+
+        <div className="form-field">
+          <label className="form-label" htmlFor="store-name">Store Name <span className="form-required">*</span></label>
+          <input id="store-name" className="form-input" type="text" value={name} disabled={!canEdit}
+            onChange={(e) => setName(e.target.value)} placeholder="e.g. Navkar Fashion Boutique" required />
+        </div>
+
+        <div className="form-field">
+          <label className="form-label" htmlFor="store-address">Store Address <span className="form-required">*</span></label>
+          <textarea id="store-address" className="form-textarea" rows={3} value={address} disabled={!canEdit}
+            onChange={(e) => setAddress(e.target.value)} placeholder="Full shop address including city and pincode" required />
+        </div>
+
+        <div className="settings-grid">
           <div className="form-field">
-            <label className="form-label" htmlFor="store-name">Store Name <span className="form-required">*</span></label>
-            <input
-              id="store-name"
-              className="form-input"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Navkar Fashion Boutique"
-              required
-            />
+            <label className="form-label" htmlFor="store-phone">Contact Phone <span className="form-required">*</span></label>
+            <input id="store-phone" className="form-input" type="text" value={phone} disabled={!canEdit}
+              onChange={(e) => setPhone(e.target.value)} placeholder="+91 9876543210" required />
           </div>
-
           <div className="form-field">
-            <label className="form-label" htmlFor="store-address">Store Address <span className="form-required">*</span></label>
-            <textarea
-              id="store-address"
-              className="form-textarea"
-              rows={3}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Full shop address including city and pincode"
-              required
-            />
-          </div>
-
-          <div className="form-grid">
-            <div className="form-field">
-              <label className="form-label" htmlFor="store-phone">Contact Phone <span className="form-required">*</span></label>
-              <input
-                id="store-phone"
-                className="form-input"
-                type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 9876543210"
-                required
-              />
-            </div>
-
-            <div className="form-field">
-              <label className="form-label" htmlFor="store-retail-type">Retail Type</label>
-              <select
-                id="store-retail-type"
-                className="form-select"
-                value={retailType}
-                onChange={(e) => setRetailType(e.target.value)}
-              >
-                {/* Values must be the RetailType enum the backend stores (e.g. CLOTHING_FASHION). */}
-                <option value={RetailType.CLOTHING_FASHION}>Clothing &amp; Fashion</option>
-                <option value={RetailType.FOOTWEAR} disabled>Footwear (coming soon)</option>
-                <option value={RetailType.GENERAL_RETAIL} disabled>General Retail (coming soon)</option>
-              </select>
-            </div>
+            <label className="form-label" htmlFor="store-retail-type">Retail Type</label>
+            <select id="store-retail-type" className="form-select" value={retailType} disabled={!canEdit}
+              onChange={(e) => setRetailType(e.target.value)}>
+              {/* Values must be the RetailType enum the backend stores (e.g. CLOTHING_FASHION). */}
+              <option value={RetailType.CLOTHING_FASHION}>Clothing &amp; Fashion</option>
+              <option value={RetailType.FOOTWEAR} disabled>Footwear (coming soon)</option>
+              <option value={RetailType.GENERAL_RETAIL} disabled>General Retail (coming soon)</option>
+            </select>
           </div>
         </div>
       </section>
 
-      {/* Tax & GST Settings Card */}
-      <section className="pe-card">
-        <header className="pe-card__header">
-          <h2 className="pe-card__title">Tax &amp; GST Configuration</h2>
+      <section className="settings-card">
+        <header className="settings-card__head">
+          <span className="settings-card__icon material-symbols-outlined" aria-hidden="true">receipt_long</span>
+          <div>
+            <h2 className="settings-card__title">Currency &amp; Tax</h2>
+            <p className="settings-card__desc">GST rules applied automatically at POS checkout and on invoices.</p>
+          </div>
         </header>
-        <div className="pe-card__body space-y-4">
+
+        <div className="settings-grid">
           <div className="form-field">
-            <label className="form-label" htmlFor="store-gstin">GSTIN / Tax ID Number</label>
-            <input
-              id="store-gstin"
-              className="form-input pe-mono"
-              type="text"
-              value={gstNumber}
-              onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
-              placeholder="27AAAAA0000A1Z5"
-            />
+            <label className="form-label" htmlFor="store-currency">Store Currency</label>
+            <select id="store-currency" className="form-select" value={currency} disabled={!canEdit}
+              onChange={(e) => setCurrency(e.target.value)}>
+              <option value="INR">INR (₹) — Indian Rupee</option>
+              <option value="USD">USD ($) — US Dollar</option>
+              <option value="EUR">EUR (€) — Euro</option>
+              <option value="GBP">GBP (£) — British Pound</option>
+              <option value="AED">AED — UAE Dirham</option>
+              <option value="SGD">SGD (S$) — Singapore Dollar</option>
+            </select>
           </div>
-
-          <div className="flex items-center gap-3 pt-2">
-            <input
-              id="gst-enabled"
-              type="checkbox"
-              className="w-5 h-5 rounded border-gray-700 bg-gray-900 text-violet-600 focus:ring-violet-500"
-              checked={gstEnabled}
-              onChange={(e) => setGstEnabled(e.target.checked)}
-            />
-            <label htmlFor="gst-enabled" className="text-sm font-medium text-gray-200">
-              Enable GST calculation on billing &amp; invoices
-            </label>
+          <div className="form-field">
+            <label className="form-label" htmlFor="store-gstin">GSTIN / Tax ID</label>
+            <input id="store-gstin" className="form-input settings-mono" type="text" value={gstNumber} disabled={!canEdit}
+              maxLength={15} onChange={(e) => setGstNumber(e.target.value.toUpperCase())} placeholder="27AAAAA0000A1Z5" />
           </div>
+        </div>
 
-          {gstEnabled && (
-            <div className="form-grid pt-2">
-              <div className="form-field">
-                <label className="form-label" htmlFor="gst-rate">Default GST Rate (%)</label>
-                <input
-                  id="gst-rate"
-                  className="form-input"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  value={gstRate}
-                  onChange={(e) => setGstRate(e.target.value)}
-                />
-              </div>
+        <div className="settings-toggle-row">
+          <div>
+            <div className="settings-toggle-row__title">Enable GST calculation</div>
+            <div className="settings-toggle-row__desc">When on, GST is added at POS checkout and recorded on every invoice.</div>
+          </div>
+          <label className="switch">
+            <input id="gst-enabled" type="checkbox" checked={gstEnabled} disabled={!canEdit}
+              onChange={(e) => setGstEnabled(e.target.checked)} aria-label="Enable GST calculation" />
+            <span className="switch__track" />
+          </label>
+        </div>
 
-              <div className="form-field justify-end flex flex-col">
-                <label className="flex items-center gap-3 text-sm text-gray-200 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 rounded border-gray-700 bg-gray-900 text-violet-600 focus:ring-violet-500"
-                    checked={inclusiveTax}
-                    onChange={(e) => setInclusiveTax(e.target.checked)}
-                  />
-                  Prices are GST Inclusive
-                </label>
-              </div>
+        {gstEnabled && (
+          <div className="settings-grid">
+            <div className="form-field">
+              <label className="form-label" htmlFor="gst-rate">Default GST Rate (%)</label>
+              <input id="gst-rate" className="form-input" type="number" step="0.1" min="0" max="100"
+                value={gstRate} disabled={!canEdit} onChange={(e) => setGstRate(e.target.value)} />
             </div>
-          )}
+            <div className="form-field">
+              <span className="form-label">Pricing Model</span>
+              <label className="settings-check">
+                <input type="checkbox" checked={inclusiveTax} disabled={!canEdit} onChange={(e) => setInclusiveTax(e.target.checked)} />
+                <span>
+                  <strong>Prices include GST</strong>
+                  <small>Catalog prices are the final customer price; tax is extracted on the receipt.</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="settings-card">
+        <header className="settings-card__head">
+          <span className="settings-card__icon material-symbols-outlined" aria-hidden="true">print</span>
+          <div>
+            <h2 className="settings-card__title">Receipt Header Preview</h2>
+            <p className="settings-card__desc">How your store appears at the top of printed receipts.</p>
+          </div>
+        </header>
+        <div className="settings-receipt">
+          <div className="settings-receipt__name">{name || 'Your store name'}</div>
+          {address && <div>{address}</div>}
+          {phone && <div>Ph: {phone}</div>}
+          {gstNumber && <div>GSTIN: {gstNumber}</div>}
+          <div className="settings-receipt__line">{receiptHeader}</div>
         </div>
       </section>
+
+      {canEdit && (
+        <div className="settings-savebar">
+          <span className="settings-savebar__hint">Changes apply to new invoices straight away.</span>
+          <button id="save-store-settings-btn" type="submit" className="btn btn-primary" disabled={isSaving}>
+            {isSaving ? 'Saving…' : 'Save Changes'}
+          </button>
+        </div>
+      )}
     </form>
   );
 }

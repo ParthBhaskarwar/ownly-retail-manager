@@ -119,20 +119,20 @@ export function StockEntryForm({
               required
             />
           </div>
-        </div>
 
-        <div className="form-field">
-          <label className="form-field__label" htmlFor="stock-purchase-date">
-            Purchase Date <span className="form-field__required">*</span>
-          </label>
-          <input
-            id="stock-purchase-date"
-            type="date"
-            className="form-field__input"
-            value={purchaseDate}
-            onChange={(e) => setPurchaseDate(e.target.value)}
-            required
-          />
+          <div className="form-field">
+            <label className="form-field__label" htmlFor="stock-purchase-date">
+              Purchase Date <span className="form-field__required">*</span>
+            </label>
+            <input
+              id="stock-purchase-date"
+              type="date"
+              className="form-field__input"
+              value={purchaseDate}
+              onChange={(e) => setPurchaseDate(e.target.value)}
+              required
+            />
+          </div>
         </div>
 
         <div className="form-field">

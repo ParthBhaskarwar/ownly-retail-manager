@@ -109,7 +109,7 @@ function ProductDetailContent() {
             </Link>
           )}
           {canEdit && (
-            <Link href={`/products/${product.id}/stock`} className="btn-products-primary" id="add-stock-link">
+            <Link href={`/restock?productId=${product.id}`} className="btn-products-primary" id="add-stock-link">
               <span className="material-symbols-outlined">add_box</span>
               Restock Product
             </Link>

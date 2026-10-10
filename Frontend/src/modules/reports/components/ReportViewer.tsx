@@ -254,7 +254,7 @@ export function ReportViewer() {
             className="btn btn--secondary btn--sm"
             onClick={handleExportCsv}
           >
-            📥 CSV Export
+            <span className="material-symbols-outlined" aria-hidden="true">download</span> CSV Export
           </button>
           <button
             type="button"
@@ -262,7 +262,7 @@ export function ReportViewer() {
             className="btn btn--primary btn--sm"
             onClick={handleExportExcel}
           >
-            📊 Excel (.xls)
+            <span className="material-symbols-outlined" aria-hidden="true">table_view</span> Excel (.xls)
           </button>
           <button
             type="button"
@@ -270,19 +270,19 @@ export function ReportViewer() {
             className="btn btn--ghost btn--sm"
             onClick={() => ExportService.printCurrentView()}
           >
-            🖨️ Print
+            <span className="material-symbols-outlined" aria-hidden="true">print</span> Print
           </button>
         </div>
       </div>
 
       <div className="filter-tabs" role="tablist" style={{ marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
         {[
-          { id: 'SALES_PROFIT', label: '💰 Sales & Profit' },
-          { id: 'INVENTORY_VALUATION', label: '📦 Stock Valuation' },
-          { id: 'STOCK_AGEING', label: '⏳ Stock Ageing & Dead Stock' },
-          { id: 'SUPPLIERS', label: '🏭 Supplier Performance' },
-          { id: 'RETURNS', label: '↩️ Returns & Damages' },
-          { id: 'STAFF_ACTIVITY', label: '👥 Staff Audit' },
+          { id: 'SALES_PROFIT', label: <><span className="material-symbols-outlined" aria-hidden="true">trending_up</span> Sales &amp; Profit</> },
+          { id: 'INVENTORY_VALUATION', label: <><span className="material-symbols-outlined" aria-hidden="true">inventory_2</span> Stock Valuation</> },
+          { id: 'STOCK_AGEING', label: <><span className="material-symbols-outlined" aria-hidden="true">hourglass_bottom</span> Stock Ageing &amp; Dead Stock</> },
+          { id: 'SUPPLIERS', label: <><span className="material-symbols-outlined" aria-hidden="true">local_shipping</span> Supplier Performance</> },
+          { id: 'RETURNS', label: <><span className="material-symbols-outlined" aria-hidden="true">assignment_return</span> Returns &amp; Damages</> },
+          { id: 'STAFF_ACTIVITY', label: <><span className="material-symbols-outlined" aria-hidden="true">badge</span> Staff Audit</> },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -372,22 +372,22 @@ export function ReportViewer() {
             <div className="report-section">
               <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', marginBottom: 'var(--space-4)' }}>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">💰</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">payments</span></div>
                   <div className="stat-card__value">{fmt(salesData.totalRevenue)}</div>
                   <div className="stat-card__label">Total Revenue</div>
                 </div>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">🏷️</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">sell</span></div>
                   <div className="stat-card__value">{fmt(salesData.grossProfit)}</div>
                   <div className="stat-card__label">Gross Profit ({salesData.grossMarginPercent.toFixed(1)}%)</div>
                 </div>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">📦</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">inventory_2</span></div>
                   <div className="stat-card__value">{salesData.totalItemsSold}</div>
                   <div className="stat-card__label">Items Sold</div>
                 </div>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">🧾</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">receipt_long</span></div>
                   <div className="stat-card__value">{fmt(salesData.averageBillValue)}</div>
                   <div className="stat-card__label">Average Bill Value</div>
                 </div>
@@ -435,22 +435,22 @@ export function ReportViewer() {
             <div className="report-section">
               <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', marginBottom: 'var(--space-4)' }}>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">📦</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">inventory_2</span></div>
                   <div className="stat-card__value">{valuationData.totalStockQuantity}</div>
                   <div className="stat-card__label">Physical Stock on Hand</div>
                 </div>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">💵</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">savings</span></div>
                   <div className="stat-card__value">{fmt(valuationData.totalStockCostValue)}</div>
                   <div className="stat-card__label">Total Cost Valuation</div>
                 </div>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">🏷️</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">sell</span></div>
                   <div className="stat-card__value">{fmt(valuationData.totalStockRetailValue)}</div>
                   <div className="stat-card__label">Expected Retail Value</div>
                 </div>
                 <div className="stat-card card">
-                  <div className="stat-card__icon">📈</div>
+                  <div className="stat-card__icon"><span className="material-symbols-outlined" aria-hidden="true">trending_up</span></div>
                   <div className="stat-card__value">{fmt(valuationData.potentialGrossProfit)}</div>
                   <div className="stat-card__label">Potential Margin ({valuationData.potentialMarginPercent.toFixed(1)}%)</div>
                 </div>

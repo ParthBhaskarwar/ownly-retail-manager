@@ -76,7 +76,7 @@ export function LoginForm({ onSubmit, isLoading, serverError }: LoginFormProps) 
               onClick={() => setShowPassword((s) => !s)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? '👁' : '👁‍🗨'}
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }} aria-hidden="true">{showPassword ? 'visibility_off' : 'visibility'}</span>
             </button>
           </div>
         </FormField>

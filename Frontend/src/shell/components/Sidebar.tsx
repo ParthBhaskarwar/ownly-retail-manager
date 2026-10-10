@@ -43,7 +43,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="shell-sidebar-logo">
             <img 
               alt="Ownly Retail Logo" 
-              src="https://lh3.googleusercontent.com/aida/AEtjO1Ug834MoQjE9U6zQ0nlJsRvydhtLJTWwAaN94FC7dO4m-amUCn0aK4jS0Q5-uHbnoZgCThXGRi8reNFTplJxXe_oWiFdkQbhLPXe0Rpy0n5RQTbrdX919y9tUA0Zw9V_8Ig0zqVGPAkBrsa-UBCjFzUBHYsieOKLXmFv7f66sItKh1x3QiZXLiYQsIOWJsAiaTcneXn95JslNm9CPsnWI4oC2_bYJS0YwMDu269lzJoGRaEOT_KUPKF" 
+              src="/logo.png" 
             />
             <div className="shell-sidebar-logo-text">
               <span className="shell-sidebar-logo-title">Ownly</span>

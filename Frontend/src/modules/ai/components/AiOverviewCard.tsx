@@ -31,7 +31,7 @@ export function AiOverviewCard() {
         </h2>
         <span className="dash-card-badge ai">
           <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>auto_awesome</span>
-          Gemini Retail AI
+          Offline AI · your data
         </span>
       </div>
 

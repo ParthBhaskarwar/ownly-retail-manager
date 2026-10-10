@@ -129,7 +129,7 @@ export default function InventoryPage() {
 
           <div style={{ display: 'flex', gap: '8px' }}>
             <Link href="/restock" className="btn btn--primary">
-              ⚡ Manual Restock
+              <span className="material-symbols-outlined" style={{ fontSize: 18, verticalAlign: -4 }}>bolt</span> Manual Restock
             </Link>
           </div>
         </div>
@@ -140,27 +140,47 @@ export default function InventoryPage() {
           </div>
         )}
 
-        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', marginBottom: 'var(--space-4)' }}>
-          <div className="stat-card card">
-            <div className="stat-card__icon">📦</div>
-            <div className="stat-card__value">{valuation?.itemCount ?? 0}</div>
-            <div className="stat-card__label">In Stock (Available)</div>
-          </div>
-          <div className="stat-card card">
-            <div className="stat-card__icon">💰</div>
-            <div className="stat-card__value">{fmt(valuation?.stockCostValue ?? 0)}</div>
-            <div className="stat-card__label">In-Stock Cost Value</div>
-          </div>
-          <div className="stat-card card">
-            <div className="stat-card__icon">🏷️</div>
-            <div className="stat-card__value">{soldTotal}</div>
-            <div className="stat-card__label">Units Sold to Date</div>
-          </div>
-          <div className="stat-card card">
-            <div className="stat-card__icon">📊</div>
-            <div className="stat-card__value">{allTotal}</div>
-            <div className="stat-card__label">Total Barcodes Tracked</div>
-          </div>
+        <div className="dash-kpi-grid" style={{ marginBottom: 'var(--space-4)' }}>
+            <div className="dash-kpi-card">
+              <div className="dash-kpi-header">
+                <span className="dash-kpi-title">In Stock (Available)</span>
+                <span className="material-symbols-outlined">inventory_2</span>
+              </div>
+              <div>
+                <div className="dash-kpi-value">{valuation?.itemCount ?? 0} <span>units</span></div>
+                
+              </div>
+            </div>
+            <div className="dash-kpi-card">
+              <div className="dash-kpi-header">
+                <span className="dash-kpi-title">In-Stock Cost Value</span>
+                <span className="material-symbols-outlined">payments</span>
+              </div>
+              <div>
+                <div className="dash-kpi-value">{fmt(valuation?.stockCostValue ?? 0)}</div>
+                <div className="dash-kpi-desc">At purchase cost</div>
+              </div>
+            </div>
+            <div className="dash-kpi-card">
+              <div className="dash-kpi-header">
+                <span className="dash-kpi-title">Units Sold to Date</span>
+                <span className="material-symbols-outlined">shopping_bag</span>
+              </div>
+              <div>
+                <div className="dash-kpi-value">{soldTotal} <span>units</span></div>
+                
+              </div>
+            </div>
+            <div className="dash-kpi-card">
+              <div className="dash-kpi-header">
+                <span className="dash-kpi-title">Total Barcodes Tracked</span>
+                <span className="material-symbols-outlined">qr_code_2</span>
+              </div>
+              <div>
+                <div className="dash-kpi-value">{allTotal} <span>barcodes</span></div>
+                
+              </div>
+            </div>
         </div>
 
         <div className="product-toolbar" style={{ marginBottom: 'var(--space-4)' }}>
@@ -249,7 +269,7 @@ export default function InventoryPage() {
                         </code>
                       </td>
                       <td><strong>{item.productName || '—'}</strong></td>
-                      <td>{item.variantDisplayName || item.size || '—'}</td>
+                      <td>{item.size || item.variantDisplayName || '—'}</td>
                       <td style={{ textAlign: 'right' }}>{fmt(Number(item.purchaseCostPrice) || 0)}</td>
                       <td style={{ textAlign: 'center' }}>
                         <span className={`badge ${item.status === 'IN_STOCK' ? 'badge--paid' : item.status === 'SOLD' ? 'badge--neutral' : 'badge--return'}`}>
@@ -259,7 +279,7 @@ export default function InventoryPage() {
                       <td>{new Date(item.purchaseDate || item.createdAt).toLocaleDateString()}</td>
                       <td style={{ textAlign: 'center' }}>
                         <button type="button" className="btn btn--ghost btn--sm" onClick={() => void viewHistory(item)}>
-                          📜 Audit Trail
+                          <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: -3 }}>history</span> Audit Trail
                         </button>
                       </td>
                     </tr>

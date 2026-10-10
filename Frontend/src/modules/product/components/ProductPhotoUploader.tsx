@@ -133,11 +133,13 @@ export function ProductPhotoUploader({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="photo-uploader">
       {/* Dropzone */}
       <div
         id="product-photo-dropzone"
-        className={`pe-dropzone ${dragOver ? 'pe-dropzone--active' : ''}`}
+        className={`photo-dropzone ${dragOver ? 'photo-dropzone--active' : ''}`}
+        role="button"
+        tabIndex={0}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={(e) => {
@@ -154,103 +156,60 @@ export function ProductPhotoUploader({
           input.click();
         }}
       >
-        <span className="pe-dropzone__icon" aria-hidden="true">📷</span>
-        <span className="pe-dropzone__label">Drop product photos here, or click to browse</span>
-        <span className="pe-dropzone__hint">Supports JPG, PNG, WEBP · Max 5 MB each · Offline photo AI (optional)</span>
+        <span className="material-symbols-outlined photo-dropzone__icon" aria-hidden="true">add_a_photo</span>
+        <span className="photo-dropzone__label">Drop product photos here, or click to browse</span>
+        <span className="photo-dropzone__hint">JPG, PNG or WEBP · max 5 MB each · offline photo AI (optional)</span>
 
         {isAnalyzing && !isProcessing && (
-          <div className="mt-2 text-violet-400 text-xs font-semibold flex items-center justify-center gap-2">
+          <span className="photo-dropzone__status">
             <span className="btn-spinner" /> Analysing photo… (the first run can take a moment while the model loads)
-          </div>
+          </span>
         )}
-
         {isProcessing && (
-          <div className="mt-2 text-violet-400 text-xs font-semibold flex items-center justify-center gap-2">
-            <span className="btn-spinner" /> Processing photo intelligence...
-          </div>
+          <span className="photo-dropzone__status">
+            <span className="btn-spinner" /> Processing photo…
+          </span>
         )}
       </div>
 
-      {errorMsg && (
-        <div className="p-3 bg-red-950/60 border border-red-500/30 text-red-400 text-sm rounded-lg" role="alert">
-          {errorMsg}
-        </div>
-      )}
+      {errorMsg && <div className="photo-alert photo-alert--error" role="alert">{errorMsg}</div>}
 
       {analysisError && (
-        <div className="p-3 bg-amber-950/60 border border-amber-500/30 text-amber-300 text-sm rounded-lg flex items-center justify-between gap-3" role="alert">
+        <div className="photo-alert photo-alert--warn" role="alert">
           <span>Photo AI could not analyse this picture: {analysisError}</span>
           {lastAnalyzed && (
-            <button
-              type="button"
-              className="px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600/40 border border-amber-500/30 rounded text-xs"
-              onClick={() => void runAnalysis(lastAnalyzed)}
-              disabled={isAnalyzing}
-            >
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => void runAnalysis(lastAnalyzed)} disabled={isAnalyzing}>
               Try again
             </button>
           )}
         </div>
       )}
 
-      {/* Duplicate warning banner */}
       {possibleDuplicate && (
-        <div className="p-3 bg-amber-950/70 border border-amber-500/40 text-amber-300 text-sm rounded-lg flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">⚠</span>
-            <div>
-              <strong>Possible Duplicate Photo Detected:</strong> Similar to product <em>&quot;{possibleDuplicate.name}&quot;</em> (SKU: {possibleDuplicate.baseSku}, Match: {Math.round(possibleDuplicate.similarity * 100)}%)
-            </div>
-          </div>
+        <div className="photo-alert photo-alert--warn">
+          <span className="material-symbols-outlined" aria-hidden="true">warning</span>
+          <span>
+            <strong>Possible duplicate photo:</strong> similar to <em>&quot;{possibleDuplicate.name}&quot;</em> (SKU {possibleDuplicate.baseSku}, {Math.round(possibleDuplicate.similarity * 100)}% match)
+          </span>
         </div>
       )}
 
-      {/* Uploaded Images Gallery */}
       {images.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-            Uploaded Photos ({images.length})
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div>
+          <h4 className="photo-section-title">Uploaded photos ({images.length})</h4>
+          <div className="photo-grid">
             {images.map((img, idx) => (
-              <div
-                key={idx}
-                className={`relative group rounded-xl overflow-hidden border bg-slate-950 ${
-                  idx === 0 ? 'border-violet-500 ring-2 ring-violet-500/30' : 'border-slate-800'
-                }`}
-              >
-                <img
-                  src={img}
-                  alt={`Product photo ${idx + 1}`}
-                  className="w-full h-36 object-cover"
-                />
-
-                {/* Primary Badge */}
-                {idx === 0 && (
-                  <span className="absolute top-2 left-2 px-2 py-0.5 bg-violet-600 text-white text-[10px] font-bold rounded-full shadow">
-                    Primary
-                  </span>
-                )}
-
-                {/* Actions overlay */}
-                <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div key={idx} className={`photo-tile ${idx === 0 ? 'photo-tile--primary' : ''}`}>
+                <img src={img} alt={`Product photo ${idx + 1}`} />
+                {idx === 0 && <span className="photo-tile__badge">Primary</span>}
+                <div className="photo-tile__actions">
                   {idx !== 0 && (
-                    <button
-                      type="button"
-                      className="px-2 py-1 bg-slate-800 hover:bg-violet-600 text-white text-xs rounded transition-colors"
-                      onClick={() => setPrimaryImage(idx)}
-                      title="Set as Primary Image"
-                    >
-                      ★ Set Primary
+                    <button type="button" className="photo-tile__btn" onClick={() => setPrimaryImage(idx)} title="Set as primary image">
+                      <span className="material-symbols-outlined">star</span> Primary
                     </button>
                   )}
-                  <button
-                    type="button"
-                    className="p-1 bg-red-600/80 hover:bg-red-600 text-white rounded transition-colors"
-                    onClick={() => removeImage(idx)}
-                    title="Remove Image"
-                  >
-                    🗑
+                  <button type="button" className="photo-tile__btn photo-tile__btn--danger" onClick={() => removeImage(idx)} title="Remove image">
+                    <span className="material-symbols-outlined">delete</span>
                   </button>
                 </div>
               </div>
@@ -259,44 +218,38 @@ export function ProductPhotoUploader({
         </div>
       )}
 
-      {/* Week 6 AI Photo Intelligence Panel */}
       {quality && (
-        <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-xl space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-violet-400 flex items-center gap-2">
-              ⚡ Photo Intelligence
+        <div className="photo-ai">
+          <div className="photo-ai__head">
+            <span className="photo-ai__title">
+              <span className="material-symbols-outlined" aria-hidden="true">auto_awesome</span> Photo Intelligence
             </span>
-            <span className="text-xs text-slate-400">
-              Quality Score: <strong className={quality.score > 0.7 ? 'text-emerald-400' : 'text-amber-400'}>{Math.round(quality.score * 100)}%</strong>
+            <span className="photo-ai__score">
+              Quality score{' '}
+              <strong className={quality.score > 0.7 ? 'is-good' : 'is-warn'}>{Math.round(quality.score * 100)}%</strong>
             </span>
           </div>
 
           {quality.issues.length > 0 && (
-            <ul className="text-xs text-amber-400 space-y-1 list-disc list-inside">
-              {quality.issues.map((issue: string, i: number) => (
-                <li key={i}>{issue}</li>
-              ))}
+            <ul className="photo-ai__issues">
+              {quality.issues.map((issue: string, i: number) => <li key={i}>{issue}</li>)}
             </ul>
           )}
 
-          {aiNote && (
-            <p className="text-xs text-slate-400">{aiNote}</p>
-          )}
-
+          {aiNote && <p className="photo-ai__note">{aiNote}</p>}
 
           {aiSuggestions && (
-            <div className="pt-2 border-t border-slate-800 space-y-2 text-xs">
-              <div className="text-slate-300">
-                <strong>AI Suggestions</strong>
-                {onAISuggestions ? ' — click a suggestion to use it, or apply all:' : ':'}
+            <div className="photo-ai__suggest">
+              <div className="photo-ai__suggest-label">
+                AI suggestions{onAISuggestions ? ' — click one to use it, or apply all' : ''}
               </div>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="photo-ai__chips">
                 {(aiSuggestions.colours ?? []).map((c) => (
                   <button
                     key={c}
                     type="button"
+                    className="photo-chip"
                     disabled={!onAISuggestions}
-                    className="px-2.5 py-1 bg-slate-800 hover:bg-violet-600/40 text-slate-200 border border-slate-700 rounded-full transition-colors"
                     onClick={() => applySuggestions({ colours: [c, ...(aiSuggestions.colours ?? []).filter((x) => x !== c)] })}
                     title="Use this colour"
                   >
@@ -306,8 +259,8 @@ export function ProductPhotoUploader({
                 {aiSuggestions.pattern && (
                   <button
                     type="button"
+                    className="photo-chip"
                     disabled={!onAISuggestions}
-                    className="px-2.5 py-1 bg-slate-800 hover:bg-violet-600/40 text-slate-200 border border-slate-700 rounded-full transition-colors"
                     onClick={() => applySuggestions({ pattern: aiSuggestions.pattern })}
                     title="Use this pattern"
                   >
@@ -315,16 +268,12 @@ export function ProductPhotoUploader({
                   </button>
                 )}
                 {onAISuggestions && (
-                  <button
-                    type="button"
-                    className="ml-auto px-2.5 py-1 bg-violet-600/20 hover:bg-violet-600/40 text-violet-300 border border-violet-500/30 rounded text-xs transition-colors"
-                    onClick={() => applySuggestions()}
-                  >
+                  <button type="button" className="btn btn-primary btn-sm photo-ai__apply" onClick={() => applySuggestions()}>
                     Apply all
                   </button>
                 )}
               </div>
-              {appliedNote && <p className="text-emerald-400">{appliedNote}</p>}
+              {appliedNote && <p className="photo-ai__applied">{appliedNote}</p>}
             </div>
           )}
         </div>

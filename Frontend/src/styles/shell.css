@@ -331,7 +331,7 @@
 /* -- MAIN CONTENT AREA -- */
 .shell-main {
   flex: 1;
-  padding-top: 64px;
+  padding-top: 88px; /* 64px fixed header + 24px breathing room */
   width: 100%;
   background-color: var(--color-paper);
   padding-left: 24px;

@@ -60,7 +60,7 @@ export default function VerifyPage() {
   return (
     <div className="auth-card card animate-fade-in-scale">
       <div className="auth-card__header">
-        <div className="auth-card__icon">✉️</div>
+        <div className="auth-card__icon"><span className="material-symbols-outlined" style={{ fontSize: 28 }} aria-hidden="true">mark_email_unread</span></div>
         <h1 className="auth-card__title">Verify your email</h1>
         <p className="auth-card__subtitle">
           Enter the 6-digit code to activate your account.

@@ -7,11 +7,15 @@
 @import './tokens.css';
 @import './animations.css';
 @import './components.css';
+@import './forms.css';
+@import './settings.css';
+@import './staff.css';
 @import './pos.css';
 @import './billing.css';
 @import './products.css';
 @import './ai.css';
 @import './shell.css';
+@import './dashboard.css';
 @import './restock.css';
 
 /* ── Reset ──────────────────────────────────────────────────── */

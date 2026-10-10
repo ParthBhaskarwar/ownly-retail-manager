@@ -36,7 +36,7 @@ function LoginContent() {
     <div className="auth-card card animate-fade-in-scale">
       {verified && (
         <div className="auth-success-banner animate-fade-in-down">
-          ✅ Email verified! You can now sign in.
+          Email verified! You can now sign in.
         </div>
       )}
       <div className="auth-card__header">
