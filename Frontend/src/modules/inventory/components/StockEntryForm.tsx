@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { todayLocalISO } from '@/lib/dates';
 import { useAuthContext } from '@/context/AuthContext';
 import { InventoryItemService, deriveStoreCode } from '@/modules/inventory/services/InventoryItemService';
 import type { AddStockInput } from '@/modules/inventory/types';
@@ -26,7 +27,7 @@ export function StockEntryForm({
   const [quantity, setQuantity] = useState(1);
   const [purchaseCostPrice, setPurchaseCostPrice] = useState('');
   const [purchaseDate, setPurchaseDate] = useState(
-    new Date().toISOString().split('T')[0]
+    todayLocalISO()
   );
   const [barcodesText, setBarcodesText] = useState('');
   const [notes, setNotes] = useState('');

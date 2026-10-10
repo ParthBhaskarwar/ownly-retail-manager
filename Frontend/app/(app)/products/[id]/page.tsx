@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthContext } from '@/context/AuthContext';
 import { evaluatePermission } from '@/config/permissions';
-import { AuthGuard } from '@/shared/components/PermissionGuard';
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import { ProductService } from '@/modules/product/services/ProductService';
 import { StockSummaryCard } from '@/modules/inventory/components/StockSummaryCard';
 import { StockEntryForm } from '@/modules/inventory/components/StockEntryForm';
@@ -308,8 +308,8 @@ function ProductDetailContent() {
 
 export default function ProductDetailPage() {
   return (
-    <AuthGuard>
+    <PermissionGuard permissionKey="inventory:view">
       <ProductDetailContent />
-    </AuthGuard>
+    </PermissionGuard>
   );
 }

@@ -8,7 +8,7 @@
  * is a signed JWT rather than a client-generated string.
  */
 
-import { apiClient, getToken, setToken, clearToken } from '@/lib/apiClient';
+import { apiClient, getToken, setToken, clearToken, ApiError } from '@/lib/apiClient';
 import {
   User,
   Session,
@@ -147,9 +147,14 @@ export const AuthService = {
         deviceInfo: getDeviceInfo(),
       };
       return { user, session };
-    } catch {
-      clearStoredSession();
-      return null;
+    } catch (err) {
+      // Only a real auth rejection ends the session. A network blip or a 5xx must not
+      // sign the user out (or wipe their token) — let the caller retry instead.
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+        clearStoredSession();
+        return null;
+      }
+      throw err;
     }
   },
 

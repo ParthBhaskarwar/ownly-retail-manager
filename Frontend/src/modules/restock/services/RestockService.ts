@@ -1,3 +1,4 @@
+import { todayLocalISO } from '@/lib/dates';
 import { ProductService, VariantService } from '@/modules/product/services/ProductService';
 import { SupplierService } from '@/modules/catalog/services/CategoryService';
 import { InventoryItemService } from '@/modules/inventory/services/InventoryItemService';
@@ -46,7 +47,7 @@ export const RestockService = {
           variantId: line.variantId,
           quantity: line.restockQty,
           purchaseCostPrice: costPrice,
-          purchaseDate: new Date().toISOString(),
+          purchaseDate: todayLocalISO(),
           performedBy: performedBy || 'system',
           notes: notes ? `Restock: ${notes}` : `Manual Restock (${line.displayName})`,
         },

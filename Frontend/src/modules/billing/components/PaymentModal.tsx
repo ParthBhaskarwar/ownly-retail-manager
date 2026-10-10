@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { PaymentMethod, PaymentSplit } from '../types';
 
 interface PaymentModalProps {
@@ -30,6 +30,23 @@ export function PaymentModal({
   const [cardAmount, setCardAmount] = useState<string>('');
   const [cardRef, setCardRef] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+
+  // Each time the dialog opens, start from the amount actually due. The initial state
+  // above was captured when the cart was still empty (total 0) and would otherwise
+  // stay 0 — or keep last sale's values — for every later sale.
+  useEffect(() => {
+    if (!isOpen) return;
+    setMode('SINGLE');
+    setSelectedMethod('CASH');
+    setSingleAmount(grandTotal);
+    setSingleRef('');
+    setCashAmount('');
+    setUpiAmount('');
+    setUpiRef('');
+    setCardAmount('');
+    setCardRef('');
+    setError(null);
+  }, [isOpen, grandTotal]);
 
   if (!isOpen) return null;
 

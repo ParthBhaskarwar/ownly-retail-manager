@@ -5,6 +5,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useStoreContext } from '@/context/StoreContext';
 import { StoreService } from '@/modules/store/services/StoreService';
 import type { Store, UpdateStoreInput } from '@/modules/store/types';
+import { RetailType } from '@/modules/retail-template/types';
 
 export function StoreSettingsForm() {
   const { user } = useAuthContext();
@@ -19,7 +20,7 @@ export function StoreSettingsForm() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
-  const [retailType, setRetailType] = useState('clothing');
+  const [retailType, setRetailType] = useState<string>(RetailType.CLOTHING_FASHION);
   const [currency, setCurrency] = useState('INR');
   const [gstNumber, setGstNumber] = useState('');
   const [gstEnabled, setGstEnabled] = useState(true);
@@ -39,7 +40,7 @@ export function StoreSettingsForm() {
           setName(currentStore.name || '');
           setAddress(currentStore.address || '');
           setPhone(currentStore.phone || '');
-          setRetailType(currentStore.retailType || 'clothing');
+          setRetailType(currentStore.retailType || RetailType.CLOTHING_FASHION);
           setCurrency(currentStore.currency || 'INR');
           setGstNumber(currentStore.gstNumber || '');
           if (currentStore.taxSettings) {
@@ -188,9 +189,10 @@ export function StoreSettingsForm() {
                 value={retailType}
                 onChange={(e) => setRetailType(e.target.value)}
               >
-                <option value="clothing">Clothing &amp; Fashion</option>
-                <option value="footwear">Footwear</option>
-                <option value="general">General Retail</option>
+                {/* Values must be the RetailType enum the backend stores (e.g. CLOTHING_FASHION). */}
+                <option value={RetailType.CLOTHING_FASHION}>Clothing &amp; Fashion</option>
+                <option value={RetailType.FOOTWEAR} disabled>Footwear (coming soon)</option>
+                <option value={RetailType.GENERAL_RETAIL} disabled>General Retail (coming soon)</option>
               </select>
             </div>
           </div>

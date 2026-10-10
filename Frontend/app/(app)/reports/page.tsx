@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { AuthGuard } from '@/shared/components/PermissionGuard';
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import { ReportViewer } from '@/modules/reports/components/ReportViewer';
 
 export default function ReportsPage() {
   return (
-    <AuthGuard>
+    <PermissionGuard permissionKey="reports:view">
       <div className="page-content">
         <ReportViewer />
       </div>
-    </AuthGuard>
+    </PermissionGuard>
   );
 }

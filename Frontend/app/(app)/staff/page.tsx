@@ -40,6 +40,10 @@ export default function StaffPage() {
 
   const handleDeactivate = async (id: string) => {
     if (!user?.id || !store?.id) return;
+    const member = staff.find((s) => s.id === id);
+    if (!window.confirm(`Deactivate ${member?.name ?? 'this staff member'}? They will be signed out and unable to log in until reactivated.`)) {
+      return;
+    }
     try {
       await StaffService.deactivate(id, user.id, store.id);
       await loadStaff();

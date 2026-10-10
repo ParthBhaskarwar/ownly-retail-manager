@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useAuthContext } from '@/context/AuthContext';
 import { useStoreContext } from '@/context/StoreContext';
 import { evaluatePermission } from '@/config/permissions';
-import { AuthGuard } from '@/shared/components/PermissionGuard';
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import { ProductService } from '@/modules/product/services/ProductService';
 import { ProductList } from '@/modules/product/components/ProductList';
 import { ProductSearch } from '@/modules/product/components/ProductSearch';
@@ -76,7 +76,7 @@ function ProductsPageContent() {
       <div className="page-header">
         <div className="page-header__left">
           <h1 className="page-header__title">Products</h1>
-          <span className="page-header__count">{total} total</span>
+          <span className="page-header__count">{isLoading ? "…" : total} total</span>
         </div>
         {canEdit && (
           <Link href="/products/new" id="add-product-btn" className="btn btn--primary">
@@ -137,8 +137,8 @@ function ProductsPageContent() {
 
 export default function ProductsPage() {
   return (
-    <AuthGuard>
+    <PermissionGuard permissionKey="inventory:view">
       <ProductsPageContent />
-    </AuthGuard>
+    </PermissionGuard>
   );
 }

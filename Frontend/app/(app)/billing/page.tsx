@@ -1,5 +1,6 @@
 'use client';
 
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import React, { useState } from 'react';
 import { BarcodeScannerInput } from '@/modules/billing/components/BarcodeScannerInput';
 import { CartTable } from '@/modules/billing/components/CartTable';
@@ -14,7 +15,7 @@ import { useStoreContext } from '@/context/StoreContext';
 import type { CartItem, CustomerInfo, DiscountPolicy, PaymentSplit } from '@/modules/billing/types';
 import { computeTax, round2 } from '@/lib/money';
 
-export default function BillingPage() {
+function BillingPageContent() {
   const { user } = useAuthContext();
   const { store } = useStoreContext();
   const storeId = store?.id ?? user?.storeId ?? '';
@@ -347,5 +348,13 @@ export default function BillingPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BillingPage() {
+  return (
+    <PermissionGuard permissionKey="billing:create">
+      <BillingPageContent />
+    </PermissionGuard>
   );
 }

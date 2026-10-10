@@ -32,9 +32,13 @@ export function VerifyForm({
 
   const handleDigitChange = (index: number, value: string) => {
     const digit = value.replace(/\D/g, '').slice(-1);
-    const updated = [...digits];
-    updated[index] = digit;
-    setDigits(updated);
+    // Functional update: keystrokes can arrive before React re-renders, and building
+    // from the rendered `digits` would drop all but the first of them.
+    setDigits((prev) => {
+      const updated = [...prev];
+      updated[index] = digit;
+      return updated;
+    });
     setError('');
 
     // Auto-advance focus

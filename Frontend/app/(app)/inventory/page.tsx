@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthContext } from '@/context/AuthContext';
 import { useStoreContext } from '@/context/StoreContext';
-import { AuthGuard } from '@/shared/components/PermissionGuard';
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import { RestockRemindersCard } from '@/modules/restock/components/RestockRemindersCard';
 import { InventoryItemService, InventoryMovementService } from '@/modules/inventory/services/InventoryItemService';
 import type {
@@ -117,7 +117,7 @@ export default function InventoryPage() {
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <AuthGuard>
+    <PermissionGuard permissionKey="inventory:view">
       <div className="page-content animate-fade-in">
         <div className="page-header">
           <div className="page-header__left">
@@ -140,7 +140,7 @@ export default function InventoryPage() {
           </div>
         )}
 
-        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
+        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', marginBottom: 'var(--space-4)' }}>
           <div className="stat-card card">
             <div className="stat-card__icon">📦</div>
             <div className="stat-card__value">{valuation?.itemCount ?? 0}</div>
@@ -338,6 +338,6 @@ export default function InventoryPage() {
           </div>
         )}
       </div>
-    </AuthGuard>
+    </PermissionGuard>
   );
 }

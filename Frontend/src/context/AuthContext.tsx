@@ -52,18 +52,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
       return;
     }
-    try {
-      const result = await AuthService.resolveSession(token);
-      if (result) {
-        setState({ user: result.user, session: result.session, isLoading: false, isAuthenticated: true });
-      } else {
-        clearStoredSession();
-        setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
+    // Retry transient failures (server restarting, dropped connection) before giving up.
+    // A definitive "not logged in" answer clears the token inside resolveSession; a
+    // transient failure leaves the token in place so a reload can recover.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const result = await AuthService.resolveSession(token);
+        if (result) {
+          setState({ user: result.user, session: result.session, isLoading: false, isAuthenticated: true });
+        } else {
+          setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
+        }
+        return;
+      } catch {
+        if (attempt < 2) await new Promise((r) => setTimeout(r, 700 * (attempt + 1)));
       }
-    } catch {
-      clearStoredSession();
-      setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
     }
+    setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
   }, []);
 
   useEffect(() => {

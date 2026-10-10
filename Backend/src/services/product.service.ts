@@ -178,6 +178,16 @@ export const ProductService = {
     const product = (await db('products').where({ id, store_id: storeId }).first()) as Product | undefined;
     if (!product) return null;
 
+    const [category, subcategory, supplier] = await Promise.all([
+      db('categories').where({ id: product.categoryId }).first('name') as Promise<{ name: string } | undefined>,
+      product.subcategoryId
+        ? (db('subcategories').where({ id: product.subcategoryId }).first('name') as Promise<{ name: string } | undefined>)
+        : Promise.resolve(undefined),
+      product.supplierId
+        ? (db('suppliers').where({ id: product.supplierId, store_id: storeId }).first('name') as Promise<{ name: string } | undefined>)
+        : Promise.resolve(undefined),
+    ]);
+
     const [defRows, productValues, variants] = await Promise.all([
       db('attribute_definitions').where({ retail_template_id: product.retailTemplateId }),
       db('product_attribute_values').where({ product_id: id }),
@@ -222,6 +232,9 @@ export const ProductService = {
 
     return {
       ...product,
+      categoryName: category?.name,
+      subcategoryName: subcategory?.name,
+      supplierName: supplier?.name,
       attributes: resolve(productValues as Array<{ attributeDefinitionId: string; value: string }>),
       variants: variantsWithStock,
     };

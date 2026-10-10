@@ -502,3 +502,45 @@ describe('staff and store rules', () => {
     await request(app).get('/api/billing/invoices').set(bearer(cashier.token)).expect(403);
   });
 });
+
+describe('found during browser end-to-end testing', () => {
+  test('product detail includes category and supplier names for the page header', async () => {
+    const supplier = await request(app).post('/api/catalog/suppliers').set(bearer(owner.token))
+      .send({ name: 'Test Mills', code: `TM${RUN_ID}`.slice(0, 12) });
+    expect(supplier.status).toBe(201);
+
+    const productId: string = (await db('products').where({ store_id: owner.storeId }).first('id')).id;
+    await request(app).put(`/api/products/${productId}`).set(bearer(owner.token))
+      .send({ supplierId: supplier.body.supplier.id }).expect(200);
+
+    const detail = await request(app).get(`/api/products/${productId}`).set(bearer(owner.token));
+    expect(detail.status).toBe(200);
+    expect(detail.body.product.supplierName).toBe('Test Mills');
+    expect(typeof detail.body.product.categoryName).toBe('string');
+  });
+
+  test('return rate is returned units / sold units and never exceeds 100%', async () => {
+    const res = await request(app).get('/api/reports/returns/summary').set(bearer(owner.token));
+    expect(res.status).toBe(200);
+    expect(res.body.returnRatePercent).toBeGreaterThan(0);
+    expect(res.body.returnRatePercent).toBeLessThanOrEqual(100);
+  });
+
+  test('restore works when rows hold JSON arrays (product photos) and puts back deleted rows', async () => {
+    const productId: string = (await db('products').where({ store_id: owner.storeId }).first('id')).id;
+    await db('products').where({ id: productId }).update({ image_urls: JSON.stringify(['data:image/png;base64,AAAA']) });
+
+    const backup = await request(app).post('/api/backup').set(bearer(owner.token));
+    expect(backup.status).toBe(201);
+
+    // Remove a movement row, then restore: it must come back.
+    const movement = await db('inventory_movements').where({ store_id: owner.storeId }).first('id');
+    await db('inventory_movements').where({ id: movement.id }).del();
+
+    const restore = await request(app).post(`/api/backup/${backup.body.backup.id}/restore`).set(bearer(owner.token));
+    expect(restore.status).toBe(200);
+    expect(restore.body.summary.rowsInserted.inventory_movements).toBeGreaterThanOrEqual(1);
+    const back = await db('inventory_movements').where({ id: movement.id }).first('id');
+    expect(back).toBeTruthy();
+  });
+});

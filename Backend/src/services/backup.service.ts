@@ -74,6 +74,20 @@ const BACKUP_TABLES: { table: string; storeColumn: string }[] = [
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
+/**
+ * Rows come back from the JSON file with jsonb columns already parsed (arrays such as
+ * product image_urls, objects such as audit meta). Handed to the pg driver as-is, a JS
+ * array is sent as a Postgres ARRAY literal and an object is fine — so arrays break
+ * with "invalid input syntax". Serialising every non-scalar value makes them valid JSON.
+ */
+function toInsertRow(row: unknown): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(row as Record<string, unknown>)) {
+    out[key] = value !== null && typeof value === 'object' ? JSON.stringify(value) : value;
+  }
+  return out;
+}
+
 function ensureBackupDir(): string {
   const dir = path.resolve(config.backupDir);
   if (!fs.existsSync(dir)) {
@@ -234,7 +248,7 @@ export const BackupService = {
         // Insert in chunks of 500 to avoid hitting Postgres parameter limits
         let inserted = 0;
         for (let i = 0; i < rows.length; i += 500) {
-          const chunk = rows.slice(i, i + 500);
+          const chunk = rows.slice(i, i + 500).map(toInsertRow);
           const result = await trx(table)
             .insert(chunk)
             .onConflict('id')

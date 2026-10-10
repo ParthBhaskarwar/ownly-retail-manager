@@ -34,7 +34,11 @@ export default function DashboardPage() {
   const [storageHealth, setStorageHealth] = useState<BackupStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const showChecklist = !store?.setupCompleted;
+  const role = user?.role as Role | undefined;
+  const can = (key: Parameters<typeof evaluatePermission>[1]) => !!role && evaluatePermission(role, key);
+  const canReports = can('reports:view');
+  // Onboarding is the owner's job; other roles have nothing to complete.
+  const showChecklist = role === 'OWNER' && !store?.setupCompleted;
 
   const [stats, setStats] = useState({
     todaySales: 0,
@@ -133,21 +137,36 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <Link href="/products/new" id="dash-quick-add" className="btn btn--primary btn--sm">
-              + Add Product
-            </Link>
-            <Link href="/restock" id="dash-quick-restock" className="btn btn--secondary btn--sm">
-              ⚡ Restock
-            </Link>
-            <Link href="/inventory" id="dash-quick-inventory" className="btn btn--secondary btn--sm">
-              ▦ Inventory
-            </Link>
-            <Link href="/reports" id="dash-quick-reports" className="btn btn--secondary btn--sm">
-              📊 Reports
-            </Link>
-            <Link href="/backup" id="dash-quick-backup" className="btn btn--ghost btn--sm">
-              💾 Backup
-            </Link>
+            {can('billing:create') && (
+              <Link href="/billing" id="dash-quick-billing" className="btn btn--primary btn--sm">
+                ⊟ New Sale
+              </Link>
+            )}
+            {can('inventory:edit') && (
+              <Link href="/products/new" id="dash-quick-add" className="btn btn--secondary btn--sm">
+                + Add Product
+              </Link>
+            )}
+            {can('inventory:edit') && (
+              <Link href="/restock" id="dash-quick-restock" className="btn btn--secondary btn--sm">
+                ⚡ Restock
+              </Link>
+            )}
+            {can('inventory:view') && (
+              <Link href="/inventory" id="dash-quick-inventory" className="btn btn--secondary btn--sm">
+                ▦ Inventory
+              </Link>
+            )}
+            {canReports && (
+              <Link href="/reports" id="dash-quick-reports" className="btn btn--secondary btn--sm">
+                📊 Reports
+              </Link>
+            )}
+            {can('settings:edit') && (
+              <Link href="/backup" id="dash-quick-backup" className="btn btn--ghost btn--sm">
+                💾 Backup
+              </Link>
+            )}
           </div>
         </div>
 
@@ -170,7 +189,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', margin: 'var(--space-5) 0' }}>
+        {canReports ? (
+        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', margin: 'var(--space-5) 0' }}>
           <div className="stat-card card">
             <div className="stat-card__icon">💰</div>
             <div className="stat-card__value">{fmt(salesReport?.totalRevenue || 0)}</div>
@@ -199,14 +219,39 @@ export default function DashboardPage() {
             <div className="stat-card__label">Stock Valuation (Cost)</div>
           </div>
         </div>
+        ) : (
+        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', margin: 'var(--space-5) 0' }}>
+          <div className="stat-card card">
+            <div className="stat-card__icon">💰</div>
+            <div className="stat-card__value">{fmt(stats.todaySales)}</div>
+            <div className="stat-card__label">Today&apos;s Sales</div>
+          </div>
+          <div className="stat-card card">
+            <div className="stat-card__icon">🧾</div>
+            <div className="stat-card__value">{stats.ordersToday}</div>
+            <div className="stat-card__label">Orders Today</div>
+          </div>
+          <div className="stat-card card">
+            <div className="stat-card__icon">📦</div>
+            <div className="stat-card__value">{stats.inStockItems}</div>
+            <div className="stat-card__label">Items In Stock</div>
+          </div>
+          <div className="stat-card card">
+            <div className="stat-card__icon">⊞</div>
+            <div className="stat-card__value">{stats.totalProducts}</div>
+            <div className="stat-card__label">Products</div>
+          </div>
+        </div>
+        )}
 
         {user && evaluatePermission(user.role as Role, 'reports:view') && <AiOverviewCard />}
 
-        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
+        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
           <div>
             <RestockRemindersCard storeId={storeId} />
           </div>
 
+          {canReports && (
           <div className="card">
             <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 className="card__title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -263,8 +308,10 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+          )}
         </div>
 
+        {canReports && (
         <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
           <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="card__title">Top-Selling Garments &amp; Performance</h2>
@@ -300,13 +347,16 @@ export default function DashboardPage() {
             </table>
           ) : (
             <div style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-ink-muted)' }}>
-              <p>No sales records logged yet. Use the manual restock and barcode ledger to start selling.</p>
-              <Link href="/backup" className="btn btn--ghost btn--sm">
-                Load Sample Store Data for Demo
-              </Link>
+              <p>No sales yet. Scan a product barcode in POS Billing to make your first sale.</p>
+              {can('billing:create') && (
+                <Link href="/billing" className="btn btn--ghost btn--sm">
+                  Open POS Billing
+                </Link>
+              )}
             </div>
           )}
         </div>
+        )}
       </div>
     </PermissionGuard>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ThermalInvoiceView } from '@/modules/billing/components/ThermalInvoiceView';
 import { A4InvoiceView } from '@/modules/billing/components/A4InvoiceView';
@@ -13,7 +14,7 @@ const STATUS_BADGES: Record<string, string> = {
   CANCELLED: 'badge--error',
 };
 
-export default function InvoicesPage() {
+function InvoicesPageContent() {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -251,5 +252,13 @@ export default function InvoicesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function InvoicesPage() {
+  return (
+    <PermissionGuard permissionKey="billing:view">
+      <InvoicesPageContent />
+    </PermissionGuard>
   );
 }

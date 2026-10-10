@@ -205,6 +205,9 @@ export interface VariantWithStock extends ProductVariant {
 }
 
 export interface ProductDetail extends Product {
+  categoryName?: string;
+  subcategoryName?: string;
+  supplierName?: string;
   attributes: ResolvedAttribute[];
   variants: VariantWithStock[];
 }

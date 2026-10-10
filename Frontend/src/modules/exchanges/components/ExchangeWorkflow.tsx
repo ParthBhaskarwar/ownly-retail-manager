@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { BarcodeScannerInput } from '@/modules/billing/components/BarcodeScannerInput';
 import { BillingService } from '@/modules/billing/services/BillingService';
 import { apiClient } from '@/lib/apiClient';
+import { computeTax } from '@/lib/money';
+import { useStoreContext } from '@/context/StoreContext';
 
 interface ExchangeableItem {
   id: string;
@@ -39,6 +41,7 @@ interface ExchangeResult {
 }
 
 export function ExchangeWorkflow() {
+  const { store } = useStoreContext();
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [invoiceData, setInvoiceData] = useState<ExchangeInvoice | null>(null);
@@ -89,7 +92,11 @@ export function ExchangeWorkflow() {
   const returnedItem = invoiceData?.items.find((i) => i.id === selectedReturnItemId);
   // Preview only — the server recomputes both sides (replacement prices and GST come from the database).
   const returnedValue = returnedItem ? Number(returnedItem.refundableAmount ?? returnedItem.finalPrice ?? 0) : 0;
-  const replacementValue = replacementItems.reduce((sum, item) => sum + Number(item.unitPrice), 0);
+  // Replacement is billed like a normal sale, so GST from the store settings applies.
+  const replacementValue = computeTax(
+    store?.taxSettings,
+    replacementItems.reduce((sum, item) => sum + Number(item.unitPrice), 0)
+  ).grandTotal;
   const priceDifference = replacementValue - returnedValue;
 
   const handleSubmitExchange = async () => {
@@ -335,7 +342,7 @@ export function ExchangeWorkflow() {
                   <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{returnedValue.toFixed(2)}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
-                  <span>Replacement Total:</span>
+                  <span>Replacement Total{store?.taxSettings?.gstEnabled ? ' (incl. GST)' : ''}:</span>
                   <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{replacementValue.toFixed(2)}</strong>
                 </div>
 

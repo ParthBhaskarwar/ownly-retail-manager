@@ -121,12 +121,14 @@ app.use((
 
   // Malformed id (e.g. a non-UUID in a path or body) reaching a uuid column.
   if (typeof err === 'object' && err !== null && (err as { code?: string }).code === '22P02') {
+    console.warn('[ERROR 22P02]', (err as Error).message);
     res.status(400).json({ error: 'That request contained an invalid identifier.' });
     return;
   }
 
   // Foreign-key violation: the request referenced something that does not exist.
   if (typeof err === 'object' && err !== null && (err as { code?: string }).code === '23503') {
+    console.warn('[ERROR 23503]', (err as Error).message);
     res.status(400).json({ error: 'That request referenced a record that does not exist.' });
     return;
   }

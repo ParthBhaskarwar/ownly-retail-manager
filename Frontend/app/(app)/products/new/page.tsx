@@ -16,6 +16,7 @@ import { applyPhotoSuggestions } from '@/modules/attributes/applySuggestions';
 import type { CreateProductInput } from '@/modules/product/types';
 import type { Category } from '@/modules/catalog/types';
 import type { AttributeSuggestions } from '@/modules/product/types';
+import { todayLocalISO } from '@/lib/dates';
 import { CLOTHING_TEMPLATE_ID } from '@/config/retail-templates';
 
 // Standard clothing sizes
@@ -185,7 +186,7 @@ function NewProductContent() {
           initialStock: {
             quantity: s.qty,
             purchaseCostPrice: parseFloat(baseCostPrice),
-            purchaseDate: new Date().toISOString().split('T')[0],
+            purchaseDate: todayLocalISO(),
           },
         })),
         createdBy: user?.id ?? 'user-1',

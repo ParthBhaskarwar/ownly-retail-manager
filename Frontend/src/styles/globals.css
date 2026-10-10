@@ -157,6 +157,9 @@ hr {
 
 .app-main {
   flex: 1;
+  /* A flex child defaults to min-width:auto, so one wide table would stretch the whole page
+     (header included) past the screen on phones. */
+  min-width: 0;
   margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;

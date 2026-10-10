@@ -265,11 +265,16 @@ export const ReportsService = {
       db.ref('ri.inventory_action').as('inventory_action')
     )) as Array<Record<string, unknown>>;
 
-    const invoiceCountRow = (await dated(
-      db('invoices as inv').where('inv.store_id', storeId).whereNot('inv.status', 'CANCELLED'),
+    // Return rate = units returned / units sold in the period (not returns / invoices,
+    // which an exchange — one return plus one new invoice — would distort).
+    const soldLinesRow = (await dated(
+      db('invoice_items as ii')
+        .join('invoices as inv', 'inv.id', 'ii.invoice_id')
+        .where('inv.store_id', storeId)
+        .whereNot('inv.status', 'CANCELLED'),
       'inv.created_at'
     ).count('* as n').first()) as { n: string | number } | undefined;
-    const invoiceCount = Number(invoiceCountRow?.n ?? 0);
+    const soldLines = Number(soldLinesRow?.n ?? 0);
 
     const returnsByReason: Record<string, number> = {};
     const perProduct = new Map<string, {
@@ -304,7 +309,7 @@ export const ReportsService = {
     return {
       totalReturnsCount: returnsCount,
       totalRefundAmount: Number(totals?.['refundTotal'] ?? 0),
-      returnRatePercent: invoiceCount > 0 ? (returnsCount / invoiceCount) * 100 : 0,
+      returnRatePercent: soldLines > 0 ? Math.min(100, (items.length / soldLines) * 100) : 0,
       damagedOrDefectiveCount: damaged,
       returnedToStockCount: toStock,
       returnsByReason,

@@ -64,9 +64,9 @@ export function RestockRemindersCard({ storeId, onSelectRestock, compact = false
 
   return (
     <div className="card restock-reminders-card">
-      <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
         <div>
-          <h2 className="card__title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h2 className="card__title" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
             <span>⚠️</span> Restock Reminders
             <span className="badge badge--caution badge--sm">
               {reminders.length} item{reminders.length === 1 ? '' : 's'} need attention

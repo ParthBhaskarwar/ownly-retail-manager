@@ -25,3 +25,4 @@ Thumbs.db
 
 # Downloaded photo-AI model files (re-downloaded automatically)
 models/
+backups/

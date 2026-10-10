@@ -31,7 +31,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: 'POS Billing',
     href: '/billing',
     icon: '⊟',
-    permissionKey: 'billing:view',
+    permissionKey: 'billing:create',
     section: 'store',
   },
   // Invoices History

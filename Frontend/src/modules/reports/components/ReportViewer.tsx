@@ -370,7 +370,7 @@ export function ReportViewer() {
         <div className="report-body">
           {activeTab === 'SALES_PROFIT' && salesData && (
             <div className="report-section">
-              <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
+              <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', marginBottom: 'var(--space-4)' }}>
                 <div className="stat-card card">
                   <div className="stat-card__icon">💰</div>
                   <div className="stat-card__value">{fmt(salesData.totalRevenue)}</div>
@@ -433,7 +433,7 @@ export function ReportViewer() {
 
           {activeTab === 'INVENTORY_VALUATION' && valuationData && (
             <div className="report-section">
-              <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
+              <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', marginBottom: 'var(--space-4)' }}>
                 <div className="stat-card card">
                   <div className="stat-card__icon">📦</div>
                   <div className="stat-card__value">{valuationData.totalStockQuantity}</div>
@@ -601,7 +601,7 @@ export function ReportViewer() {
 
           {activeTab === 'RETURNS' && returnsData && (
             <div className="report-section">
-              <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 'var(--space-4)' }}>
+              <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', marginBottom: 'var(--space-4)' }}>
                 <div className="stat-card card">
                   <div className="stat-card__value">{returnsData.totalReturnsCount}</div>
                   <div className="stat-card__label">Total Returns Logged</div>
@@ -626,7 +626,7 @@ export function ReportViewer() {
                 <div className="card__header">
                   <h2 className="card__title">Return Reasons Distribution</h2>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '16px' }}>
                   {Object.entries(returnsData.returnsByReason).map(([reason, count]) => (
                     <div key={reason} className="stat-pill" style={{ padding: 'var(--space-3)' }}>
                       <span>{reason}</span>
