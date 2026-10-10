@@ -1909,4 +1909,1021 @@ a.checklist-step:hover {
   z-index: var(--z-modal);
 }
 
+/* ── Barcode Label ───────────────────────────────────────────── */
+
+/**
+ * .barcode-label is the on-screen preview of a retail barcode label.
+ * It is also used inside .barcode-print-root for the print sheet.
+ *
+ * The label intentionally uses white background and black text
+ * so it looks correct both on dark-mode screens and on paper.
+ */
+.barcode-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 20px 24px 16px;
+  width: 280px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  gap: 4px;
+  text-align: center;
+}
+
+.barcode-label--compact {
+  width: 200px;
+  padding: 12px 16px 10px;
+  gap: 3px;
+}
+
+.barcode-label__store {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.barcode-label__product {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barcode-label--compact .barcode-label__product {
+  font-size: 12px;
+}
+
+.barcode-label__variant {
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.barcode-label--compact .barcode-label__variant {
+  font-size: 10px;
+}
+
+.barcode-label__sku {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+  font-family: 'Courier New', Courier, monospace;
+  background: #f3f4f6;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-top: 2px;
+}
+
+.barcode-label__image-wrap {
+  margin-top: 8px;
+  margin-bottom: 2px;
+}
+
+.barcode-label__code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #111827;
+  margin-top: 2px;
+}
+
+.barcode-label--compact .barcode-label__code {
+  font-size: 9px;
+}
+
+.barcode-label__price {
+  font-size: 18px;
+  font-weight: 800;
+  color: #059669;
+  margin-top: 4px;
+}
+
+.barcode-label--compact .barcode-label__price {
+  font-size: 14px;
+}
+
+/* ── Barcode Print Manager ───────────────────────────────────── */
+
+.barcode-manager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.barcode-manager__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.barcode-manager__toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.barcode-manager__count {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.barcode-manager__body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .barcode-manager__body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.barcode-manager__table-wrap {
+  overflow-x: auto;
+}
+
+.barcode-manager__table {
+  width: 100%;
+  font-size: var(--text-sm);
+}
+
+.barcode-manager__check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-denim);
+  cursor: pointer;
+}
+
+.barcode-manager__code {
+  font-size: var(--text-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+
+.data-table__row--selected {
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.barcode-manager__preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  position: sticky;
+  top: var(--space-4);
+}
+
+.barcode-manager__preview-header {
+  width: 100%;
+  text-align: center;
+}
+
+.barcode-manager__preview-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-ink-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* ── Print Label Grid (hidden on screen, shown in print) ─────── */
+
+/**
+ * The .barcode-print-root container is HIDDEN on screen by default.
+ * When window.print() is called, @media print rules:
+ *   1. Hide the entire app (header, sidebar, page content).
+ *   2. Show ONLY .barcode-print-root.
+ * This gives a clean label sheet with no UI chrome.
+ */
+.barcode-print-root {
+  display: none;
+}
+
+.barcode-label-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+/* ── @media print — Label-only output ───────────────────────── */
+
+@media print {
+  /* Hide the entire app shell */
+  .app-sidebar,
+  .app-main > header,
+  .app-main > .app-content,
+  header,
+  nav,
+  [class*="sidebar"],
+  [class*="header"]:not(.barcode-label__store),
+  [class*="page-header"],
+  [class*="page-content"],
+  [class*="breadcrumb"],
+  [class*="toast"],
+  [class*="modal"],
+  .barcode-manager__toolbar,
+  .barcode-manager__table-wrap,
+  .barcode-manager__preview,
+  .data-table-wrapper,
+  #sidebar,
+  #main-content > header {
+    display: none !important;
+  }
+
+  /* Show the print sheet */
+  .barcode-print-root {
+    display: block !important;
+    width: 100%;
+  }
+
+  .barcode-label-grid {
+    grid-template-columns: repeat(3, 1fr);
+    page-break-inside: avoid;
+  }
+
+  .barcode-label {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #999;
+  }
+
+  /* Single-label print from the item detail page */
+  .barcode-single-print .barcode-print-root {
+    display: flex !important;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
+  /* Force white background on print */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: white !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OWNLY — UI/UX Quality Improvements
+   Professional, formal, interactive, modern.
+   These augment the existing design tokens without overriding them.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Enhanced Sidebar ───────────────────────────────────────── */
+
+/* Sidebar nav should scroll smoothly and show a subtle scrollbar */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-sidebar-border) transparent;
+}
+.sidebar-nav::-webkit-scrollbar { width: 4px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--color-sidebar-border);
+  border-radius: var(--radius-full);
+}
+
+/* Nav item — richer hover interaction */
+.sidebar-nav-item {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-right: var(--space-2);
+}
+
+/* Brand logo — slightly elevated feel */
+.sidebar-brand__logo {
+  box-shadow: 0 2px 8px rgba(59, 91, 140, 0.35);
+  letter-spacing: 0.01em;
+}
+
+/* Profile completion indicator in sidebar footer */
+.sidebar-footer-completion {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2) 0 0;
+  border-top: 1px solid var(--color-sidebar-border);
+  margin-top: var(--space-2);
+}
+.sidebar-completion-label {
+  font-size: 10px;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.sidebar-completion-bar {
+  height: 4px;
+  background: var(--color-sidebar-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.sidebar-completion-fill {
+  height: 100%;
+  background: var(--color-denim);
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+/* ── Enhanced Stat Cards ────────────────────────────────────── */
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal);
+}
+
+/* Subtle lift on hover */
+.stat-card:hover {
+  border-color: var(--color-denim-border);
+  box-shadow: 0 4px 16px rgba(59, 91, 140, 0.10);
+  transform: translateY(-2px);
+}
+
+/* Decorative accent bar at the top */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-denim), var(--color-denim-tint));
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--color-denim-tint);
+  border-radius: var(--radius-md);
+  font-size: 1.25rem;
+}
+
+.stat-card__value {
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.stat-card__label {
+  line-height: var(--leading-snug);
+  font-weight: var(--font-medium);
+}
+
+/* Stat card color variants */
+.stat-card--success .stat-card__icon { background: var(--color-paid-tint); }
+.stat-card--success::before { background: linear-gradient(90deg, var(--color-paid), var(--color-paid-tint)); }
+.stat-card--warning .stat-card__icon { background: var(--color-caution-tint); }
+.stat-card--warning::before { background: linear-gradient(90deg, var(--color-caution), var(--color-caution-tint)); }
+.stat-card--danger .stat-card__icon { background: var(--color-return-tint); }
+.stat-card--danger::before { background: linear-gradient(90deg, var(--color-return), var(--color-return-tint)); }
+
+/* ── Enhanced Cards ─────────────────────────────────────────── */
+
+.card {
+  transition: border-color var(--transition-fast);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1.5px dashed var(--color-border-subtle);
+}
+
+.card__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.card__subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  margin: var(--space-1) 0 0;
+}
+
+/* ── Enhanced Buttons ───────────────────────────────────────── */
+
+/* Primary button — subtle glow on hover */
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(59, 91, 140, 0.25);
+}
+
+/* All buttons — scale feedback on click */
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Loading state spinner in btn */
+.btn[aria-busy="true"] {
+  pointer-events: none;
+}
+
+/* ── Enhanced Tables ────────────────────────────────────────── */
+
+/* data-table rows — better hover */
+.data-table__row {
+  transition: background-color var(--transition-fast);
+}
+.data-table__row:hover {
+  background: rgba(59, 91, 140, 0.03);
+}
+
+/* Table headers — clear visual weight */
+.data-table th,
+.table th {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1.5px solid var(--color-border-subtle);
+  white-space: nowrap;
+}
+
+/* Table cells — comfortable reading */
+.data-table td,
+.table td {
+  padding: var(--space-4);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+}
+
+.data-table tr:last-child td,
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Enhanced Empty States ──────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-8);
+  gap: var(--space-4);
+}
+
+.empty-state__icon {
+  font-size: 2.5rem;
+  color: var(--color-ink-muted);
+  opacity: 0.5;
+  margin-bottom: var(--space-2);
+}
+
+.empty-state__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.empty-state__desc {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  max-width: 380px;
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+/* ── Skeleton Loading ───────────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-border-subtle) 25%,
+    var(--color-paper) 50%,
+    var(--color-border-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton--text { height: 14px; border-radius: 4px; }
+.skeleton--title { height: 24px; border-radius: 4px; }
+.skeleton--card { height: 120px; }
+.skeleton--avatar { width: 32px; height: 32px; border-radius: 50%; }
+
+/* ── Enhanced Alert Banners ─────────────────────────────────── */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.alert--success {
+  background: var(--color-paid-tint);
+  border-color: var(--color-paid-border);
+  color: var(--color-paid);
+  border-left: 3px solid var(--color-paid);
+}
+.alert--warning {
+  background: var(--color-caution-tint);
+  border-color: var(--color-caution-border);
+  color: var(--color-caution);
+  border-left: 3px solid var(--color-caution);
+}
+.alert--error {
+  background: var(--color-return-tint);
+  border-color: var(--color-return-border);
+  color: var(--color-return);
+  border-left: 3px solid var(--color-return);
+}
+.alert--info {
+  background: var(--color-info-tint);
+  border-color: var(--color-info-border);
+  color: var(--color-info);
+  border-left: 3px solid var(--color-info);
+}
+
+/* ── Professional Dashboard Welcome ─────────────────────────── */
+
+.dashboard__welcome {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle decorative accent at top of welcome card */
+.dashboard__welcome::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-denim), transparent);
+}
+
+.dashboard__greeting {
+  font-size: var(--text-2xl);
+  letter-spacing: -0.01em;
+}
+
+/* ── Gradient Text ───────────────────────────────────────────── */
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-denim), #5B7FBA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── SKU Badge ───────────────────────────────────────────────── */
+
+.sku-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background: var(--color-paper);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  color: var(--color-ink-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* ── Breadcrumb ──────────────────────────────────────────────── */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.breadcrumb__link {
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.breadcrumb__link:hover { color: var(--color-denim); }
+
+.breadcrumb__sep {
+  color: var(--color-border);
+  font-size: var(--text-xs);
+  user-select: none;
+}
+
+.breadcrumb__current {
+  color: var(--color-ink-secondary);
+  font-weight: var(--font-medium);
+}
+
+/* ── Page Content ────────────────────────────────────────────── */
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ── Page Header Improvements ───────────────────────────────── */
+
+.page-header__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+  line-height: var(--leading-tight);
+}
+
+.page-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ── Status Change Panel ─────────────────────────────────────── */
+
+.status-change-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.status-change-form {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.status-change-form .form-field {
+  flex: 1;
+  min-width: 160px;
+}
+
+/* ── Item Detail Grid ────────────────────────────────────────── */
+
+.item-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.item-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-paper);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  transition: border-color var(--transition-fast);
+}
+
+.item-detail-field:hover {
+  border-color: var(--color-border);
+}
+
+.item-detail-field__label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+}
+
+.item-detail-field__value {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-ink);
+  line-height: var(--leading-snug);
+}
+
+.item-detail-field__value.mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* ── Barcode preview card in item detail ─────────────────────── */
+
+.barcode-preview-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.barcode-preview-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-denim), transparent);
+}
+
+/* ── Filter tabs ─────────────────────────────────────────────── */
+
+.filter-tabs {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  font-family: var(--font-body);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-ink-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  min-height: 36px;
+}
+
+.filter-tab:hover {
+  border-color: var(--color-denim-border);
+  color: var(--color-denim);
+  background: var(--color-denim-tint);
+}
+
+.filter-tab--active {
+  background: var(--color-denim-tint);
+  border-color: var(--color-denim);
+  color: var(--color-denim-dark);
+  font-weight: var(--font-semibold);
+}
+
+/* ── Product toolbar ─────────────────────────────────────────── */
+
+.product-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* ── Mono utility ────────────────────────────────────────────── */
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* ── Visual Barcode wrapper ──────────────────────────────────── */
+
+.visual-barcode {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2);
+}
+
+/* ── Onboarding checklist improvements ───────────────────────── */
+
+.onboarding-checklist {
+  position: relative;
+  overflow: hidden;
+}
+
+.onboarding-checklist::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-denim), transparent);
+}
+
+.checklist-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+  color: inherit;
+}
+
+.checklist-step--pending {
+  cursor: pointer;
+}
+
+.checklist-step--pending:hover {
+  background: var(--color-paper);
+}
+
+.checklist-step--done {
+  opacity: 0.7;
+}
+
+.checklist-step__indicator {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checklist-step__number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-paper);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: var(--color-ink-muted);
+}
+
+.checklist-step__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checklist-step__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.checklist-step__desc {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  line-height: var(--leading-relaxed);
+}
+
+.checklist-step__optional-tag {
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  padding: 1px 6px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.checklist-step__arrow {
+  color: var(--color-ink-muted);
+  flex-shrink: 0;
+}
+
+.onboarding-checklist__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.onboarding-checklist__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.onboarding-checklist__subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  margin: var(--space-1) 0 0;
+}
+
+.onboarding-checklist__percent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.onboarding-checklist__ring { display: block; }
+
+.onboarding-checklist__percent-label {
+  position: absolute;
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: var(--color-denim);
+  font-family: var(--font-heading);
+}
+
+.onboarding-checklist__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── Page enter animation ────────────────────────────────────── */
+
+.page-enter {
+  animation: fadeInUp 0.22s ease-out both;
+}
+
+/* ── Responsive utility helpers ─────────────────────────────── */
+
+@media (max-width: 768px) {
+  .item-detail-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .status-change-form {
+    flex-direction: column;
+  }
+  .status-change-form .form-field {
+    min-width: 100%;
+  }
+  .product-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dashboard__welcome {
+    padding: var(--space-5);
+  }
+}
+
+@media (max-width: 480px) {
+  .item-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .filter-tabs {
+    gap: var(--space-1);
+  }
+}
 

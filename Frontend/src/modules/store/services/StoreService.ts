@@ -119,11 +119,15 @@ export const StoreService = {
       },
       {
         key: 'setup_complete',
-        label: 'Setup Complete!',
-        description: "You're all set to start managing your store.",
+        label: 'Mark Setup Complete',
+        description: 'Confirm your store setup is finished and unlock full access.',
+        // Auto-complete this step if the store already has setupCompleted = true.
+        // It is optional so the completion percentage reflects the three core steps
+        // (verified account, retail type, store details) rather than requiring the
+        // owner to click a separate "complete setup" button before reaching 100%.
         completed: !!store?.setupCompleted,
-        href: '/dashboard',
-        optional: false,
+        href: '/onboarding/complete',
+        optional: true,
       },
     ];
   },

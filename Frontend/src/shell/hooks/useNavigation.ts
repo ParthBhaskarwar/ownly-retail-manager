@@ -97,6 +97,15 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'inventory:view',
     section: 'store',
   },
+  // Barcode Management
+  {
+    id: 'nav-barcodes',
+    label: 'Barcodes',
+    href: '/inventory/barcodes',
+    icon: '⠿',
+    permissionKey: 'inventory:view',
+    section: 'store',
+  },
   // Staff
   {
     id: 'nav-staff',
