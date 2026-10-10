@@ -192,9 +192,9 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center" role="status">
-        <div className="btn-spinner inline-block mr-2" />
-        <p className="text-gray-400 mt-2">Loading product details...</p>
+      <div style={{ padding: 32, textAlign: 'center' }} role="status">
+        <div className="btn-spinner" style={{ display: 'inline-block', marginRight: 8 }} />
+        <p style={{ color: 'var(--color-text-muted)', marginTop: 8 }}>Loading product details...</p>
       </div>
     );
   }
@@ -202,7 +202,7 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
   if (submitSuccess) {
     return (
       <div className="pe-success-screen" role="status" aria-live="polite">
-        <div className="pe-success-icon" aria-hidden="true">✓</div>
+        <div className="pe-success-icon" aria-hidden="true" style={{ fontFamily: 'Material Symbols Outlined' }}>check_circle</div>
         <h2 className="pe-success-title">Product Updated Successfully</h2>
         <p className="pe-success-desc">Returning to product details page...</p>
       </div>
@@ -248,7 +248,8 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
               <label className="form-label" htmlFor="edit-sku">Base SKU</label>
               <input
                 id="edit-sku"
-                className="form-input pe-mono bg-slate-900 cursor-not-allowed"
+                className="form-input pe-mono"
+                style={{ backgroundColor: 'var(--color-surface)', cursor: 'not-allowed' }}
                 type="text"
                 value={baseSku}
                 disabled
@@ -389,7 +390,8 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
                           <input
                             type="number"
                             step="0.01"
-                            className="form-input text-sm py-1 px-2"
+                            className="form-input"
+                            style={{ fontSize: 'var(--text-sm)', padding: '4px 8px' }}
                             placeholder={baseSellingPrice}
                             value={variantPrices[v.id]?.selling ?? ''}
                             onChange={(e) =>
@@ -404,7 +406,8 @@ export function ProductEditForm({ productId }: ProductEditFormProps) {
                           <input
                             type="number"
                             step="0.01"
-                            className="form-input text-sm py-1 px-2"
+                            className="form-input"
+                            style={{ fontSize: 'var(--text-sm)', padding: '4px 8px' }}
                             placeholder={baseCostPrice}
                             value={variantPrices[v.id]?.cost ?? ''}
                             onChange={(e) =>

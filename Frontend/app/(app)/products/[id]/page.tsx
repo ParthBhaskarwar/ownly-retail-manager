@@ -76,171 +76,238 @@ function ProductDetailContent() {
   };
 
   return (
-    <div className="page-content space-y-6">
-      {/* Breadcrumb */}
-      <nav className="breadcrumb" aria-label="Breadcrumb">
-        <Link href="/products" className="breadcrumb__link">Products</Link>
-        <span className="breadcrumb__sep">/</span>
-        <span className="breadcrumb__current">{product.name}</span>
-      </nav>
-
-      {/* Product header & title */}
-      <div className="product-detail__header flex flex-wrap items-center justify-between gap-4">
+    <div className="product-detail-layout">
+      {/* Breadcrumb & Action Bar */}
+      <div className="product-detail-header">
         <div>
-          <div className="product-detail__title-row flex items-center gap-3">
-            <h1 className="product-detail__name text-2xl font-bold">{product.name}</h1>
-            <span className={`status-badge status-badge--${product.status === 'ACTIVE' ? 'success' : 'warning'}`}>
+          <nav className="product-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/products" className="product-breadcrumb-link">
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_back</span>
+              Products
+            </Link>
+            <span className="product-breadcrumb-sep">/</span>
+            <span>Store</span>
+            <span className="product-breadcrumb-sep">/</span>
+            <span className="product-breadcrumb-current">{product.name}</span>
+          </nav>
+          <div className="product-title-row">
+            <h1 className="product-title-name">{product.name}</h1>
+            <span className="product-tag product-tag--sku">
+              SKU: {product.baseSku}
+            </span>
+            <span className={`product-tag ${product.status === 'ACTIVE' ? 'product-tag--active' : ''}`}>
               {product.status}
             </span>
-          </div>
-          <div className="flex items-center gap-2 mt-1">
-            <code className="sku-badge sku-badge--large">{product.baseSku}</code>
-            <span className="badge badge--denim">{product.categoryName}</span>
-            {product.subcategoryName && <span className="badge badge--neutral">{product.subcategoryName}</span>}
+            <span className="product-tag">{product.categoryName}</span>
           </div>
         </div>
-        {canEdit && (
-          <Link href={`/products/${product.id}/edit`} id="edit-product-btn" className="btn btn--secondary">
-            ✎ Edit Product
-          </Link>
-        )}
-      </div>
-
-      {/* Photo Gallery & Top Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Photo Gallery */}
-        <div className="card md:col-span-1 space-y-3">
-          <h2 className="card__title">Product Photos</h2>
-          {currentPhoto ? (
-            <div className="space-y-3">
-              <div className="aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
-                <img src={currentPhoto} alt={product.name} className="w-full h-full object-cover" />
-              </div>
-              {images.length > 1 && (
-                <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                  {images.map((img, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      className={`w-14 h-14 rounded-lg overflow-hidden border transition-all ${
-                        selectedPhotoIndex === idx ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-slate-800 opacity-60 hover:opacity-100'
-                      }`}
-                      onClick={() => setSelectedPhotoIndex(idx)}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="aspect-square rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-500 text-sm">
-              <span className="text-3xl mb-1">📷</span>
-              <span>No Photo Uploaded</span>
-            </div>
-          )}
-        </div>
-
-        {/* Overview & Stock Card */}
-        <div className="md:col-span-2 space-y-6">
-          <section aria-labelledby="stock-summary-heading" className="card">
-            <h2 id="stock-summary-heading" className="card__title">Stock Overview</h2>
-            <StockSummaryCard summary={overallSummary} />
-          </section>
-
-          {/* Pricing & Supplier Summary */}
-          <section className="card">
-            <h2 className="card__title">Pricing &amp; Info</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm mt-3">
-              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
-                <span className="text-xs text-slate-400 block">Selling Price</span>
-                <span className="text-lg font-bold text-emerald-400">₹{product.baseSellingPrice.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
-                <span className="text-xs text-slate-400 block">Cost Price</span>
-                <span className="text-lg font-bold text-slate-200">₹{product.baseCostPrice.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
-                <span className="text-xs text-slate-400 block">Supplier</span>
-                <span className="text-sm font-semibold text-slate-200">{product.supplierName || '—'}</span>
-              </div>
-              <div className="p-3 bg-slate-900/60 rounded-lg border border-slate-800">
-                <span className="text-xs text-slate-400 block">Total Variants</span>
-                <span className="text-lg font-bold text-violet-400">{product.variants.length}</span>
-              </div>
-            </div>
-
-            {product.description && (
-              <p className="text-sm text-slate-300 mt-4 pt-3 border-t border-slate-800">
-                {product.description}
-              </p>
-            )}
-          </section>
-        </div>
-      </div>
-
-      {/* Category-Specific Attributes */}
-      {product.attributes.length > 0 && (
-        <section aria-labelledby="attributes-heading" className="card">
-          <h2 id="attributes-heading" className="card__title">Category Attributes ({product.categoryName})</h2>
-          <dl className="attribute-display-list mt-3">
-            {product.attributes.map((attr) => (
-              <div key={attr.definition.id} className="attribute-display-item">
-                <dt className="attribute-display-item__label">{attr.definition.name}</dt>
-                <dd className="attribute-display-item__value">{attr.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      )}
-
-      {/* Variants & Size Stock Grid */}
-      <section aria-labelledby="variants-heading" className="card">
-        <div className="card__header">
-          <h2 id="variants-heading" className="card__title">Variants &amp; Size Breakdown ({product.variants.length})</h2>
+        <div className="products-header__actions">
           {canEdit && (
-            <Link href={`/products/${product.id}/stock`} id="add-stock-link" className="btn btn--secondary btn--sm">
-              + Add Stock
+            <Link href={`/products/${product.id}/edit`} className="btn-products-outline" id="edit-product-btn">
+              <span className="material-symbols-outlined">edit</span>
+              Edit Product
+            </Link>
+          )}
+          {canEdit && (
+            <Link href={`/products/${product.id}/stock`} className="btn-products-primary" id="add-stock-link">
+              <span className="material-symbols-outlined">add_box</span>
+              Restock Product
             </Link>
           )}
         </div>
+      </div>
 
-        <div className="variant-list">
-          {product.variants.map((variant) => (
-            <div key={variant.id} className="variant-row">
-              <div className="variant-row__info">
-                <span className="variant-row__name">{variant.displayName}</span>
-                <code className="sku-badge">{variant.sku}</code>
-                {variant.sellingPriceOverride !== null && (
-                  <span className="variant-row__override-badge">Custom Price</span>
-                )}
+      <div className="product-split-grid">
+        {/* Left Column: Info & Imagery */}
+        <div className="product-panel">
+          <div className="product-panel__header">
+            <div className="product-panel__title-wrap">
+              <span className="material-symbols-outlined product-panel__icon">inventory_2</span>
+              <h2 className="product-panel__title">Product Information &amp; Imagery</h2>
+            </div>
+            <span className="product-panel__meta">
+              <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'var(--color-accent)' }}>verified</span>
+              Verified Catalog Entry
+            </span>
+          </div>
+
+          <div className="product-gallery">
+            {currentPhoto ? (
+              <div className="product-gallery__main">
+                <img src={currentPhoto} alt={product.name} />
+                <div className="product-gallery__zoom-badge">
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>zoom_in</span>
+                  Hover to zoom
+                </div>
               </div>
-              <div className="variant-row__attrs">
-                {variant.attributes.map((a) => (
-                  <span key={a.definition.id} className="variant-attr-chip">
-                    {a.value}
-                  </span>
+            ) : (
+              <div className="product-gallery__main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'var(--color-text-muted)' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 32 }}>image_not_supported</span>
+                <span style={{ fontSize: 12, marginTop: 8 }}>No Photo Uploaded</span>
+              </div>
+            )}
+            {images.length > 1 && (
+              <div className="product-gallery__thumbnails">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`product-gallery__thumb ${selectedPhotoIndex === idx ? 'product-gallery__thumb--active' : ''}`}
+                    onClick={() => setSelectedPhotoIndex(idx)}
+                  >
+                    <img src={img} alt="" />
+                  </button>
                 ))}
               </div>
-              <div className="variant-row__price">
-                ₹{variant.effectiveSellingPrice.toLocaleString('en-IN')}
-              </div>
-              <StockSummaryCard summary={variant.stock} compact />
-              {canEdit && (
-                <button
-                  id={`add-stock-btn-${variant.id}`}
-                  className="btn btn--ghost btn--sm"
-                  onClick={() => setStockFormVariant(
-                    stockFormVariant?.id === variant.id ? null : variant
-                  )}
-                >
-                  {stockFormVariant?.id === variant.id ? 'Cancel' : '+ Stock'}
-                </button>
-              )}
+            )}
+          </div>
+
+          {product.description && (
+            <div className="product-info-text">
+              <p>{product.description}</p>
             </div>
-          ))}
+          )}
+
+          <div className="product-specs">
+            <div className="product-specs__title">Specifications &amp; Pricing Metadata</div>
+            <div className="product-specs__grid">
+              <div className="product-specs__row">
+                <span className="product-specs__label">Category</span>
+                <span className="product-specs__value">{product.categoryName}</span>
+              </div>
+              <div className="product-specs__row">
+                <span className="product-specs__label">Supplier</span>
+                <span className="product-specs__value">{product.supplierName || '—'}</span>
+              </div>
+              {product.attributes.map(attr => (
+                <div className="product-specs__row" key={attr.definition.id}>
+                  <span className="product-specs__label">{attr.definition.name}</span>
+                  <span className="product-specs__value">{attr.value}</span>
+                </div>
+              ))}
+              <div className="product-specs__row">
+                <span className="product-specs__label">Base Cost Price</span>
+                <span className="product-specs__value product-specs__value-mono">₹{product.baseCostPrice.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="product-specs__row">
+                <span className="product-specs__label">Base Selling Price</span>
+                <span className="product-specs__value product-specs__value-mono">₹{product.baseSellingPrice.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Right Column: Performance */}
+        <div className="product-panel">
+          <div className="product-panel__header">
+            <div className="product-panel__title-wrap">
+              <span className="material-symbols-outlined product-panel__icon">monitoring</span>
+              <h2 className="product-panel__title">Performance &amp; Velocity</h2>
+            </div>
+          </div>
+          
+          <div className="product-stats-grid">
+            <div className="product-stat-tile">
+              <span className="product-stat-tile__label">Total Variants</span>
+              <div className="product-stat-tile__main">
+                <span className="product-stat-tile__value">{product.variants.length}</span>
+              </div>
+              <span className="product-stat-tile__sub">Active configurations</span>
+            </div>
+            <div className="product-stat-tile">
+              <span className="product-stat-tile__label">Total In Stock</span>
+              <div className="product-stat-tile__main">
+                <span className="product-stat-tile__value">{totalInStock}</span>
+                {totalInStock === 0 && (
+                  <span className="product-stat-tile__trend-badge product-stat-tile__trend-badge--warn">Empty</span>
+                )}
+              </div>
+              <span className="product-stat-tile__sub">Across all variants</span>
+            </div>
+          </div>
+
+          <div className="product-info-text">
+            <StockSummaryCard summary={overallSummary} compact />
+          </div>
+
+          {canSeeAi && (
+            <AiProductAnalysisPanel productId={product.id} canRestock={canEdit} />
+          )}
+          <ProductPerformancePanel productId={product.id} />
+        </div>
+      </div>
+
+      {/* Variants & Size Stock Grid */}
+      <div className="products-card products-card--variants">
+        <div className="products-card__header">
+          <div className="products-card__title-wrap">
+            <span className="material-symbols-outlined product-panel__icon">style</span>
+            <h2 className="products-card__title">Variant Stock &amp; Sizing Breakdown</h2>
+          </div>
+        </div>
+        <div className="products-table-wrapper">
+          <table className="products-table">
+            <thead>
+              <tr>
+                <th>Variant</th>
+                <th>Variant SKU</th>
+                <th>Attributes</th>
+                <th style={{ textAlign: 'center' }}>Current Stock</th>
+                <th style={{ textAlign: 'right' }}>Selling Price</th>
+                <th style={{ textAlign: 'right' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {product.variants.map((variant) => {
+                const isOutOfStock = variant.stock.inStock === 0;
+                return (
+                  <tr key={variant.id} className={isOutOfStock ? 'row-danger' : ''}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}>
+                        <div className="variant-size-badge">
+                          {variant.displayName.charAt(0).toUpperCase()}
+                        </div>
+                        {variant.displayName}
+                      </div>
+                    </td>
+                    <td>
+                      <span className="sku-badge">{variant.sku}</span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                        {variant.attributes.map(a => (
+                          <span key={a.definition.id} className="stock-badge stock-badge--in-stock" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', margin: 0 }}>
+                            {a.value}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'center' }}>
+                      <span className={isOutOfStock ? 'stock-badge stock-badge--out-stock' : 'stock-badge stock-badge--in-stock'}>
+                        {variant.stock.inStock} units
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+                      ₹{variant.effectiveSellingPrice.toLocaleString('en-IN')}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        className="btn-products-outline"
+                        style={{ padding: '4px 8px' }}
+                        onClick={() => setStockFormVariant(
+                          stockFormVariant?.id === variant.id ? null : variant
+                        )}
+                      >
+                        {stockFormVariant?.id === variant.id ? 'Cancel' : 'Restock'}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        
         {/* Inline stock entry form */}
         {stockFormVariant && user?.storeId && (
           <div className="variant-stock-entry-panel">
@@ -257,51 +324,35 @@ function ProductDetailContent() {
             />
           </div>
         )}
-      </section>
+      </div>
 
-      {/* ── Week 6: Product photo & fingerprint ───────────────────────────── */}
-      {canEdit && (
-        <section aria-labelledby="photo-heading" className="card">
-          <h2 id="photo-heading" className="card__title">Photo Intelligence Capture</h2>
-          <PhotoCapture
-            productId={product.id}
-            enabled={true}
-            onAddPhoto={async (base64) => {
-              await ProductService.updateProduct(product.id, {
-                imageUrls: [...(product.imageUrls ?? []), base64],
-                updatedBy: user?.id ?? 'system',
-              });
-              await loadProduct();
-            }}
-          />
-        </section>
-      )}
-
-      {/* ── Week 6: Similar products (fingerprint-based) ──────────────────── */}
-      <section aria-labelledby="similar-heading" className="card">
-        <h2 id="similar-heading" className="card__title mb-3">
-          Visual Similarity Search
-        </h2>
-        <SimilarProductsPanel productId={product.id} />
-      </section>
-
-      {/* ── Week 6: Performance metrics ───────────────────────────────────── */}
-      <section aria-labelledby="perf-heading" className="card">
-        <h2 id="perf-heading" className="card__title mb-3">
-          Performance Analytics
-        </h2>
-        <ProductPerformancePanel productId={product.id} />
-      </section>
-
-      {/* ── Week 7: AI product analysis ───────────────────────────────────── */}
-      {canSeeAi && (
-        <section aria-labelledby="ai-heading" className="card">
-          <h2 id="ai-heading" className="card__title mb-3">
-            AI Product Analysis
-          </h2>
-          <AiProductAnalysisPanel productId={product.id} canRestock={canEdit} />
-        </section>
-      )}
+      <div className="product-split-grid">
+        <div className="product-panel">
+          <div className="product-panel__header">
+            <h2 className="product-panel__title">Visual Similarity Search</h2>
+          </div>
+          <SimilarProductsPanel productId={product.id} />
+        </div>
+        
+        {canEdit && (
+          <div className="product-panel">
+            <div className="product-panel__header">
+              <h2 className="product-panel__title">Photo Intelligence Capture</h2>
+            </div>
+            <PhotoCapture
+              productId={product.id}
+              enabled={true}
+              onAddPhoto={async (base64) => {
+                await ProductService.updateProduct(product.id, {
+                  imageUrls: [...(product.imageUrls ?? []), base64],
+                  updatedBy: user?.id ?? 'system',
+                });
+                await loadProduct();
+              }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -144,300 +144,445 @@ export function RestockForm() {
 
   if (restockResult) {
     return (
-      <div className="card animate-fade-in-up" style={{ maxWidth: 800, margin: '0 auto', padding: 'var(--space-6)' }}>
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-          <div className="pe-success-icon" style={{ margin: '0 auto 16px' }}>✓</div>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-2xl)', color: 'var(--color-ink)' }}>
-            Restock Completed Successfully
-          </h2>
-          <p style={{ color: 'var(--color-ink-secondary)', marginTop: '4px' }}>
-            Added <strong>{restockResult.totalQuantity}</strong> physical items with unique sequential barcodes to inventory.
-          </p>
-        </div>
-
-        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 'var(--space-6)' }}>
-          <div className="stat-card card">
-            <div className="stat-card__value">{restockResult.totalQuantity}</div>
-            <div className="stat-card__label">Units Added</div>
+      <div className="page-content" style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div className="restock-success-card animate-fade-in-up">
+          <div className="restock-success-icon">
+            <span className="material-symbols-outlined">check_circle</span>
           </div>
-          <div className="stat-card card">
-            <div className="stat-card__value">{fmt(restockResult.totalPurchaseCost)}</div>
-            <div className="stat-card__label">Purchase Spend</div>
+          <div className="restock-success-text">
+            <div className="restock-success-title-row">
+              <h1 className="restock-success-title">Restock completed</h1>
+              <span className="restock-badge">
+                <span className="material-symbols-outlined" style={{ fontSize: 14, marginRight: 4 }}>schedule</span>
+                {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })},{' '}
+                {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+            <p className="restock-success-desc">
+              Successfully logged <strong>{restockResult.totalQuantity}</strong> units of{' '}
+              <strong>{productDetail?.name} ({productDetail?.baseSku})</strong> into the inventory ledger. 
+              Supplier invoice verified and matched.
+            </p>
           </div>
-          <div className="stat-card card">
-            <div className="stat-card__value">{fmt(restockResult.expectedSalesValue)}</div>
-            <div className="stat-card__label">Expected Revenue</div>
-          </div>
-        </div>
-
-        <div className="card" style={{ background: 'var(--color-paper)', marginBottom: 'var(--space-6)' }}>
-          <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontSize: 'var(--text-base)', margin: 0 }}>
-              Generated Item Barcodes ({restockResult.barcodes.length})
-            </h3>
+          <div className="restock-success-actions">
             <button
               type="button"
-              className="btn btn--secondary btn--sm"
+              className="restock-btn restock-btn--secondary"
               onClick={() => window.print()}
+              style={{ width: 'auto' }}
             >
-              🖨️ Print Labels
+              <span className="material-symbols-outlined">receipt_long</span>
+              Inward Slip
             </button>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', maxHeight: 200, overflowY: 'auto', padding: 'var(--space-3)' }}>
-            {restockResult.barcodes.map((bc) => (
-              <span key={bc} className="sku-badge" style={{ fontSize: 'var(--text-xs)', padding: '4px 8px' }}>
-                {bc}
-              </span>
-            ))}
+        </div>
+        
+        <div className="restock-stats-grid">
+          <div className="restock-stat-card">
+            <div className="restock-stat-card__top">
+              <span className="restock-stat-card__label">Units Added</span>
+              <span className="material-symbols-outlined">inventory_2</span>
+            </div>
+            <div>
+              <div className="restock-stat-card__val">{restockResult.totalQuantity} units</div>
+              <div className="restock-stat-card__sub">Across {restockResult.barcodes.length} active tags</div>
+            </div>
+          </div>
+          <div className="restock-stat-card">
+            <div className="restock-stat-card__top">
+              <span className="restock-stat-card__label">Purchase Spend</span>
+              <span className="material-symbols-outlined">payments</span>
+            </div>
+            <div>
+              <div className="restock-stat-card__val">{fmt(restockResult.totalPurchaseCost)}</div>
+              <div className="restock-stat-card__sub">Total supplier value logged</div>
+            </div>
+          </div>
+          <div className="restock-stat-card">
+            <div className="restock-stat-card__top">
+              <span className="restock-stat-card__label">Expected Revenue</span>
+              <span className="material-symbols-outlined" style={{ color: 'var(--color-accent)' }}>trending_up</span>
+            </div>
+            <div>
+              <div className="restock-stat-card__val">{fmt(restockResult.expectedSalesValue)}</div>
+              <div className="restock-stat-card__sub">Gross Realizable Value</div>
+            </div>
           </div>
         </div>
-
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-          <button
-            type="button"
-            className="btn btn--secondary"
-            onClick={() => {
-              setRestockResult(null);
-              setSelectedProductId('');
-              setLines([]);
-            }}
-          >
-            Restock Another Product
-          </button>
-          <button
-            type="button"
-            className="btn btn--primary"
-            onClick={() => router.push(`/products/${productDetail?.id}`)}
-          >
-            View Product Details
-          </button>
+        
+        <div className="restock-barcodes-card">
+          <div className="restock-card__header" style={{ padding: '20px' }}>
+            <div className="restock-card__header-left">
+              <h2 className="restock-card__title">Generated Barcodes &amp; SKU Labels</h2>
+              <span className="restock-badge restock-badge--primary">{restockResult.barcodes.length} unique tags</span>
+            </div>
+            <p className="restock-card__meta" style={{ marginTop: 4 }}>
+              Print thermal sticker tags for incoming physical garments before placing them on display racks.
+            </p>
+          </div>
+          <div className="restock-barcodes-canvas">
+            <div className="restock-barcodes-grid">
+              {restockResult.barcodes.map((bc, idx) => (
+                <div key={bc} className="restock-barcode-chip">
+                  <div className="restock-barcode-chip__left">
+                    <span className="material-symbols-outlined restock-barcode-chip__icon">qr_code_2</span>
+                    <div className="restock-barcode-chip__col">
+                      <span className="restock-barcode-chip__val">{bc}</span>
+                    </div>
+                  </div>
+                  <span className="restock-barcode-chip__num">#{idx + 1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', padding: '16px 20px', borderTop: '1px solid var(--color-border)', justifyContent: 'flex-start', background: 'var(--color-surface)' }}>
+            <button
+              type="button"
+              className="restock-btn restock-btn--primary"
+              style={{ width: 'auto' }}
+              onClick={() => window.print()}
+            >
+              <span className="material-symbols-outlined">print</span>
+              Print All Labels
+            </button>
+            <button
+              type="button"
+              className="restock-btn restock-btn--secondary"
+              style={{ width: 'auto' }}
+              onClick={() => {
+                setRestockResult(null);
+                setSelectedProductId('');
+                setLines([]);
+              }}
+            >
+              <span className="material-symbols-outlined">add_circle</span>
+              Restock Another
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="page-content" noValidate>
-      <div className="page-header">
-        <div className="page-header__left">
-          <h1 className="page-header__title">Manual Restocking</h1>
-          <p className="page-subtitle">
-            Select an existing garment design, update cost/selling prices if changed, and enter restock quantities per size.
+    <form onSubmit={handleSubmit} noValidate>
+      <div className="restock-header">
+        <div>
+          <div className="restock-header__title-row">
+            <h1 className="restock-header__title">Restock</h1>
+            <span className="restock-badge">Batch Entry</span>
+          </div>
+          <p className="restock-header__subtitle">
+            Add incoming inventory, adjust procurement costs, and generate ledger batches
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="form-server-error" role="alert">
+        <div className="form-server-error" role="alert" style={{ marginTop: 'var(--space-6)' }}>
           <strong>Error:</strong> {error}
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 'var(--space-6)', alignItems: 'start' }}>
-        <div className="pe-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-          <section className="card">
-            <div className="card__header">
-              <h2 className="card__title">1. Select Garment to Restock</h2>
+      <div className="restock-stepper">
+        <div className="restock-stepper__inner">
+          <div className="restock-step">
+            <div className={`restock-step__icon ${!productDetail ? 'restock-step__icon--active' : ''}`}>
+              {productDetail ? <span className="material-symbols-outlined">check</span> : '1'}
+            </div>
+            <div className="restock-step__text">
+              <span className="restock-step__label">Step 1</span>
+              <span className="restock-step__title">Select Garment</span>
+            </div>
+          </div>
+          <div className={`restock-stepper__line ${!productDetail ? 'restock-stepper__line--faded' : ''}`} />
+          <div className="restock-step">
+            <div className={`restock-step__icon ${productDetail ? 'restock-step__icon--active' : ''}`}>2</div>
+            <div className="restock-step__text">
+              <span className="restock-step__label">Step 2</span>
+              <span className="restock-step__title">Supplier &amp; Batch</span>
+            </div>
+          </div>
+          <div className="restock-stepper__line restock-stepper__line--faded" />
+          <div className="restock-step">
+            <div className="restock-step__icon" style={{ background: 'var(--color-surface)', color: 'var(--color-ink-muted)', border: '1px solid var(--color-border)' }}>3</div>
+            <div className="restock-step__text">
+              <span className="restock-step__label" style={{ color: 'var(--color-ink-secondary)' }}>Step 3</span>
+              <span className="restock-step__title">Quantities &amp; Rates</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="restock-grid">
+        <div className="restock-main-col">
+          <div className="restock-card restock-card--padded">
+            <div className="restock-card__header">
+              <div className="restock-card__header-left">
+                <span className="material-symbols-outlined restock-card__icon">checkroom</span>
+                <h2 className="restock-card__title">1. Select Garment</h2>
+              </div>
+              <span className="restock-card__meta">Catalog Match</span>
             </div>
             
-            <div className="card__body" style={{ padding: 'var(--space-4)' }}>
-              <div style={{ marginBottom: 'var(--space-4)' }}>
+            <div className="restock-field">
+              <label className="restock-field__label">Search or Scan Product</label>
+              <div className="restock-input-wrap restock-input-wrap--search">
+                <span className="material-symbols-outlined">search</span>
                 <input
                   type="text"
-                  className="form-input"
+                  className="restock-input restock-input--search"
                   placeholder="Search product by name or SKU..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ width: '100%', maxWidth: 400 }}
                 />
               </div>
+            </div>
 
-              <div className="form-field">
-                <label className="form-label">Product</label>
+            {!productDetail && (
+              <div className="restock-field" style={{ marginTop: 8 }}>
                 <select
-                  className="form-select"
+                  className="restock-input"
                   value={selectedProductId}
                   onChange={(e) => setSelectedProductId(e.target.value)}
-                  style={{ maxWidth: 400 }}
                 >
                   <option value="">-- Choose a product --</option>
                   {filteredProducts.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.baseSku}) — Current Stock: {p.totalInStock}
+                      {p.name} ({p.baseSku})
                     </option>
                   ))}
                 </select>
               </div>
-            </div>
-          </section>
+            )}
+
+            {productDetail && (
+              <div className="restock-product-chip">
+                <div className="restock-product-chip__left">
+                  <div className="restock-product-chip__icon">
+                    <span className="material-symbols-outlined">apparel</span>
+                  </div>
+                  <div>
+                    <div className="restock-product-chip__name-row">
+                      <span className="restock-product-chip__name">{productDetail.name}</span>
+                      <span className="restock-product-chip__sku">{productDetail.baseSku}</span>
+                    </div>
+                    <div className="restock-product-chip__meta-row">
+                      <span>Category: {productDetail.categoryName}</span>
+                      <span>•</span>
+                      <span className="restock-product-chip__meta-highlight">{lines.length} active size variants</span>
+                    </div>
+                  </div>
+                </div>
+                <span className="restock-badge" style={{ color: 'var(--color-pending, #D97706)', background: 'var(--color-pending-bg, #FFFBEB)', borderColor: 'var(--color-pending-border, #FDE68A)' }}>
+                  Current: {productDetail.variants.reduce((s,v) => s + v.stock.inStock, 0)} units in stock
+                </span>
+              </div>
+            )}
+          </div>
 
           {productDetail && (
-            <section className="card">
-              <div className="card__header">
-                <h2 className="card__title">2. Supplier &amp; Batch Details</h2>
+            <div className="restock-card restock-card--padded">
+              <div className="restock-card__header">
+                <div className="restock-card__header-left">
+                  <span className="material-symbols-outlined restock-card__icon">local_shipping</span>
+                  <h2 className="restock-card__title">2. Supplier &amp; Batch Details</h2>
+                </div>
               </div>
-
-              <div className="card__body" style={{ padding: 'var(--space-4)' }}>
-                <div className="form-grid">
-                  <SupplierSelect
-                    id="restock-supplier"
-                    storeId={storeId}
-                    value={selectedSupplierId}
-                    onChange={setSelectedSupplierId}
-                    placeholder="-- No supplier assigned --"
-                  />
-
-                  <div className="form-field">
-                    <label className="form-label">Restock Notes / Invoice No.</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. Invoice #PO-2026-89 from Mumbai Mill"
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+                <div className="restock-field">
+                  <label className="restock-field__label">Supplier</label>
+                  <div className="restock-input-wrap restock-input-wrap--select">
+                    <SupplierSelect
+                      id="restock-supplier"
+                      storeId={storeId}
+                      value={selectedSupplierId}
+                      onChange={setSelectedSupplierId}
+                      placeholder="-- No supplier assigned --"
                     />
                   </div>
                 </div>
+                
+                <div className="restock-field">
+                  <label className="restock-field__label">Supplier Invoice / Batch Reference</label>
+                  <div className="restock-input-wrap restock-input-wrap--invoice">
+                    <input
+                      type="text"
+                      className="restock-input"
+                      style={{ fontFamily: 'var(--font-mono)' }}
+                      placeholder="e.g. INV-2026-OCT-8891"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                    />
+                    <span className="material-symbols-outlined">receipt</span>
+                  </div>
+                </div>
               </div>
-            </section>
+            </div>
           )}
 
           {productDetail && (
-            <section className="card">
-              <div className="card__header">
-                <h2 className="card__title">3. Size-Wise Restock Quantities &amp; Rates</h2>
+            <div className="restock-card">
+              <div className="restock-card__header" style={{ padding: '20px' }}>
+                <div className="restock-card__header-left">
+                  <span className="material-symbols-outlined restock-card__icon">tune</span>
+                  <h2 className="restock-card__title">3. Quantities &amp; Rates</h2>
+                </div>
+                <p className="restock-card__meta" style={{ marginTop: 4 }}>
+                  Update unit cost or selling price if revised, then enter restock quantities for each size variant.
+                </p>
               </div>
-
-              <table className="table" style={{ width: '100%', fontSize: 'var(--text-sm)' }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: 'left' }}>Size / Variant</th>
-                    <th style={{ textAlign: 'center' }}>Current Stock</th>
-                    <th style={{ textAlign: 'right', width: 120 }}>Cost (₹)</th>
-                    <th style={{ textAlign: 'right', width: 120 }}>Selling (₹)</th>
-                    <th style={{ textAlign: 'center', width: 130 }}>+ Restock Qty</th>
-                    <th style={{ textAlign: 'right' }}>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lines.map((line) => {
-                    const cp = line.costPriceOverride ?? productDetail.baseCostPrice;
-                    const sp = line.sellingPriceOverride ?? productDetail.baseSellingPrice;
-                    const lineTotal = (line.restockQty || 0) * cp;
-
-                    return (
-                      <tr key={line.variantId}>
-                        <td>
-                          <strong>{line.sizeName}</strong>
-                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
-                            {line.sku}
-                          </div>
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                          <span className={`badge ${line.currentStock === 0 ? 'badge--return' : line.currentStock <= 5 ? 'badge--caution' : 'badge--neutral'}`}>
-                            {line.currentStock}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <input
-                            type="number"
-                            className="form-input form-input--sm"
-                            value={cp}
-                            onChange={(e) => handleCostChange(line.variantId, parseFloat(e.target.value) || 0)}
-                            style={{ textAlign: 'right', width: '100%' }}
-                          />
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <input
-                            type="number"
-                            className="form-input form-input--sm"
-                            value={sp}
-                            onChange={(e) => handlePriceChange(line.variantId, parseFloat(e.target.value) || 0)}
-                            style={{ textAlign: 'right', width: '100%' }}
-                          />
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                          <input
-                            type="number"
-                            min={0}
-                            className="form-input form-input--sm"
-                            value={line.restockQty || ''}
-                            placeholder="0"
-                            onChange={(e) => handleQtyChange(line.variantId, parseInt(e.target.value) || 0)}
-                            style={{ textAlign: 'center', fontWeight: 'bold', width: '100%' }}
-                          />
-                        </td>
-                        <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                          {line.restockQty > 0 ? fmt(lineTotal) : '—'}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </section>
-          )}
-
-          {productDetail && (
-            <div className="form-actions" style={{ marginTop: 'var(--space-2)' }}>
-              <button
-                type="button"
-                className="btn btn--secondary"
-                onClick={() => router.push('/products')}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn--primary"
-                disabled={isSubmitting || summary.totalQty === 0}
-              >
-                {isSubmitting ? 'Processing...' : `Complete Restock (${summary.totalQty} Units)`}
-              </button>
+              <div className="restock-table-wrap">
+                <table className="restock-table">
+                  <thead>
+                    <tr>
+                      <th>Size / Variant</th>
+                      <th>Current Stock</th>
+                      <th style={{ width: 140 }}>Unit Cost</th>
+                      <th style={{ width: 140 }}>Selling Price</th>
+                      <th style={{ textAlign: 'center', width: 160 }}>+ Restock Qty</th>
+                      <th style={{ textAlign: 'right' }}>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lines.map((line) => {
+                      const cp = line.costPriceOverride ?? productDetail.baseCostPrice;
+                      const sp = line.sellingPriceOverride ?? productDetail.baseSellingPrice;
+                      const lineTotal = (line.restockQty || 0) * cp;
+                      
+                      return (
+                        <tr key={line.variantId}>
+                          <td>
+                            <div style={{ fontWeight: 500, color: 'var(--color-ink)' }}>{line.sizeName}</div>
+                            <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-ink-secondary)', marginTop: 2 }}>{line.sku}</div>
+                          </td>
+                          <td>
+                            <span className="restock-badge" style={line.currentStock === 0 ? { color: 'var(--color-return, #DC2626)', background: '#FEF2F2', borderColor: '#FCA5A5' } : {}}>
+                              {line.currentStock} in stock
+                            </span>
+                          </td>
+                          <td>
+                            <div className="restock-input-wrap">
+                              <span className="restock-input-currency-symbol">₹</span>
+                              <input
+                                type="number"
+                                className="restock-input restock-input--currency"
+                                value={cp}
+                                onChange={(e) => handleCostChange(line.variantId, parseFloat(e.target.value) || 0)}
+                              />
+                            </div>
+                          </td>
+                          <td>
+                            <div className="restock-input-wrap">
+                              <span className="restock-input-currency-symbol">₹</span>
+                              <input
+                                type="number"
+                                className="restock-input restock-input--currency"
+                                value={sp}
+                                onChange={(e) => handlePriceChange(line.variantId, parseFloat(e.target.value) || 0)}
+                              />
+                            </div>
+                          </td>
+                          <td>
+                            <div className={`restock-qty-ctrl ${line.restockQty > 0 ? 'restock-qty-ctrl--active' : ''}`}>
+                              <button
+                                type="button"
+                                className="restock-qty-btn"
+                                onClick={() => handleQtyChange(line.variantId, (line.restockQty || 0) - 1)}
+                              >-</button>
+                              <input
+                                type="number"
+                                className="restock-qty-input"
+                                min={0}
+                                value={line.restockQty || ''}
+                                placeholder="0"
+                                onChange={(e) => handleQtyChange(line.variantId, parseInt(e.target.value) || 0)}
+                              />
+                              <button
+                                type="button"
+                                className="restock-qty-btn"
+                                onClick={() => handleQtyChange(line.variantId, (line.restockQty || 0) + 1)}
+                              >+</button>
+                            </div>
+                          </td>
+                          <td style={{ textAlign: 'right', fontWeight: 500, fontFamily: 'var(--font-mono)' }}>
+                            {line.restockQty > 0 ? fmt(lineTotal) : '₹0'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
 
-        <aside className="card" aria-label="Restock summary" style={{ position: 'sticky', top: 'var(--space-6)' }}>
-          <div className="card__header">
-            <h3 className="card__title">Restock Summary</h3>
-          </div>
-          <div className="card__body" style={{ padding: 'var(--space-4)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
-                <span style={{ color: 'var(--color-ink-secondary)' }}>Total Restock Qty</span>
-                <strong style={{ fontSize: 'var(--text-base)' }}>{summary.totalQty > 0 ? summary.totalQty : '—'}</strong>
+        <div className="restock-side-col">
+          <div className="restock-card restock-card--padded">
+            <div className="restock-card__header" style={{ paddingBottom: 12, borderBottom: '1px solid var(--color-border)' }}>
+              <div className="restock-card__header-left">
+                <span className="material-symbols-outlined restock-card__icon">analytics</span>
+                <h3 className="restock-card__title">Restock Summary</h3>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
-                <span style={{ color: 'var(--color-ink-secondary)' }}>Purchase Spend</span>
-                <strong>{summary.totalCost > 0 ? fmt(summary.totalCost) : '—'}</strong>
+              <span className="restock-badge restock-badge--primary">{lines.length} Variants</span>
+            </div>
+            
+            <div className="restock-summary-list">
+              <div className="restock-summary-row">
+                <span className="restock-summary-row__label">Total Units Added</span>
+                <span className="restock-summary-row__val">{summary.totalQty} units</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
-                <span style={{ color: 'var(--color-ink-secondary)' }}>Expected Revenue</span>
-                <strong>{summary.expectedSales > 0 ? fmt(summary.expectedSales) : '—'}</strong>
+              <div className="restock-summary-row">
+                <span className="restock-summary-row__label">Total Purchase Spend</span>
+                <span className="restock-summary-row__val restock-summary-row__val--mono">{fmt(summary.totalCost)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '12px', marginTop: '4px' }}>
-                <span style={{ color: 'var(--color-ink-secondary)', fontWeight: 600 }}>Potential Margin</span>
-                <strong style={{ color: 'var(--color-paid)' }}>{summary.profit > 0 ? fmt(summary.profit) : '—'}</strong>
+              <div className="restock-summary-row">
+                <span className="restock-summary-row__label">Gross Realizable Value</span>
+                <span className="restock-summary-row__val restock-summary-row__val--mono" style={{ fontWeight: 400 }}>{fmt(summary.expectedSales)}</span>
+              </div>
+              
+              <div style={{ height: 1, background: 'var(--color-border)', margin: '8px 0' }}></div>
+              
+              <div className="restock-summary-row restock-summary-row--profit">
+                <span className="restock-summary-row__label">Potential Gross Profit</span>
+                <span className="restock-summary-row__val restock-summary-row__val--mono">{fmt(summary.profit)}</span>
               </div>
             </div>
 
-            {summary.totalQty > 0 ? (
-              <div style={{ marginTop: 'var(--space-4)' }}>
-                <div style={{ height: 6, background: 'var(--color-border)', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ width: `${Math.min(100, Math.max(0, summary.margin))}%`, height: '100%', background: 'var(--color-paid)' }} />
-                </div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', marginTop: '6px', textAlign: 'right' }}>
-                  {summary.margin.toFixed(1)}% projected gross margin
-                </div>
+            <div className="restock-margin-bar">
+              <div className="restock-margin-bar__track">
+                <div className="restock-margin-bar__fill" style={{ width: `${Math.max(0, Math.min(100, summary.margin))}%` }}></div>
               </div>
-            ) : (
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-muted)', marginTop: 'var(--space-4)', textAlign: 'center', padding: 'var(--space-2)' }}>
-                Select sizes and enter restock quantities to preview spend and profit margins.
-              </p>
-            )}
+              <div className="restock-margin-bar__labels">
+                <span>Procurement {(100 - summary.margin).toFixed(1)}%</span>
+                <span>Margin {summary.margin.toFixed(1)}%</span>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+              <button
+                type="submit"
+                className="restock-btn restock-btn--primary"
+                disabled={isSubmitting || summary.totalQty === 0}
+              >
+                <span className="material-symbols-outlined">check_circle</span>
+                {isSubmitting ? 'Processing...' : `Complete Restock (${summary.totalQty} Units)`}
+              </button>
+              <button
+                type="button"
+                className="restock-btn restock-btn--secondary"
+                onClick={() => {
+                  setLines([]);
+                  setSelectedProductId('');
+                  setProductDetail(null);
+                }}
+              >
+                Cancel &amp; Discard
+              </button>
+            </div>
           </div>
-        </aside>
+        </div>
       </div>
     </form>
   );

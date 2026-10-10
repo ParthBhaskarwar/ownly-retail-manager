@@ -31,6 +31,7 @@ function BillingPageContent() {
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isClearCartModalOpen, setIsClearCartModalOpen] = useState(false);
   const [isSubmittingCheckout, setIsSubmittingCheckout] = useState(false);
 
   // Invoice output modal state
@@ -137,7 +138,7 @@ function BillingPageContent() {
   };
 
   return (
-    <div className="pos-container">
+    <div className="billing-layout">
       {/* Toast alert */}
       {toastMessage && (
         <div className="toast-container">
@@ -152,109 +153,145 @@ function BillingPageContent() {
       )}
 
       {/* Main Header */}
-      <div className="pos-header">
-        <div className="pos-header__titles">
-          <h1 className="pos-header__title">POS Billing Checkout</h1>
-          <span className="pos-header__subtitle">
-            {store?.name || 'Retail Store'} • Cashier: <strong>{user?.name || 'Active Cashier'}</strong>
-          </span>
+      <div className="billing-header">
+        <div className="billing-header-info">
+          <div className="billing-title-wrap">
+            <h1 className="billing-title">POS Billing</h1>
+            <span className="billing-status-badge">
+              <span className="billing-status-dot"></span>
+              Terminal Online
+            </span>
+          </div>
+          <div className="billing-meta">
+            {store?.name || 'Retail Store'} • Cashier: <span className="billing-meta-highlight">{user?.name || 'Active Cashier'}</span> • Register 01
+          </div>
         </div>
 
-        <div className="pos-header__actions">
-          {/* Customer Selection Tag */}
+        {/* Customer Selection Tag */}
+        <div className="customer-pill">
+          <div className="customer-pill-icon">
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>person</span>
+          </div>
+          <div className="customer-pill-info">
+            <span className="customer-pill-name">{customer ? customer.name : 'Walk-in Customer'}</span>
+            <span className="customer-pill-tier">{customer ? customer.phone : 'Default Tier'}</span>
+          </div>
           <button
             type="button"
             onClick={() => setIsCustomerModalOpen(true)}
-            className="pos-customer-chip"
+            className="customer-pill-action"
           >
-            <span className="pos-customer-chip__icon">👤</span>
-            <span>{customer ? `${customer.name} (${customer.phone})` : 'Walk-in Customer'}</span>
-            <span className="pos-customer-chip__change">Change</span>
+            Change
           </button>
-
-          {/* Reset Cart */}
-          {cartItems.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                if (confirm('Clear all items from the cart?')) {
-                  setCartItems([]);
-                  setDiscount(null);
-                }
-              }}
-              className="btn btn-secondary btn-sm"
-              style={{ color: 'var(--color-return)' }}
-            >
-              Clear Cart
-            </button>
-          )}
         </div>
       </div>
 
       {/* Barcode Scanner Section */}
-      <BarcodeScannerInput onBarcodeScanned={handleBarcodeScanned} isLoading={isLoading} />
+      <div className="scanner-hero">
+        <div className="scanner-hero-top">
+          <div className="scanner-ready">
+            <span style={{ position: 'relative', display: 'flex', width: '8px', height: '8px' }}>
+              <span style={{ position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', backgroundColor: 'var(--color-paid)', opacity: 0.75, animation: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite' }}></span>
+              <span style={{ position: 'relative', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--color-paid)' }}></span>
+            </span>
+            <span className="scanner-ready-title">
+              Barcode Scanner Ready <span className="scanner-ready-sub">(USB / Bluetooth / Keyboard)</span>
+            </span>
+          </div>
+          <span className="scanner-badge">Auto-Detect Active</span>
+        </div>
+        <BarcodeScannerInput onBarcodeScanned={handleBarcodeScanned} isLoading={isLoading} />
+      </div>
 
       {/* Main POS Grid (Cart + Bill Summary) */}
-      <div className="pos-grid">
+      <div className="billing-grid">
         {/* Left Col: Cart Items Table */}
-        <div>
-          <CartTable
-            items={cartItems}
-            onRemoveItem={handleRemoveCartItem}
-            onUpdateLineDiscount={handleUpdateLineDiscount}
-          />
+        <div className="billing-col-left">
+          <div className="cart-header">
+            <div className="cart-header-title">
+              <h2 className="cart-title">Current Cart</h2>
+              <span className="cart-count-badge">{cartItems.length} items</span>
+            </div>
+            {cartItems.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsClearCartModalOpen(true)}
+                className="cart-clear-btn"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete_sweep</span>
+                Clear Cart
+              </button>
+            )}
+          </div>
+          
+          <div className="cart-container">
+            {cartItems.length > 0 ? (
+              <CartTable
+                items={cartItems}
+                onRemoveItem={handleRemoveCartItem}
+                onUpdateLineDiscount={handleUpdateLineDiscount}
+              />
+            ) : (
+              <div className="cart-empty">
+                <div className="cart-empty-icon">
+                  <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>shopping_cart_checkout</span>
+                </div>
+                <h3 className="cart-empty-title">Cart is currently empty</h3>
+                <p className="cart-empty-desc">Scan an item barcode with your handheld reader, camera scanner, or search by SKU above to start creating the bill.</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Col: Bill Summary Card */}
-        <div>
-          <div className="bill-card">
-            <div className="bill-card__header">
-              <h2 className="bill-card__title">Bill Summary</h2>
-              <span className="badge badge--denim badge--sm">{cartItems.length} Items</span>
+        <div className="billing-col-right">
+          <div className="bill-summary">
+            <div className="bill-summary-header">
+              <h2 className="bill-summary-title">Bill Summary</h2>
+              <span className="bill-summary-badge">{cartItems.length} ITEMS ({cartItems.reduce((acc, it) => acc + it.quantity, 0)} UNITS)</span>
             </div>
 
-            <div className="bill-card__rows">
-              <div className="bill-card__row">
-                <span>Items Subtotal:</span>
-                <span className="bill-card__row-val">₹{rawSubtotal.toFixed(2)}</span>
+            <div className="bill-summary-list">
+              <div className="bill-summary-row">
+                <span className="bill-summary-label">Items Subtotal</span>
+                <span className="bill-summary-val">₹{rawSubtotal.toFixed(2)}</span>
               </div>
 
               {/* Discount Row */}
-              <div className="bill-card__row">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                  <span>Bill Discount:</span>
+              <div className="bill-summary-row">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span className="bill-summary-label">Bill Discount</span>
                   <button
                     type="button"
                     onClick={() => setIsDiscountModalOpen(true)}
-                    className="link-btn"
-                    style={{ fontSize: 'var(--text-xs)' }}
+                    style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-accent)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                   >
                     {discount ? '(Edit)' : '+ Add'}
                   </button>
                 </div>
-                <span className={`bill-card__row-val ${discount ? 'bill-card__row-val--discount' : ''}`}>
+                <span className="bill-summary-val" style={{ color: discount ? 'var(--color-paid)' : 'inherit' }}>
                   {discount ? `-₹${billDiscountAmount.toFixed(2)}` : '₹0.00'}
                 </span>
               </div>
 
-              {discount && (
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', textAlign: 'right' }}>
-                  {discount.type === 'PERCENTAGE' ? `${discount.value}% Bill Discount` : `₹${discount.value} Flat Discount`}
+              <div style={{ padding: '8px 0', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div className="bill-summary-row">
+                  <span className="bill-summary-label">Tax Breakdown (GST)</span>
+                  <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Included</span>
                 </div>
-              )}
-
-              {taxAmount > 0 && (
-                <div className="bill-card__row">
-                  <span>GST{store?.taxSettings?.inclusiveTax ? ' (included)' : ''}:</span>
-                  <span className="bill-card__row-val">₹{taxAmount.toFixed(2)}</span>
-                </div>
-              )}
-
-              {/* Grand Total Row */}
-              <div className="bill-card__total-row">
-                <span className="bill-card__total-label">Grand Total:</span>
-                <span className="bill-card__total-amount">₹{grandTotal.toFixed(2)}</span>
+                <p style={{ fontSize: '11px', color: 'var(--color-ink-secondary)', margin: 0 }}>
+                  GST included in prices (5% apparel): <span style={{ fontWeight: 600, color: 'var(--color-ink)' }}>₹{taxAmount.toFixed(2)}</span>
+                </p>
               </div>
+            </div>
+
+            {/* Grand Total Row */}
+            <div className="bill-summary-total-box">
+              <div>
+                <span className="bill-summary-total-label">Grand Total</span>
+                <span style={{ fontSize: '10px', color: 'var(--color-ink-secondary)' }}>Round off: ₹0.00</span>
+              </div>
+              <span className="bill-summary-total-val">₹{grandTotal.toFixed(2)}</span>
             </div>
 
             {/* Pay Button */}
@@ -262,9 +299,10 @@ function BillingPageContent() {
               type="button"
               onClick={() => setIsPaymentModalOpen(true)}
               disabled={cartItems.length === 0}
-              className="btn btn-primary bill-card__checkout-btn"
+              className="pay-btn"
             >
-              <span>💳 Proceed to Payment</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>credit_card</span>
+              <span>Proceed to Payment (F4)</span>
             </button>
           </div>
         </div>
@@ -295,53 +333,121 @@ function BillingPageContent() {
         isSubmitting={isSubmittingCheckout}
       />
 
-      {/* Completed Invoice Output Modal */}
       {completedInvoice && (
         <div className="pos-modal-overlay">
           <div className="pos-modal pos-modal--wide">
-            <div className="pos-modal__header">
-              <h3 className="pos-modal__title">Sale Completed Successfully</h3>
+            <div className="pos-modal__header" style={{ padding: '24px 24px 16px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-paper)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <div>
+                <h3 className="pos-modal__title" style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)', margin: 0 }}>Sale Completed</h3>
+                <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', margin: '4px 0 0 0', fontWeight: 'var(--font-medium)' }}>Transaction recorded successfully</p>
+              </div>
               <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                 <button
                   type="button"
                   className={`btn btn-sm ${invoicePrintFormat === 'THERMAL' ? 'btn-primary' : 'btn-secondary'}`}
                   onClick={() => setInvoicePrintFormat('THERMAL')}
+                  style={invoicePrintFormat === 'THERMAL' ? { backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)', border: '1px solid var(--color-accent-border)', boxShadow: 'var(--shadow-raised)' } : { color: 'var(--color-ink-secondary)' }}
                 >
-                  🧾 80mm Thermal
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>receipt_long</span> 80mm Thermal
                 </button>
                 <button
                   type="button"
                   className={`btn btn-sm ${invoicePrintFormat === 'A4' ? 'btn-primary' : 'btn-secondary'}`}
                   onClick={() => setInvoicePrintFormat('A4')}
+                  style={invoicePrintFormat === 'A4' ? { backgroundColor: 'var(--color-surface)', color: 'var(--color-accent)', border: '1px solid var(--color-accent-border)', boxShadow: 'var(--shadow-raised)' } : { color: 'var(--color-ink-secondary)' }}
                 >
-                  📄 A4 Invoice
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>description</span> A4 Invoice
                 </button>
+                
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: 'var(--color-accent)', color: 'white', borderRadius: 'var(--radius-md)', border: 'none', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', cursor: 'pointer', marginLeft: '8px' }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>print</span> Print
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setCompletedInvoice(null)}
-                  className="modal-close"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: 'var(--radius-md)', border: 'none', background: 'transparent', color: 'var(--color-ink-secondary)', cursor: 'pointer', marginLeft: '4px' }}
                   aria-label="Close invoice preview"
                 >
-                  &times;
+                  <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
             </div>
 
-            <div className="pos-modal__body">
+            <div className="pos-modal__body" style={{ padding: '24px', backgroundColor: 'var(--color-paper)', display: 'flex', justifyContent: 'center', maxHeight: '480px', overflowY: 'auto' }}>
               {invoicePrintFormat === 'THERMAL' ? (
-                <ThermalInvoiceView invoice={completedInvoice} onClose={() => setCompletedInvoice(null)} />
+                <ThermalInvoiceView invoice={completedInvoice} onClose={() => {}} />
               ) : (
-                <A4InvoiceView invoice={completedInvoice} onClose={() => setCompletedInvoice(null)} />
+                <A4InvoiceView invoice={completedInvoice} onClose={() => {}} />
               )}
             </div>
 
-            <div className="pos-modal__footer">
+            <div className="pos-modal__footer" style={{ padding: '16px 24px', backgroundColor: 'var(--color-paper)', borderTop: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>keyboard</span>
+                <span>Shortcut: Press <kbd style={{ padding: '2px 6px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '4px', fontFamily: 'var(--font-mono)' }}>Space</kbd> to Print or <kbd style={{ padding: '2px 6px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '4px', fontFamily: 'var(--font-mono)' }}>N</kbd> for New Bill</span>
+              </div>
               <button
                 type="button"
                 onClick={() => setCompletedInvoice(null)}
-                className="btn btn-primary"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', backgroundColor: 'var(--color-accent)', color: 'white', borderRadius: 'var(--radius-md)', border: 'none', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', cursor: 'pointer' }}
               >
-                + Start New Bill
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>add</span> Start New Bill
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear Cart Modal */}
+      {isClearCartModalOpen && (
+        <div 
+          className="billing-modal-overlay"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setIsClearCartModalOpen(false);
+            if (e.key === 'Enter') {
+              setCartItems([]);
+              setDiscount(null);
+              setIsClearCartModalOpen(false);
+            }
+          }}
+        >
+          <div className="billing-modal-card" style={{ maxWidth: '380px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-return-tint)', color: 'var(--color-return)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>warning</span>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>Clear Active Cart?</h3>
+                <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)' }}>All {cartItems.length} added line items will be removed.</p>
+              </div>
+            </div>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', marginBottom: '20px' }}>
+              Are you sure you want to discard this bill transaction? This action cannot be reversed.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+              <button
+                autoFocus
+                type="button"
+                onClick={() => setIsClearCartModalOpen(false)}
+                style={{ padding: '6px 12px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--color-ink)', cursor: 'pointer' }}
+              >
+                Cancel (Esc)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCartItems([]);
+                  setDiscount(null);
+                  setIsClearCartModalOpen(false);
+                }}
+                style={{ padding: '6px 12px', backgroundColor: 'var(--color-return)', border: 'none', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'white', cursor: 'pointer' }}
+              >
+                Yes, Clear All
               </button>
             </div>
           </div>

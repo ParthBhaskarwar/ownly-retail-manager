@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding - Store Setup - Ownly Retail Manager</title>
+<!-- Tailwind CSS CDN with forms and container queries plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Newsreader (Serif) & Inter (Sans) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="custom-typography">
+    .font-serif-heading {
+      font-family: 'Newsreader', Georgia, serif;
+    }
+    .font-sans-body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-[#F7F6F4] text-stone-800 font-sans-body min-h-screen flex flex-col justify-center items-center py-10 px-4 selection:bg-[#0F766E]/20 selection:text-[#0F766E]">
+<!-- BEGIN: OnboardingContainer -->
+<main class="w-full max-w-[500px] flex flex-col items-center">
+<!-- BEGIN: BrandHeader -->
+<header class="flex items-center gap-3.5 mb-7 select-none" data-purpose="brand-identity">
+<!-- Brand Logo Badge -->
+<div class="w-10 h-10 rounded-xl bg-[#0F766E] flex items-center justify-center shadow-sm">
+<span class="text-white font-serif-heading font-bold text-2xl leading-none">O</span>
+</div>
+<!-- Brand Titles -->
+<div class="flex flex-col">
+<span class="font-serif-heading text-2xl font-bold tracking-tight text-stone-900 leading-tight">Ownly</span>
+<span class="text-[10px] uppercase font-bold tracking-[0.2em] text-stone-500 -mt-0.5">Retail Manager</span>
+</div>
+</header>
+<!-- END: BrandHeader -->
+<!-- BEGIN: ProgressIndicator -->
+<!-- 3-Step Wizard Navigation Indicator matching Screen 72 styling -->
+<nav aria-label="Onboarding Progress" class="flex items-center justify-center gap-2 mb-6 w-full text-xs" data-purpose="step-indicator">
+<!-- Step 1: Retail Type (Completed) -->
+<div class="flex items-center gap-1.5 text-stone-500 font-medium">
+<span class="w-4 h-4 rounded-full bg-teal-50 border border-[#0F766E]/30 text-[#0F766E] flex items-center justify-center">
+<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<span class="text-stone-600">Retail Type</span>
+</div>
+<!-- Connector Line 1 to 2 -->
+<div class="w-6 sm:w-8 h-[1px] bg-stone-300"></div>
+<!-- Step 2: Store Setup (Active) -->
+<div class="relative flex items-center gap-1.5 font-semibold text-[#0F766E] pb-1">
+<span class="w-4 h-4 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold">2</span>
+<span>Store Setup</span>
+<!-- Active underline indicator matching Screen 72 design pattern -->
+<span class="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0F766E] rounded-full"></span>
+</div>
+<!-- Connector Line 2 to 3 -->
+<div class="w-6 sm:w-8 h-[1px] bg-stone-300"></div>
+<!-- Step 3: Done (Upcoming) -->
+<div class="flex items-center gap-1.5 text-stone-400 font-normal">
+<span class="w-4 h-4 rounded-full border border-stone-300 text-stone-400 flex items-center justify-center text-[10px]">3</span>
+<span>Done</span>
+</div>
+</nav>
+<!-- END: ProgressIndicator -->
+<!-- BEGIN: MainCardContainer -->
+<section class="bg-white border border-[#E7E5E4] rounded-2xl shadow-sm p-6 sm:p-8 w-full" data-purpose="setup-form-card">
+<!-- Card Title & Subtitle -->
+<div class="text-center mb-6">
+<h1 class="font-serif-heading text-2xl sm:text-[26px] font-bold text-stone-900 tracking-tight">Set up your store</h1>
+<p class="text-xs sm:text-sm text-stone-500 mt-1.5 leading-relaxed">
+          Configure your essential business details and billing preferences.
+        </p>
+</div>
+<!-- Store Configuration Form -->
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<!-- Field 1: Store Name -->
+<div>
+<label class="block text-[11px] font-bold tracking-wider text-stone-500 uppercase mb-1.5" for="store-name">
+            Store Name <span class="text-rose-500">*</span>
+</label>
+<input class="w-full text-sm font-medium text-stone-900 bg-white border border-[#E7E5E4] rounded-lg px-3.5 py-2.5 shadow-none focus:outline-none focus:ring-1 focus:ring-[#0F766E] focus:border-[#0F766E] transition-all" id="store-name" name="storeName" placeholder="e.g. Tulsi Collection" required="" type="text" value="Tulsi Collection"/>
+</div>
+<!-- Field 2: Store Address -->
+<div>
+<label class="block text-[11px] font-bold tracking-wider text-stone-500 uppercase mb-1.5" for="store-address">
+            Store Address <span class="text-rose-500">*</span>
+</label>
+<input class="w-full text-sm font-medium text-stone-900 bg-white border border-[#E7E5E4] rounded-lg px-3.5 py-2.5 shadow-none focus:outline-none focus:ring-1 focus:ring-[#0F766E] focus:border-[#0F766E] transition-all" id="store-address" name="storeAddress" placeholder="Street address, shop number, locality" required="" type="text" value="Shop 4, MG Road, Gandhi Market, Jintoor"/>
+</div>
+<!-- Field 3: Contact Phone -->
+<div>
+<label class="block text-[11px] font-bold tracking-wider text-stone-500 uppercase mb-1.5" for="contact-phone">
+            Contact Phone <span class="text-rose-500">*</span>
+</label>
+<div class="relative flex rounded-lg border border-[#E7E5E4] focus-within:ring-1 focus-within:ring-[#0F766E] focus-within:border-[#0F766E] overflow-hidden">
+<span class="inline-flex items-center px-3 text-xs font-semibold text-stone-600 bg-stone-50 border-r border-[#E7E5E4] select-none">
+              🇮🇳 +91
+            </span>
+<input class="w-full border-0 text-sm font-medium text-stone-900 px-3.5 py-2.5 focus:ring-0 focus:outline-none" id="contact-phone" name="contactPhone" placeholder="10-digit mobile number" required="" type="tel" value="99709 02298"/>
+</div>
+</div>
+<!-- Field 4: GSTIN / Tax ID -->
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="text-[11px] font-bold tracking-wider text-stone-500 uppercase" for="gstin-number">
+              GSTIN / Tax ID
+            </label>
+<span class="text-[10px] text-stone-400 font-medium uppercase tracking-wide">Optional</span>
+</div>
+<input class="font-mono-code uppercase w-full text-sm text-stone-900 placeholder:text-stone-400 bg-white border border-[#E7E5E4] rounded-lg px-3.5 py-2.5 shadow-none focus:outline-none focus:ring-1 focus:ring-[#0F766E] focus:border-[#0F766E] transition-all" id="gstin-number" name="gstin" placeholder="e.g. 27AAAAA0000A1Z5" type="text"/>
+</div>
+<!-- Field 5: GST Configuration Controls (Toggle & Rate) -->
+<div class="p-3.5 rounded-xl border border-stone-200/80 bg-stone-50/70 space-y-3.5" data-purpose="tax-configuration">
+<!-- GST Enablement Toggle -->
+<div class="flex items-center justify-between">
+<div>
+<span class="block text-[11px] font-bold tracking-wider text-stone-700 uppercase">Enable GST Invoicing</span>
+<span class="block text-[11px] text-stone-500">Apply tax slabs &amp; print GST on receipts</span>
+</div>
+<!-- Custom Styled Toggle Switch (Active/ON) -->
+<button aria-checked="true" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-[#0F766E] transition-colors duration-200 ease-in-out focus:outline-none" role="switch" type="button">
+<span class="sr-only">Toggle GST Invoicing</span>
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<div class="h-[1px] bg-stone-200/80"></div>
+<!-- Default GST Rate Dropdown -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+<div>
+<label class="block text-[11px] font-bold tracking-wider text-stone-600 uppercase" for="gst-rate">
+                Default GST Rate
+              </label>
+<span class="block text-[10px] text-stone-400">Can be overridden per item</span>
+</div>
+<div>
+<select class="w-full text-xs font-medium text-stone-800 bg-white border border-[#E7E5E4] rounded-lg px-3 py-2 focus:ring-1 focus:ring-[#0F766E] focus:border-[#0F766E]" id="gst-rate" name="gstRate">
+<option selected="" value="5">5% (Apparel standard)</option>
+<option value="12">12% (Footwear standard)</option>
+<option value="18">18% (Accessories / General)</option>
+<option value="0">0% (Exempt items)</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Field 6: Base Currency -->
+<div>
+<label class="block text-[11px] font-bold tracking-wider text-stone-500 uppercase mb-1.5" for="base-currency">
+            Base Currency
+          </label>
+<div class="relative">
+<input class="w-full text-sm font-medium text-stone-700 bg-stone-100/70 border border-[#E7E5E4] rounded-lg px-3.5 py-2.5 cursor-not-allowed select-none" id="base-currency" readonly="" tabindex="-1" type="text" value="₹ INR — Indian Rupee"/>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-stone-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-3 pt-4" data-purpose="form-actions">
+<!-- Secondary Back Button -->
+<button class="px-5 py-2.5 border border-[#E7E5E4] hover:bg-stone-50 text-stone-700 font-medium rounded-lg transition-colors text-sm flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-stone-300" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+            Back
+          </button>
+<!-- Primary Continue Button -->
+<button class="flex-1 bg-[#0F766E] hover:bg-[#0D655E] active:bg-[#0B544E] text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E]/40" type="submit">
+<span>Continue</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</form>
+</section>
+<!-- END: MainCardContainer -->
+<!-- BEGIN: FooterMicrocopy -->
+<footer class="flex items-center justify-center gap-1.5 text-xs text-stone-400 text-center mt-6 select-none" data-purpose="footer-security-note">
+<svg class="w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Step 2 of 3 • Store details can be edited anytime under Settings</span>
+</footer>
+<!-- END: FooterMicrocopy -->
+</main>
+<!-- END: OnboardingContainer -->
+</body></html>

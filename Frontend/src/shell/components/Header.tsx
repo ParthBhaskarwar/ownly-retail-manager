@@ -8,35 +8,59 @@ interface HeaderProps {
   title?: string;
 }
 
+import { useAuthContext } from '@/context/AuthContext';
+
 export function Header({ onMenuToggle, title }: HeaderProps) {
   const { store } = useStoreContext();
+  const { user } = useAuthContext();
 
   return (
-    <header className="app-header" id="app-header">
-      {/* Mobile hamburger */}
-      <button
-        className="header-menu-btn"
-        onClick={onMenuToggle}
-        aria-label="Toggle navigation menu"
-        id="header-menu-toggle"
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-      </button>
+    <header className="shell-header" id="app-header">
+      <div className="shell-header-left">
+        <button className="shell-mobile-hamburger" onClick={onMenuToggle} aria-label="Toggle navigation menu">
+          <span className="material-symbols-outlined">menu</span>
+        </button>
 
-      {/* Page title / breadcrumb */}
-      <div className="header-title">
-        {title && <h1 className="header-page-title">{title}</h1>}
+        {store && (
+          <div className="shell-header-chip">
+            <span className="header-store-chip__dot" aria-hidden="true" />
+            <span>{store.name}</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--color-ink-secondary)' }}>expand_more</span>
+          </div>
+        )}
+
+        <div className="shell-header-shift">
+          <span className="material-symbols-outlined" style={{ fontSize: '14px', color: 'var(--color-ink-secondary)' }}>schedule</span>
+          <span className="shell-header-shift-text">Shift #1 • Open</span>
+        </div>
       </div>
 
-      {/* Store name chip */}
-      {store && (
-        <div className="header-store-chip">
-          <span className="header-store-chip__dot" aria-hidden="true" />
-          <span className="header-store-chip__name">{store.name}</span>
+      <div className="shell-header-right">
+        <div className="shell-header-search">
+          <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--color-ink-secondary)' }}>search</span>
+          <span className="shell-header-search-input">Search orders, items...</span>
+          <kbd className="shell-header-kbd">⌘K</kbd>
         </div>
-      )}
+
+        <button className="shell-header-btn">
+          <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>notifications</span>
+          <span className="shell-header-badge"></span>
+        </button>
+
+        <div className="shell-header-divider"></div>
+
+        {user && (
+          <button className="shell-header-user">
+            <div className="shell-header-avatar">
+               {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="shell-header-user-info">
+              <span className="shell-header-user-name">{user.name}</span>
+              <span className="shell-header-user-role">{user.role}</span>
+            </div>
+          </button>
+        )}
+      </div>
     </header>
   );
 }

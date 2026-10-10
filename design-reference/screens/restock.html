@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-secondary-fixed":"#191c1f","on-secondary":"#ffffff","primary-container":"#2b4c7e","on-error-container":"#93000a","on-surface":"#191c1d","outline":"#747780","error-container":"#ffdad6","on-tertiary":"#ffffff","on-tertiary-fixed-variant":"#624000","surface-container-highest":"#e1e3e4","error":"#ba1a1a","on-error":"#ffffff","surface-container-high":"#e7e8e9","inverse-on-surface":"#f0f1f2","primary-fixed-dim":"#a9c7ff","inverse-primary":"#a9c7ff","on-primary-container":"#9ebdf7","tertiary-fixed":"#ffddb3","on-surface-variant":"#43474f","on-tertiary-fixed":"#291800","outline-variant":"#c3c6d0","on-tertiary-container":"#e7b369","secondary-fixed-dim":"#c5c6ca","on-background":"#191c1d","on-primary-fixed-variant":"#254778","primary-fixed":"#d6e3ff","surface-container-low":"#f3f4f5","surface-container":"#edeeef","on-primary":"#ffffff","primary":"#0e3566","on-secondary-fixed-variant":"#44474a","background":"#f8f9fa","tertiary":"#4b2f00","on-primary-fixed":"#001b3d","surface-variant":"#e1e3e4","inverse-surface":"#2e3132","surface":"#f8f9fa","tertiary-container":"#694400","tertiary-fixed-dim":"#f3bd72","secondary":"#5c5f62","surface-dim":"#d9dadb","surface-tint":"#3f5f92","secondary-container":"#dee0e4","secondary-fixed":"#e1e2e6","surface-container-lowest":"#ffffff","surface-bright":"#f8f9fa","on-secondary-container":"#606366"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"gutter":"1rem","space-lg":"1.25rem","space-xs":"0.25rem","margin-lg":"1.75rem","gutter-lg":"1.5rem","margin":"1rem","space-xl":"1.75rem","space-md":"0.75rem","space-sm":"0.5rem"},"fontFamily":{"body-sm":["DM Sans"],"headline-lg-mobile":["Newsreader"],"headline-xl":["Newsreader"],"title-md":["DM Sans"],"body-md":["DM Sans"],"label-md":["DM Sans"],"headline-md":["Newsreader"],"headline-lg":["Newsreader"],"body-lg":["DM Sans"],"data-mono":["DM Sans"]},"fontSize":{"body-sm":["0.8125rem",{"lineHeight":"1.125rem","fontWeight":"400"}],"headline-lg-mobile":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.02em","fontWeight":"600"}],"title-md":["1rem",{"lineHeight":"1.375rem","fontWeight":"600"}],"body-md":["0.875rem",{"lineHeight":"1.25rem","fontWeight":"400"}],"label-md":["0.75rem",{"lineHeight":"1rem","letterSpacing":"0.05em","fontWeight":"600"}],"headline-md":["1.25rem",{"lineHeight":"1.625rem","fontWeight":"500"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.015em","fontWeight":"600"}],"body-lg":["1rem",{"lineHeight":"1.5rem","fontWeight":"400"}],"data-mono":["0.875rem",{"lineHeight":"1.25rem","fontWeight":"500"}]}}}}</script></head><body><aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-[#E7E5E4] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-4 flex items-center gap-2 border-b border-[#E7E5E4]"><img alt="Ownly Retail Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Ug834MoQjE9U6zQ0nlJsRvydhtLJTWwAaN94FC7dO4m-amUCn0aK4jS0Q5-uHbnoZgCThXGRi8reNFTplJxXe_oWiFdkQbhLPXe0Rpy0n5RQTbrdX919y9tUA0Zw9V_8Ig0zqVGPAkBrsa-UBCjFzUBHYsieOKLXmFv7f66sItKh1x3QiZXLiYQsIOWJsAiaTcneXn95JslNm9CPsnWI4oC2_bYJS0YwMDu269lzJoGRaEOT_KUPKF"/><div class="flex flex-col"><span class="text-xl tracking-tight text-[#1C1917] leading-tight font-semibold">Ownly</span><span class="text-xs uppercase tracking-wider text-[#78716C] font-medium">Retail Manager</span></div></div><nav class="px-2 py-3 space-y-3 flex-1"><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Main</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="dashboard" href="#"><span class="material-symbols-outlined text-xl text-[#0F766E]">dashboard</span><span class="">Dashboard</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Store</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="pos-billing" href="#"><span class="material-symbols-outlined text-xl">point_of_sale</span><span class="">POS Billing</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="invoices-receipts" href="#"><span class="material-symbols-outlined text-xl">receipt_long</span><span class="">Invoices &amp; Receipts</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="returns-refunds" href="#"><span class="material-symbols-outlined text-xl">assignment_return</span><span class="">Returns &amp; Refunds</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="product-exchanges" href="#"><span class="material-symbols-outlined text-xl">swap_horiz</span><span class="">Product Exchanges</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="products" href="#"><span class="material-symbols-outlined text-xl">checkroom</span><span class="">Products</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="restock" href="#"><span class="material-symbols-outlined text-xl">move_to_inbox</span><span class="">Restock</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="ai-restock" href="#"><span class="material-symbols-outlined text-xl">auto_awesome</span><span class="">AI Restock</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="inventory-ledger" href="#"><span class="material-symbols-outlined text-xl">table_chart</span><span class="">Inventory Ledger</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="barcodes" href="#"><span class="material-symbols-outlined text-xl">qr_code_scanner</span><span class="">Barcodes</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">People</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="staff" href="#"><span class="material-symbols-outlined text-xl">badge</span><span class="">Staff</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Insights</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="reports" href="#"><span class="material-symbols-outlined text-xl">bar_chart</span><span class="">Reports</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="ai-insights" href="#"><span class="material-symbols-outlined text-xl">psychology</span><span class="">AI Insights</span></a></div><div class="space-y-1 pb-4"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">System</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="backup-safety" href="#"><span class="material-symbols-outlined text-xl">verified_user</span><span class="">Backup &amp; Safety</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="settings" href="#"><span class="material-symbols-outlined text-xl">settings</span><span class="">Settings</span></a></div></nav></div><div class="p-3 border-t border-[#E7E5E4] bg-white"><div class="flex items-center justify-between text-[#78716C] text-xs font-medium"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#16A34A] inline-block"></span>Online Sync</span><span class="text-[#78716C]">v2.4.1</span></div></div></aside><div class="pl-64 flex flex-col min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-white border-b border-[#E7E5E4] z-40 px-6 flex items-center justify-between"><div class="flex items-center gap-3"><div class="flex items-center gap-2 px-3 py-1.5 border border-[#E7E5E4] rounded-lg bg-[#FAFAF9] hover:bg-[#F5F5F4] transition-colors cursor-pointer"><span class="w-2 h-2 rounded-full bg-[#16A34A]"></span><span class="text-sm font-semibold text-[#1C1917]">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-base text-[#78716C]">expand_more</span></div><div class="hidden lg:flex items-center gap-1.5 px-3 py-1 border border-[#E7E5E4] rounded-lg bg-[#FAFAF9]"><span class="material-symbols-outlined text-sm text-[#78716C]">schedule</span><span class="text-xs text-[#78716C] font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-3"><div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#FAFAF9] border border-[#E7E5E4] rounded-lg text-[#1C1917] text-sm w-60"><span class="material-symbols-outlined text-lg text-[#78716C]">search</span><span class="flex-1 text-[#78716C] text-xs">Search orders, items...</span><kbd class="px-1.5 py-0.5 text-xs bg-white border border-[#E7E5E4] rounded text-[#78716C] shadow-none">⌘K</kbd></div><button class="relative p-1.5 text-[#78716C] hover:text-[#1C1917] rounded-lg hover:bg-[#F5F5F4] transition-colors"><span class="material-symbols-outlined text-2xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#DC2626] ring-2 ring-white"></span></button><div class="h-6 w-px bg-[#E7E5E4]"></div><div class="flex items-center gap-2 pl-1"><img alt="Profile" class="w-8 h-8 rounded-full object-cover border border-[#E7E5E4]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1o0_oZkkT7iGft61T28I2M3ZTToAKlaC-mTUOv1nitSlhfdGV2DULpmpfQXaUYUuluCjRbyiUfNvUOAenOTbKZKjnrqUZyHE194LprR-2SlnWeBD8zoUD1KjlRENs-KSCQDaLMPw4FCYgCtDifjaBgOJB4hc0aE2km_0vRx0J_K-CyIczuF6s_4Kn2H177lDsPlMjccRu2l8yk0Jf_J7JODJzkZ5kiJxWccBLtekP8A97uYyFg9Q"/><div class="hidden xl:flex flex-col text-left"><span class="text-sm leading-none text-[#1C1917] font-semibold">Rajesh Verma</span><span class="text-xs text-[#78716C] leading-tight mt-0.5">Store Owner &amp; Manager</span></div></div></div></header><main class="flex-1 pt-16 w-full bg-[#FAFAF9] px-6 py-6"><div class="flex flex-col w-full">
+<!-- Script for sidebar active link highlight -->
+<script>
+    (function() {
+      const restockLink = document.querySelector('aside nav a[data-path="restock"]');
+      if (restockLink) {
+        document.querySelectorAll('aside nav a').forEach(el => {
+          el.classList.remove('bg-[#F0FDFA]', 'text-[#0F766E]', 'font-medium');
+          el.classList.add('text-[#78716C]');
+          const icon = el.querySelector('.material-symbols-outlined');
+          if (icon) icon.classList.remove('text-[#0F766E]');
+        });
+        restockLink.classList.remove('text-[#78716C]', 'hover:bg-[#F5F5F4]', 'hover:text-[#1C1917]');
+        restockLink.classList.add('bg-[#F0FDFA]', 'text-[#0F766E]', 'font-medium');
+        const activeIcon = restockLink.querySelector('.material-symbols-outlined');
+        if (activeIcon) activeIcon.classList.add('text-[#0F766E]');
+      }
+    })();
+  </script>
+<!-- Page Header & Action Bar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E7E5E4]">
+<div>
+<div class="flex items-center gap-2">
+<h1 class="text-2xl font-bold text-[#1C1917] tracking-tight">Restock</h1>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#F5F5F4] text-[#78716C] border border-[#E7E5E4]">Batch Entry</span>
+</div>
+<p class="text-sm text-[#78716C] mt-0.5">Add incoming inventory, adjust procurement costs, and generate ledger batches</p>
+</div>
+<div class="flex items-center gap-2.5">
+<button class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[#78716C] hover:text-[#1C1917] bg-white hover:bg-[#FAFAF9] border border-[#E7E5E4] rounded-lg transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-lg">history</span>
+<span>Restock History</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-[#0F766E] hover:bg-[#115E59] rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F766E]" type="button">
+<span class="material-symbols-outlined text-lg">add</span>
+<span>Quick Add Supplier</span>
+</button>
+</div>
+</div>
+<!-- Stepper Indicator -->
+<div class="mt-6 mb-8 bg-white border border-[#E7E5E4] rounded-lg px-6 py-4 shadow-sm">
+<div class="flex items-center justify-between w-full">
+<!-- Step 1 -->
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-xs font-semibold">
+<span class="material-symbols-outlined text-base">check</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs uppercase tracking-wider text-[#0F766E] font-semibold">Step 1</span>
+<span class="text-sm font-semibold text-[#1C1917]">Select Garment</span>
+</div>
+</div>
+<div class="flex-1 mx-4 h-px bg-[#0F766E]/40"></div>
+<!-- Step 2 -->
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-xs font-semibold">
+          2
+        </div>
+<div class="flex flex-col">
+<span class="text-xs uppercase tracking-wider text-[#0F766E] font-semibold">Step 2</span>
+<span class="text-sm font-semibold text-[#1C1917]">Supplier &amp; Batch</span>
+</div>
+</div>
+<div class="flex-1 mx-4 h-px bg-[#0F766E]"></div>
+<!-- Step 3 -->
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-xs font-semibold ring-4 ring-[#F0FDFA]">
+          3
+        </div>
+<div class="flex flex-col">
+<span class="text-xs uppercase tracking-wider text-[#0F766E] font-semibold">Step 3</span>
+<span class="text-sm font-semibold text-[#1C1917]">Quantities &amp; Rates</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Forms & Size Grid (~68%) -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Card 1: Select Garment -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-[#E7E5E4]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#0F766E] text-xl">checkroom</span>
+<h2 class="text-base font-semibold text-[#1C1917]">1. Select Garment</h2>
+</div>
+<span class="text-xs text-[#78716C]">Catalog Match</span>
+</div>
+<div class="relative">
+<label class="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5">Search or Scan Product</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-lg text-[#78716C]">search</span>
+<input class="w-full pl-9 pr-24 py-2 bg-white border border-[#E7E5E4] rounded-lg text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" placeholder="Search product by name or SKU..." type="text" value="Chanderi Silk Anarkali Suit"/>
+<span class="absolute right-2.5 top-2 px-2 py-0.5 text-xs bg-[#F5F5F4] text-[#78716C] border border-[#E7E5E4] rounded font-mono">CHN-SLK</span>
+</div>
+</div>
+<!-- Selected Product Overview Chip -->
+<div class="bg-[#FAFAF9] border border-[#E7E5E4] rounded-lg p-3.5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-md bg-[#F0FDFA] text-[#0F766E] flex items-center justify-center border border-[#0F766E]/20">
+<span class="material-symbols-outlined text-xl">apparel</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-semibold text-[#1C1917]">Chanderi Silk Anarkali Suit</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-white border border-[#E7E5E4] text-[#1C1917]">CHN-SLK-042</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-[#78716C] mt-0.5">
+<span>Category: Ethnic Wear</span>
+<span>•</span>
+<span>HSN: 6204</span>
+<span>•</span>
+<span class="text-[#0F766E] font-medium">5 active size variants</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]">
+              Current: 24 units in stock
+            </span>
+</div>
+</div>
+</div>
+<!-- Card 2: Supplier & Batch Details -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-[#E7E5E4]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#0F766E] text-xl">local_shipping</span>
+<h2 class="text-base font-semibold text-[#1C1917]">2. Supplier &amp; Batch Details</h2>
+</div>
+<span class="text-xs text-[#16A34A] font-medium flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span> Verified Vendor
+          </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5">Supplier Name &amp; ID</label>
+<div class="relative">
+<select class="w-full px-3 py-2 bg-white border border-[#E7E5E4] rounded-lg text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none pr-8">
+<option selected="">Jaipur Handlooms &amp; Fabrics Pvt Ltd (SUP-019)</option>
+<option>Varanasi Silk Weavers Guild (SUP-008)</option>
+<option>Surat Textiles Mill Outlet (SUP-031)</option>
+<option>Kolkata Cotton Hub (SUP-014)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[#78716C] pointer-events-none text-lg">expand_more</span>
+</div>
+<p class="text-[11px] text-[#78716C] mt-1">Payment terms: Net 30 • GSTIN: 08AAACJ4928M1ZM</p>
+</div>
+<div>
+<label class="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5">Purchase / Inward Date</label>
+<div class="relative">
+<input class="w-full px-3 py-2 bg-white border border-[#E7E5E4] rounded-lg text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="03 Oct 2026"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[#78716C] text-lg pointer-events-none">calendar_today</span>
+</div>
+<p class="text-[11px] text-[#78716C] mt-1">Stock effective immediately on receipt confirmation</p>
+</div>
+<div class="md:col-span-2">
+<label class="block text-xs font-semibold uppercase tracking-wider text-[#78716C] mb-1.5">Supplier Invoice / Batch Reference</label>
+<div class="relative">
+<input class="w-full px-3 py-2 bg-white border border-[#E7E5E4] rounded-lg text-sm font-mono text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" id="invoiceInput" type="text" value="INV-2024-OCT-8891 (Chanderi festive batch re-order)"/>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[#78716C] text-lg">receipt</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Inline Warning/Error Banner -->
+<div class="p-3.5 bg-[#FEF2F2] border border-[#DC2626]/30 rounded-lg flex items-start gap-3" id="errorBanner">
+<span class="material-symbols-outlined text-[#DC2626] text-xl shrink-0 mt-0.5">error</span>
+<div class="flex-1 text-xs">
+<div class="font-semibold text-[#DC2626] mb-0.5">Batch Reference Notice</div>
+<span class="text-[#991B1B]">Supplier Invoice <span class="font-mono font-medium">INV-2024-OCT-8891</span> already has 1 partial entry logged on 28 Sep 2026. Verify reference to avoid duplicate restock ledger entries.</span>
+</div>
+<button class="text-[#DC2626] hover:text-[#991B1B] p-0.5" onclick="document.getElementById('errorBanner').style.display='none'" type="button">
+<span class="material-symbols-outlined text-base">close</span>
+</button>
+</div>
+<!-- Card 3: Quantities & Rates Grid -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg shadow-sm overflow-hidden">
+<div class="p-5 border-b border-[#E7E5E4] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#0F766E] text-xl">tune</span>
+<h2 class="text-base font-semibold text-[#1C1917]">3. Quantities &amp; Rates</h2>
+</div>
+<p class="text-xs text-[#78716C] mt-0.5">Update unit cost or selling price if revised, then enter restock quantities for each size variant.</p>
+</div>
+<button class="text-xs text-[#0F766E] font-medium hover:underline self-start sm:self-auto flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-sm">restart_alt</span> Reset to standard rates
+          </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F5F5F4] border-b border-[#E7E5E4] text-[11px] font-semibold text-[#78716C] uppercase tracking-wider">
+<th class="py-3 px-4">Size / Variant</th>
+<th class="py-3 px-3">Current Stock</th>
+<th class="py-3 px-3 w-32">Unit Cost</th>
+<th class="py-3 px-3 w-32">Selling Price</th>
+<th class="py-3 px-3 w-36 text-center">+ Restock Qty</th>
+<th class="py-3 px-4 text-right">Subtotal</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E7E5E4] text-sm text-[#1C1917]">
+<!-- Size S -->
+<tr class="hover:bg-[#FAFAF9] transition-colors">
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917]">Size S</div>
+<div class="text-[11px] font-mono text-[#78716C]">CHN-SLK-042-S</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]">
+                    2 in stock
+                  </span>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="rate-input w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="1,450.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="3,499.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center justify-center border border-[#E7E5E4] rounded-md bg-white overflow-hidden max-w-[124px] mx-auto">
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">-</button>
+<input class="w-12 text-center text-sm font-semibold text-[#1C1917] border-0 focus:ring-0 p-0" min="0" type="number" value="10"/>
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">+</button>
+</div>
+</td>
+<td class="py-3 px-4 text-right font-medium text-[#1C1917] font-mono">
+                  ₹14,500.00
+                </td>
+</tr>
+<!-- Size M -->
+<tr class="hover:bg-[#FAFAF9] transition-colors bg-[#FEF2F2]/20">
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917]">Size M</div>
+<div class="text-[11px] font-mono text-[#78716C]">CHN-SLK-042-M</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#FEF2F2] text-[#DC2626] border border-[#FCA5A5]">
+                    0 in stock
+                  </span>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="rate-input w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="1,450.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="3,499.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center justify-center border border-[#0F766E] ring-1 ring-[#0F766E] rounded-md bg-white overflow-hidden max-w-[124px] mx-auto">
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">-</button>
+<input class="w-12 text-center text-sm font-bold text-[#0F766E] border-0 focus:ring-0 p-0" min="0" type="number" value="15"/>
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">+</button>
+</div>
+</td>
+<td class="py-3 px-4 text-right font-medium text-[#1C1917] font-mono">
+                  ₹21,750.00
+                </td>
+</tr>
+<!-- Size L -->
+<tr class="hover:bg-[#FAFAF9] transition-colors">
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917]">Size L</div>
+<div class="text-[11px] font-mono text-[#78716C]">CHN-SLK-042-L</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">
+                    8 in stock
+                  </span>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="rate-input w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="1,450.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="3,499.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center justify-center border border-[#E7E5E4] rounded-md bg-white overflow-hidden max-w-[124px] mx-auto">
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">-</button>
+<input class="w-12 text-center text-sm font-semibold text-[#1C1917] border-0 focus:ring-0 p-0" min="0" type="number" value="10"/>
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">+</button>
+</div>
+</td>
+<td class="py-3 px-4 text-right font-medium text-[#1C1917] font-mono">
+                  ₹14,500.00
+                </td>
+</tr>
+<!-- Size XL -->
+<tr class="hover:bg-[#FAFAF9] transition-colors bg-[#FEF2F2]/20">
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917]">Size XL</div>
+<div class="text-[11px] font-mono text-[#78716C]">CHN-SLK-042-XL</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#FEF2F2] text-[#DC2626] border border-[#FCA5A5]">
+                    0 in stock
+                  </span>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="rate-input w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="1,480.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="3,499.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center justify-center border border-[#0F766E] ring-1 ring-[#0F766E] rounded-md bg-white overflow-hidden max-w-[124px] mx-auto">
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">-</button>
+<input class="w-12 text-center text-sm font-bold text-[#0F766E] border-0 focus:ring-0 p-0" min="0" type="number" value="12"/>
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">+</button>
+</div>
+</td>
+<td class="py-3 px-4 text-right font-medium text-[#1C1917] font-mono">
+                  ₹17,760.00
+                </td>
+</tr>
+<!-- Size XXL -->
+<tr class="hover:bg-[#FAFAF9] transition-colors">
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917]">Size XXL</div>
+<div class="text-[11px] font-mono text-[#78716C]">CHN-SLK-042-XXL</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]">
+                    4 in stock
+                  </span>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="rate-input w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="1,500.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="relative">
+<span class="absolute left-2.5 top-2 text-xs text-[#78716C]">₹</span>
+<input class="w-full pl-6 pr-2 py-1.5 bg-white border border-[#E7E5E4] rounded text-sm text-[#1C1917] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]" type="text" value="3,699.00"/>
+</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center justify-center border border-[#E7E5E4] rounded-md bg-white overflow-hidden max-w-[124px] mx-auto">
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">-</button>
+<input class="w-12 text-center text-sm font-semibold text-[#1C1917] border-0 focus:ring-0 p-0" min="0" type="number" value="8"/>
+<button class="w-8 h-8 flex items-center justify-center text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors" type="button">+</button>
+</div>
+</td>
+<td class="py-3 px-4 text-right font-medium text-[#1C1917] font-mono">
+                  ₹12,000.00
+                </td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-[#FAFAF9] px-4 py-3 border-t border-[#E7E5E4] flex items-center justify-between text-xs text-[#78716C]">
+<span>Validation status: 5/5 valid rates</span>
+<span class="text-[#0F766E] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">verified</span> All rates conform to MRP bounds
+          </span>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Sticky Restock Summary Card (~32%) -->
+<div class="lg:col-span-4 sticky top-20 space-y-4">
+<div class="bg-white border border-[#E7E5E4] rounded-lg shadow-sm p-5 space-y-5">
+<div class="flex items-center justify-between pb-3 border-b border-[#E7E5E4]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#0F766E] text-xl">analytics</span>
+<h3 class="text-base font-bold text-[#1C1917]">Restock Summary</h3>
+</div>
+<span class="px-2 py-0.5 rounded text-xs font-medium bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]">5 Variants</span>
+</div>
+<!-- Inventory Transition Stat -->
+<div class="bg-[#FAFAF9] border border-[#E7E5E4] rounded-lg p-3.5 space-y-2">
+<div class="flex items-center justify-between text-xs text-[#78716C]">
+<span>Store Inventory Shift</span>
+<span class="font-medium text-[#16A34A]">+229% stock boost</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-xs text-[#78716C]">Current</span>
+<span class="text-lg font-bold text-[#1C1917]">24 units</span>
+</div>
+<div class="flex items-center text-[#0F766E]">
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+<div class="flex flex-col text-right">
+<span class="text-xs text-[#78716C]">New Stock Level</span>
+<span class="text-lg font-bold text-[#0F766E]">79 units</span>
+</div>
+</div>
+</div>
+<!-- Financial Breakdown -->
+<div class="space-y-3 pt-1">
+<div class="flex items-center justify-between text-sm">
+<span class="text-[#78716C]">Total Units Added</span>
+<span class="font-bold text-[#1C1917]">55 units</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-[#78716C]">Total Purchase Spend</span>
+<span class="font-mono font-bold text-[#1C1917]">₹80,510.00</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="text-[#78716C]">Gross Realizable Value</span>
+<span class="font-mono text-[#1C1917]">₹1,94,445.00</span>
+</div>
+<div class="h-px bg-[#E7E5E4] my-2"></div>
+<div class="flex items-baseline justify-between">
+<div class="flex flex-col">
+<span class="text-xs font-semibold uppercase tracking-wider text-[#78716C]">Potential Gross Profit</span>
+<span class="text-xl font-bold font-mono text-[#16A34A] mt-0.5">₹1,13,935.00</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">
+              58.6% Margin
+            </span>
+</div>
+<!-- Margin Indicator Bar -->
+<div class="space-y-1 pt-1">
+<div class="w-full bg-[#E7E5E4] rounded-full h-2 overflow-hidden">
+<div class="bg-[#16A34A] h-2 rounded-full" style="width: 58.6%"></div>
+</div>
+<div class="flex justify-between text-[11px] text-[#78716C]">
+<span>Procurement 41.4%</span>
+<span>Margin 58.6%</span>
+</div>
+</div>
+</div>
+<!-- Supplier & Payment Badge Details -->
+<div class="text-xs text-[#78716C] bg-white border border-[#E7E5E4] rounded p-2.5 space-y-1">
+<div class="flex justify-between">
+<span>Supplier Credit:</span>
+<span class="text-[#1C1917] font-medium">Jaipur Handlooms</span>
+</div>
+<div class="flex justify-between">
+<span>Payment Mode:</span>
+<span class="text-[#1C1917] font-medium">Billed to Accounts Payable</span>
+</div>
+<div class="flex justify-between">
+<span>Ledger Category:</span>
+<span class="text-[#1C1917] font-medium">Ethnic Inward Goods</span>
+</div>
+</div>
+<!-- Action CTAs -->
+<div class="space-y-2.5 pt-2">
+<button class="w-full py-3 px-4 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold text-sm rounded-lg shadow-sm transition-all duration-150 flex items-center justify-center gap-2 focus:ring-2 focus:ring-offset-2 focus:ring-[#0F766E]" type="button">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+<span>Complete Restock (55 Units)</span>
+</button>
+<button class="w-full py-2.5 px-4 bg-white hover:bg-[#FAFAF9] text-[#78716C] hover:text-[#1C1917] font-medium text-sm rounded-lg border border-[#E7E5E4] transition-colors" type="button">
+            Cancel &amp; Discard
+          </button>
+</div>
+<p class="text-[11px] text-[#78716C] leading-normal text-center pt-1">
+          Stock will be immediately reflected in POS billing and inventory ledger. Barcode tags can be generated post-submission.
+        </p>
+</div>
+<!-- Quick Tips Card -->
+<div class="bg-[#F0FDFA] border border-[#0F766E]/20 rounded-lg p-4 flex gap-3 items-start">
+<span class="material-symbols-outlined text-[#0F766E] text-lg shrink-0 mt-0.5">tips_and_updates</span>
+<div class="text-xs text-[#005C55] space-y-1">
+<div class="font-semibold text-[#0F766E]">AI Restock Recommendation</div>
+<p class="leading-relaxed">Size M and XL have had zero stock for 4 days, causing 11 missed customer inquiries this week. High velocity restock is advised.</p>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "outline-variant": "#bdc9c6", "outline": "#6e7977", "surface": "#fff8f5", "on-tertiary-container": "#ffe5db", "on-tertiary": "#ffffff", "tertiary-fixed": "#ffdbce", "secondary-container": "#eae1da", "surface-dim": "#e0d8d5", "inverse-primary": "#80d5cb", "tertiary-container": "#9c573a", "primary-container": "#0f766e", "secondary-fixed-dim": "#cec5bf", "surface-variant": "#e9e1dd", "on-secondary": "#ffffff", "on-primary-fixed-variant": "#00504a", "primary": "#005c55", "on-tertiary-fixed-variant": "#72361b", "secondary-fixed": "#eae1da", "on-error-container": "#93000a", "surface-tint": "#006a63", "tertiary-fixed-dim": "#ffb598", "background": "#fff8f5", "on-secondary-fixed": "#1f1b17", "inverse-surface": "#33302d", "on-primary-fixed": "#00201d", "secondary": "#645d58", "on-background": "#1e1b19", "surface-container-high": "#eee7e3", "surface-container-lowest": "#ffffff", "on-surface-variant": "#3e4947", "on-secondary-fixed-variant": "#4b4641", "inverse-on-surface": "#f7efeb", "tertiary": "#7f4025", "primary-fixed": "#9cf2e8", "on-surface": "#1e1b19", "surface-container": "#f4ece8", "on-primary": "#ffffff", "on-primary-container": "#a3faef", "on-secondary-container": "#6a635e", "on-tertiary-fixed": "#370e00", "primary-fixed-dim": "#80d5cb", "error-container": "#ffdad6", "surface-bright": "#fff8f5", "surface-container-highest": "#e9e1dd", "error": "#ba1a1a", "on-error": "#ffffff", "surface-container-low": "#faf2ee" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "gutter-desktop": "1.5rem", "margin": "1.5rem", "space-md": "1rem", "margin-desktop": "2rem", "space-lg": "1.5rem", "space-xl": "2rem", "space-sm": "0.5rem", "gutter": "1rem", "space-xs": "0.25rem" }, "fontFamily": { "headline-lg": ["Inter"], "display-lg": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"], "body-sm": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"], "table-header": ["Inter"] }, "fontSize": { "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}], "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}], "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}], "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}], "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}], "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600"}], "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}], "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "table-header": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}] } } } };</script></head><body class="bg-background font-body-md text-on-surface"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest border-r border-surface-variant z-50 flex flex-col justify-between select-none"><div class="flex flex-col h-[calc(100vh-140px)]"><div class="h-16 flex items-center gap-3 px-space-md border-b border-surface-variant shrink-0"><img alt="Brand logo. - Primary color: #2b4c7e
+- Font: newsreader
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X0--XUhwiTWxURVHjkFrsBc5D1fTgJEdp_1kUlMEBrWzqOSIXRp_CeLm4G3tAvj-_5yKvKmSfTkW8GB30PbeNrsJp4chwGOoULxp-vu1Q9qwDQaFX0e4Kug3imJBoG_oT7PkeyGujYQwPS1hm0ZC_wXnwq5kLPgLyRiHmG-FpKz5t0CTKU8gUFf7vmAzKRViJV2WiKVAMcNjYDH4QWdNNYjD6K6Hb69pjyBCUnzNQcNc2SP8TuOpMDIA"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight tracking-tight">Ownly</span><span class="font-table-header text-table-header text-secondary uppercase tracking-wider">Retail Manager</span></div></div><div class="flex-1 overflow-y-auto px-space-xs py-space-sm space-y-space-md"><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">Main</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="dashboard" href="#"><span class="material-symbols-outlined text-lg">dashboard</span><span>Dashboard</span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">Store</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="pos-billing" href="#"><span class="material-symbols-outlined text-lg">point_of_sale</span><span>POS Billing</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="invoices-receipts" href="#"><span class="material-symbols-outlined text-lg">receipt_long</span><span>Invoices &amp; Receipts</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="returns-refunds" href="#"><span class="material-symbols-outlined text-lg">replay</span><span>Returns &amp; Refunds</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="product-exchanges" href="#"><span class="material-symbols-outlined text-lg">swap_horiz</span><span>Product Exchanges</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="products" href="#"><span class="material-symbols-outlined text-lg">inventory_2</span><span>Products</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="restock" href="#"><span class="material-symbols-outlined text-lg">sync</span><span>Restock</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="ai-restock" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg">auto_awesome</span><span>AI Restock</span></div><span class="w-1.5 h-1.5 rounded-full bg-primary"></span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="inventory-ledger" href="#"><span class="material-symbols-outlined text-lg">table_chart</span><span>Inventory Ledger</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="barcodes" href="#"><span class="material-symbols-outlined text-lg">barcode_scanner</span><span>Barcodes</span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">People</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="staff" href="#"><span class="material-symbols-outlined text-lg">group</span><span>Staff</span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">Insights</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="reports" href="#"><span class="material-symbols-outlined text-lg">bar_chart</span><span>Reports</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="ai-insights" href="#"><span class="material-symbols-outlined text-lg">insights</span><span>AI Insights</span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">System</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="backup-safety" href="#"><span class="material-symbols-outlined text-lg">shield</span><span>Backup &amp; Safety</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="settings" href="#"><span class="material-symbols-outlined text-lg">settings</span><span>Settings</span></a></nav></div></div><div class="border-t border-surface-variant bg-surface-container-lowest p-space-sm shrink-0 flex flex-col gap-2"><div class="flex items-center justify-between px-space-xs py-1 rounded bg-surface-container-low"><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Online Sync v2.4.1</span></div><span class="material-symbols-outlined text-sm text-secondary">cloud_done</span></div><div class="flex items-center justify-between pt-1"><div class="flex items-center gap-2.5 overflow-hidden"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-surface font-semibold truncate leading-tight">Rajesh Verma</span><span class="font-body-sm text-body-sm text-secondary truncate leading-tight">Store Owner &amp; Manager</span></div></div><button class="p-1 text-secondary hover:text-error hover:bg-surface-container rounded transition-colors" title="Sign out"><span class="material-symbols-outlined text-lg">logout</span></button></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-md border-b border-surface-variant z-40 flex items-center justify-between px-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low hover:bg-surface-container border border-surface-variant rounded-lg cursor-pointer transition-colors"><span class="material-symbols-outlined text-primary text-lg">storefront</span><span class="font-label-md text-label-md text-on-surface font-medium">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-secondary text-sm">expand_more</span></div><div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-container rounded-lg border border-surface-variant"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-label-sm text-label-sm text-on-surface font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-space-md"><div class="relative flex items-center w-72"><span class="material-symbols-outlined absolute left-2.5 text-secondary text-base pointer-events-none">search</span><input class="w-full bg-surface-container-low border border-surface-variant rounded-lg pl-8 pr-3 py-1.5 font-body-sm text-body-sm text-on-surface placeholder:text-secondary focus:outline-none focus:border-primary focus:bg-surface-container-lowest transition-colors" placeholder="Search records, SKUs... (Cmd+K)" type="text"/></div><button class="relative p-2 text-secondary hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span></button><div class="flex items-center gap-2 pl-2 border-l border-surface-variant"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col text-left"><span class="font-label-sm text-label-sm font-semibold text-on-surface leading-tight">Rajesh V.</span><span class="font-body-sm text-body-sm text-secondary text-[10px] leading-tight">Owner</span></div></div></div></header><main class="w-full pt-16 bg-background min-h-screen"><div class="flex flex-col w-full">
+<script>
+    (function () {
+      const navLinks = document.querySelectorAll('aside nav a[data-path]');
+      navLinks.forEach((link) => {
+        link.classList.remove('bg-surface-container', 'text-primary', 'font-medium');
+        if (link.getAttribute('data-path') === 'ai-insights') {
+          link.classList.add('bg-surface-container', 'text-primary', 'font-medium');
+        }
+      });
+    })();
+  </script>
+<div class="p-space-lg lg:p-space-xl flex flex-col gap-space-lg max-w-[1600px] mx-auto w-full">
+<!-- Top Action & Navigation Header -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">Analytics Engine</span>
+<span class="w-1 h-1 rounded-full bg-secondary"></span>
+<span class="font-table-header text-table-header uppercase tracking-wider text-primary font-semibold">Model v2.4 Active</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface font-semibold tracking-tight">AI Insights &amp; Accuracy</h1>
+<p class="font-body-md text-body-md text-secondary max-w-2xl">
+          Empirical validation showing how historical AI demand forecasting aligned with actual point-of-sale store throughput.
+        </p>
+</div>
+<div class="flex flex-wrap items-center gap-2.5">
+<button class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container text-label-md font-label-md shadow-sm transition-colors">
+<span class="material-symbols-outlined text-lg text-secondary">calendar_today</span>
+<span>Last 90 Days • Model v2.4</span>
+<span class="material-symbols-outlined text-sm text-secondary">arrow_drop_down</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-lowest text-secondary hover:text-on-surface hover:bg-surface-container text-label-md font-label-md shadow-sm transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+<span>Export CSV</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container text-label-md font-label-md shadow-sm transition-colors">
+<span class="material-symbols-outlined text-lg">play_arrow</span>
+<span>Run New Backtest</span>
+</button>
+</div>
+</div>
+<!-- Segmented Mode Control Tabs -->
+<div class="flex items-center justify-between border-b border-surface-variant pb-2">
+<div class="inline-flex p-1 bg-surface-container rounded-lg gap-1">
+<button class="px-4 py-1.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm font-label-md text-label-md font-semibold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-base">history</span>
+<span>Backtest (History Replay)</span>
+<span class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-primary/10 text-primary">Active</span>
+</button>
+<button class="px-4 py-1.5 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-low font-label-md text-label-md font-medium flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-base">online_prediction</span>
+<span>Live Predictions</span>
+</button>
+</div>
+<div class="hidden sm:flex items-center gap-4 text-secondary font-label-sm text-label-sm">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span> 42 Backtests Completed
+        </span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">schedule</span> Last updated 12 mins ago
+        </span>
+</div>
+</div>
+<!-- Context Callout Box -->
+<div class="rounded-xl p-space-md bg-surface-container-low flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md shadow-sm">
+<div class="flex items-start gap-3.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm text-primary">
+<span class="material-symbols-outlined text-xl">verified_user</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Methodology &amp; Zero Look-Ahead Assurance</span>
+</div>
+<p class="font-body-md text-body-md text-secondary mt-0.5 leading-relaxed">
+            The neural inventory model was replayed across historical calendar intervals using strictly the catalog data available prior to each date, then benchmarked against verified 30-day registered store checkout receipts.
+          </p>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-sm text-primary">query_stats</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">MAPE ≤ 8.4% across 42 validation runs</span>
+</div>
+</div>
+<!-- Key Performance Metric Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+<!-- KPI 1 -->
+<div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-table-header text-table-header uppercase text-secondary tracking-wider">Overall Accuracy</span>
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-base">check_circle</span>
+</span>
+</div>
+<div class="my-3">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-semibold text-on-surface">91.6%</span>
+<span class="inline-flex items-center text-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-sm">trending_up</span> +3.2%
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-1">vs Previous 90-day testing window</p>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 91.6%"></div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-table-header text-table-header uppercase text-secondary tracking-wider">Mean Prediction Error</span>
+<span class="p-1 rounded bg-surface-container text-secondary">
+<span class="material-symbols-outlined text-base">tune</span>
+</span>
+</div>
+<div class="my-3">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-semibold text-on-surface">±2.4</span>
+<span class="text-xs font-medium text-secondary">units/SKU</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Spread across 6 core retail garment tiers</p>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-secondary font-medium">
+<span class="inline-block w-2 h-2 rounded-full bg-surface-tint"></span>
+<span>Lower than 3.0 threshold target</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-table-header text-table-header uppercase text-secondary tracking-wider">Profitable Stock-ins</span>
+<span class="p-1 rounded bg-surface-container text-primary">
+<span class="material-symbols-outlined text-base">currency_rupee</span>
+</span>
+</div>
+<div class="my-3">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-semibold text-on-surface">94.8%</span>
+<span class="inline-flex items-center text-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-sm">north_east</span> High Margin
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Recommendations yielding &gt;40% gross margins</p>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 94.8%"></div>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-table-header text-table-header uppercase text-secondary tracking-wider">Deadstock Avoidance</span>
+<span class="p-1 rounded bg-surface-container text-tertiary">
+<span class="material-symbols-outlined text-base">production_quantity_limits</span>
+</span>
+</div>
+<div class="my-3">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-semibold text-on-surface">18.2%</span>
+<span class="inline-flex items-center text-xs font-semibold text-tertiary">
+<span class="material-symbols-outlined text-sm">trending_down</span> Waste Cut
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Reduction in overstocked slow units</p>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-tertiary font-medium">
+<span class="material-symbols-outlined text-xs">savings</span>
+<span>₹1.48L capital preserved</span>
+</div>
+</div>
+</div>
+<!-- Main Visual Card: Prediction vs Actual Timeline Chart -->
+<div class="rounded-xl bg-surface-container-lowest p-space-md lg:p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Predicted Demand vs Actual Sales Realization</h2>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">Bi-weekly aggregated trajectory comparing algorithmic inventory sizing vs register checkouts</p>
+</div>
+<div class="flex flex-wrap items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-1.5">
+<span class="w-3.5 h-1.5 rounded-full bg-primary"></span>
+<span class="text-on-surface">AI Predicted (Demand Model)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="text-on-surface">Actual POS Sales</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-4 h-0.5 border-t-2 border-dashed border-outline-variant"></span>
+<span class="text-secondary">Safety Stock Baseline</span>
+</div>
+</div>
+</div>
+<!-- High-Fidelity SVG Dual-Series Chart -->
+<div class="relative w-full h-72 sm:h-80 bg-surface-container-low/40 rounded-lg p-2 sm:p-4 flex flex-col justify-end overflow-hidden">
+<!-- SVG Canvas -->
+<svg class="w-full h-full" fill="none" preserveaspectratio="none" viewbox="0 0 1000 260" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="aiGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0f766e" stop-opacity="0.22"></stop>
+<stop offset="100%" stop-color="#0f766e" stop-opacity="0.0"></stop>
+</lineargradient>
+<lineargradient id="actualGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#645d58" stop-opacity="0.10"></stop>
+<stop offset="100%" stop-color="#645d58" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Horizontal Grid Lines -->
+<line stroke="#bdc9c6" stroke-opacity="0.3" stroke-width="1" x1="40" x2="980" y1="30" y2="30"></line>
+<text fill="#645d58" font-family="Inter" font-size="11" x="12" y="34">240</text>
+<line stroke="#bdc9c6" stroke-opacity="0.3" stroke-width="1" x1="40" x2="980" y1="85" y2="85"></line>
+<text fill="#645d58" font-family="Inter" font-size="11" x="12" y="89">180</text>
+<line stroke="#bdc9c6" stroke-opacity="0.3" stroke-width="1" x1="40" x2="980" y1="140" y2="140"></line>
+<text fill="#645d58" font-family="Inter" font-size="11" x="12" y="144">120</text>
+<line stroke="#bdc9c6" stroke-opacity="0.3" stroke-width="1" x1="40" x2="980" y1="195" y2="195"></line>
+<text fill="#645d58" font-family="Inter" font-size="11" x="18" y="199">60</text>
+<!-- Safety Baseline (Dashed) -->
+<line stroke="#bdc9c6" stroke-dasharray="4 4" stroke-width="1.5" x1="40" x2="980" y1="170" y2="170"></line>
+<!-- Filled Areas for Depth -->
+<path d="M 60 180 L 175 140 L 290 152 L 405 110 L 520 85 L 635 95 L 750 50 L 865 60 L 960 42 L 960 230 L 60 230 Z" fill="url(#aiGradient)"></path>
+<path d="M 60 185 L 175 146 L 290 148 L 405 118 L 520 82 L 635 104 L 750 46 L 865 65 L 960 48 L 960 230 L 60 230 Z" fill="url(#actualGradient)"></path>
+<!-- Actual Sales Line (Slate / Stone) -->
+<polyline points="60,185 175,146 290,148 405,118 520,82 635,104 750,46 865,65 960,48" stroke="#645d58" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></polyline>
+<!-- AI Prediction Line (Teal Brand Color) -->
+<polyline points="60,180 175,140 290,152 405,110 520,85 635,95 750,50 865,60 960,42" stroke="#005c55" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></polyline>
+<!-- Points: AI Predicted (Filled Teal dots) -->
+<circle cx="60" cy="180" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="175" cy="140" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="290" cy="152" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="405" cy="110" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="520" cy="85" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="635" cy="95" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="750" cy="50" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="865" cy="60" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<circle cx="960" cy="42" fill="#005c55" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<!-- Points: Actual Sales (Slate Squares / Rings) -->
+<circle cx="60" cy="185" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="175" cy="146" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="290" cy="148" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="405" cy="118" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="520" cy="82" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="635" cy="104" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="750" cy="46" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="865" cy="65" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<circle cx="960" cy="48" fill="#ffffff" r="3" stroke="#645d58" stroke-width="2"></circle>
+<!-- Horizontal X-Axis Ticks -->
+<text fill="#645d58" font-family="Inter" font-size="11" x="45" y="246">15 Jul</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="160" y="246">01 Aug</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="275" y="246">15 Aug</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="390" y="246">01 Sep</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="505" y="246">15 Sep</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="620" y="246">01 Oct</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="735" y="246">15 Oct</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="850" y="246">01 Nov</text>
+<text fill="#645d58" font-family="Inter" font-size="11" x="940" y="246">15 Nov</text>
+</svg>
+</div>
+<!-- Chart Insight Footer Strip -->
+<div class="flex items-center gap-2.5 p-3 rounded-lg bg-surface-container text-xs text-on-surface">
+<span class="material-symbols-outlined text-base text-primary shrink-0">insights</span>
+<span class="leading-normal">
+<strong class="font-semibold text-primary">Model Diagnosis:</strong> High model confidence observed in Kurta Sets &amp; Bottomwear (94.2% fidelity); slight seasonal variance detected in Festive Jackets (+6% actual sales exceeding predictions due to regional pre-Diwali demand spike).
+        </span>
+</div>
+</div>
+<!-- Secondary Section: Prediction History Log -->
+<div class="rounded-xl bg-surface-container-lowest shadow-sm flex flex-col overflow-hidden">
+<!-- Table Header Bar -->
+<div class="p-space-md border-b border-surface-variant flex flex-col md:flex-row md:items-center justify-between gap-3 bg-surface-container-lowest">
+<div class="flex items-center gap-3">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Prediction History</h3>
+<span class="px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-secondary">
+            42 predictions logged
+          </span>
+</div>
+<div class="flex flex-wrap items-center gap-2">
+<!-- Search Box -->
+<div class="relative flex items-center w-64">
+<span class="material-symbols-outlined absolute left-2.5 text-secondary text-base pointer-events-none">search</span>
+<input class="w-full bg-surface-container-low rounded-lg pl-8 pr-3 py-1.5 font-body-sm text-body-sm text-on-surface placeholder:text-secondary focus:outline-none focus:bg-surface-container-lowest transition-colors" placeholder="Filter SKU or garment..." type="text"/>
+</div>
+<!-- Category Select -->
+<select class="bg-surface-container-low rounded-lg px-3 py-1.5 font-body-sm text-body-sm text-on-surface focus:outline-none cursor-pointer">
+<option>All Garment Categories</option>
+<option>Ethnic Kurtas</option>
+<option>Bottomwear</option>
+<option>Festive Jackets</option>
+<option>Shirts</option>
+</select>
+<!-- Decision Filter -->
+<select class="bg-surface-container-low rounded-lg px-3 py-1.5 font-body-sm text-body-sm text-on-surface focus:outline-none cursor-pointer">
+<option>All Decisions</option>
+<option>Restock Orders</option>
+<option>Hold Signals</option>
+<option>Clearance Actions</option>
+</select>
+</div>
+</div>
+<!-- History Table Data -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-surface-variant">
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider">As Of Date</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider">Product / Garment</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider">Run Type</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider">Recommendation</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider text-right">Rec. Qty</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider text-right">Predicted Demand</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider text-right">Actual Realized</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider text-center">Accuracy</th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-secondary tracking-wider text-right">Audit</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-variant text-body-md font-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/70 transition-colors">
+<td class="py-3 px-4 whitespace-nowrap text-secondary text-body-sm">
+<div class="font-medium text-on-surface">15 Sep 2026</div>
+<div class="text-[11px] text-secondary">Backtest Cycle #42</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center font-bold text-xs text-primary shrink-0">
+                    KK
+                  </div>
+<div class="flex flex-col min-w-0">
+<span class="font-medium text-on-surface truncate">Handloom Khadi Kurta</span>
+<span class="text-[11px] font-mono text-secondary">KHD-KRT-018</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface-variant">
+                  Existing Batch
+                </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-primary/10 text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> RESTOCK 50
+                </span>
+</td>
+<td class="py-3 px-4 text-right font-medium">50 units</td>
+<td class="py-3 px-4 text-right text-secondary">48 sold</td>
+<td class="py-3 px-4 text-right font-semibold text-primary">52 sold</td>
+<td class="py-3 px-4 text-center">
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-primary">
+<span>96% High</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="text-xs font-medium text-primary hover:underline hover:text-primary-container">
+                  View Audit
+                </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/70 transition-colors">
+<td class="py-3 px-4 whitespace-nowrap text-secondary text-body-sm">
+<div class="font-medium text-on-surface">01 Sep 2026</div>
+<div class="text-[11px] text-secondary">Backtest Cycle #41</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center font-bold text-xs text-secondary shrink-0">
+                    BD
+                  </div>
+<div class="flex flex-col min-w-0">
+<span class="font-medium text-on-surface truncate">Blue Denim Jeans Slim-Fit</span>
+<span class="text-[11px] font-mono text-secondary">BLUDENJE-32</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface-variant">
+                  Low Velocity
+                </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-surface-container text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> HOLD
+                </span>
+</td>
+<td class="py-3 px-4 text-right font-medium text-secondary">0 units</td>
+<td class="py-3 px-4 text-right text-secondary">3 sold</td>
+<td class="py-3 px-4 text-right font-medium text-on-surface">2 sold</td>
+<td class="py-3 px-4 text-center">
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-primary">
+<span>92% High</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="text-xs font-medium text-primary hover:underline hover:text-primary-container">
+                  View Audit
+                </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/70 transition-colors">
+<td class="py-3 px-4 whitespace-nowrap text-secondary text-body-sm">
+<div class="font-medium text-on-surface">24 Aug 2026</div>
+<div class="text-[11px] text-secondary">Backtest Cycle #40</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center font-bold text-xs text-primary shrink-0">
+                    CS
+                  </div>
+<div class="flex flex-col min-w-0">
+<span class="font-medium text-on-surface truncate">Chanderi Silk Nehru Jacket</span>
+<span class="text-[11px] font-mono text-secondary">CHN-NHR-012</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface-variant">
+                  Seasonal Restock
+                </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-primary/10 text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> RESTOCK 35
+                </span>
+</td>
+<td class="py-3 px-4 text-right font-medium">35 units</td>
+<td class="py-3 px-4 text-right text-secondary">34 sold</td>
+<td class="py-3 px-4 text-right font-semibold text-primary">36 sold</td>
+<td class="py-3 px-4 text-center">
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-primary">
+<span>94% High</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="text-xs font-medium text-primary hover:underline hover:text-primary-container">
+                  View Audit
+                </button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low/70 transition-colors">
+<td class="py-3 px-4 whitespace-nowrap text-secondary text-body-sm">
+<div class="font-medium text-on-surface">18 Aug 2026</div>
+<div class="text-[11px] text-secondary">Backtest Cycle #39</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center font-bold text-xs text-secondary shrink-0">
+                    CC
+                  </div>
+<div class="flex flex-col min-w-0">
+<span class="font-medium text-on-surface truncate">Cotton Casual Mandarin Shirt</span>
+<span class="text-[11px] font-mono text-secondary">CTN-CSH-004</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface-variant">
+                  Existing Batch
+                </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-primary/10 text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> RESTOCK 20
+                </span>
+</td>
+<td class="py-3 px-4 text-right font-medium">20 units</td>
+<td class="py-3 px-4 text-right text-secondary">19 sold</td>
+<td class="py-3 px-4 text-right font-medium text-on-surface">21 sold</td>
+<td class="py-3 px-4 text-center">
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface-variant">
+<span>90% Good</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="text-xs font-medium text-primary hover:underline hover:text-primary-container">
+                  View Audit
+                </button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low/70 transition-colors">
+<td class="py-3 px-4 whitespace-nowrap text-secondary text-body-sm">
+<div class="font-medium text-on-surface">10 Aug 2026</div>
+<div class="text-[11px] text-secondary">Backtest Cycle #38</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center font-bold text-xs text-tertiary shrink-0">
+                    RW
+                  </div>
+<div class="flex flex-col min-w-0">
+<span class="font-medium text-on-surface truncate">Raw Silk Waistcoat Brown</span>
+<span class="text-[11px] font-mono text-secondary">RAW-WST-040</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-tertiary">
+                  Shelf Age &gt;60d
+                </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-tertiary/10 text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> CLEARANCE
+                </span>
+</td>
+<td class="py-3 px-4 text-right font-medium text-tertiary">15 units</td>
+<td class="py-3 px-4 text-right text-secondary">16 sold</td>
+<td class="py-3 px-4 text-right font-medium text-on-surface">14 sold</td>
+<td class="py-3 px-4 text-center">
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface-variant">
+<span>88% Good</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="text-xs font-medium text-primary hover:underline hover:text-primary-container">
+                  View Audit
+                </button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-surface-container-low/70 transition-colors">
+<td class="py-3 px-4 whitespace-nowrap text-secondary text-body-sm">
+<div class="font-medium text-on-surface">02 Aug 2026</div>
+<div class="text-[11px] text-secondary">Backtest Cycle #37</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center font-bold text-xs text-primary shrink-0">
+                    LK
+                  </div>
+<div class="flex flex-col min-w-0">
+<span class="font-medium text-on-surface truncate">Linen Short Kurta White</span>
+<span class="text-[11px] font-mono text-secondary">LIN-KRT-W02</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-on-surface-variant">
+                  New Launch
+                </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-primary/10 text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> RESTOCK 25
+                </span>
+</td>
+<td class="py-3 px-4 text-right font-medium">25 units</td>
+<td class="py-3 px-4 text-right text-secondary">24 sold</td>
+<td class="py-3 px-4 text-right font-semibold text-primary">26 sold</td>
+<td class="py-3 px-4 text-center">
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-surface-container text-primary">
+<span>95% High</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="text-xs font-medium text-primary hover:underline hover:text-primary-container">
+                  View Audit
+                </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination and Footer Stats -->
+<div class="p-space-md bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 text-secondary text-body-sm border-t border-surface-variant">
+<div class="flex items-center gap-2">
+<span>Showing <strong>1–6</strong> of <strong>42</strong> verified historical predictions</span>
+<span class="text-surface-variant">|</span>
+<span class="font-medium text-on-surface">Page 1 of 7</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm shadow-sm font-medium transition-colors" disabled="">
+            Previous
+          </button>
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary text-label-sm font-medium">1</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors">2</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors">3</button>
+<span class="px-1 text-secondary">...</span>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors">7</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm shadow-sm font-medium transition-colors">
+            Next
+          </button>
+</div>
+</div>
+</div>
+<!-- Reference Audit Screen Comparison Callout -->
+<div class="rounded-xl p-space-md bg-surface-container-lowest shadow-sm flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-2xl">science</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Want to test a synthetic counterfactual?</h4>
+<p class="font-body-sm text-body-sm text-secondary">Simulate what would have happened if inventory was purchased 15 days earlier or during Diwali festival promos.</p>
+</div>
+</div>
+<button class="px-4 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors shrink-0">
+        Launch Sandbox Replay
+      </button>
+</div>
+</div>
+</div></main></div></body></html>
