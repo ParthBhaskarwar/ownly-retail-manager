@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-primary": "#80d5cb", "tertiary-fixed-dim": "#ffb598", "on-tertiary-fixed-variant": "#72361b", "surface-dim": "#e0d8d5", "on-error": "#ffffff", "primary": "#005c55", "secondary": "#645d58", "secondary-fixed-dim": "#cec5bf", "on-surface": "#1e1b19", "on-error-container": "#93000a", "surface-container-low": "#faf2ee", "background": "#fff8f5", "secondary-fixed": "#eae1da", "on-background": "#1e1b19", "surface-container-highest": "#e9e1dd", "on-primary": "#ffffff", "surface-container-lowest": "#ffffff", "surface-tint": "#006a63", "tertiary-fixed": "#ffdbce", "surface-container-high": "#eee7e3", "on-secondary": "#ffffff", "on-secondary-fixed": "#1f1b17", "error": "#ba1a1a", "primary-fixed-dim": "#80d5cb", "tertiary": "#7f4025", "on-primary-fixed": "#00201d", "surface": "#fff8f5", "on-tertiary-container": "#ffe5db", "inverse-surface": "#33302d", "error-container": "#ffdad6", "on-secondary-fixed-variant": "#4b4641", "on-tertiary": "#ffffff", "secondary-container": "#eae1da", "on-primary-container": "#a3faef", "outline": "#6e7977", "on-surface-variant": "#3e4947", "tertiary-container": "#9c573a", "on-primary-fixed-variant": "#00504a", "primary-fixed": "#9cf2e8", "inverse-on-surface": "#f7efeb", "surface-variant": "#e9e1dd", "primary-container": "#0f766e", "surface-container": "#f4ece8", "surface-bright": "#fff8f5", "on-secondary-container": "#6a635e", "outline-variant": "#bdc9c6", "on-tertiary-fixed": "#370e00" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-sm": "0.5rem", "margin": "1.5rem", "space-xl": "2rem", "gutter-desktop": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "space-lg": "1.5rem", "margin-desktop": "2rem", "gutter": "1rem" }, "fontFamily": { "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "display-lg": ["Inter"], "table-header": ["Inter"] }, "fontSize": { "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "display-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "table-header": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md antialiased min-h-screen"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col h-full"><div class="h-16 px-space-md flex items-center justify-between gap-space-sm bg-surface-container-lowest"><div class="flex items-center gap-space-sm overflow-hidden"><img alt="Brand logo. - Primary color: #2b4c7e
+- Font: newsreader
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X0--XUhwiTWxURVHjkFrsBc5D1fTgJEdp_1kUlMEBrWzqOSIXRp_CeLm4G3tAvj-_5yKvKmSfTkW8GB30PbeNrsJp4chwGOoULxp-vu1Q9qwDQaFX0e4Kug3imJBoG_oT7PkeyGujYQwPS1hm0ZC_wXnwq5kLPgLyRiHmG-FpKz5t0CTKU8gUFf7vmAzKRViJV2WiKVAMcNjYDH4QWdNNYjD6K6Hb69pjyBCUnzNQcNc2SP8TuOpMDIA"/><div class="flex flex-col truncate"><span class="font-headline-sm text-headline-sm text-primary tracking-tight leading-none">Ownly</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none mt-1">Retail Manager</span></div></div><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface text-[18px]">unfold_more</span></div><div class="flex-1 overflow-y-auto px-space-sm py-space-sm space-y-space-md"><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Main</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="dashboard" href="#">Dashboard</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Store</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="pos-billing" href="#">POS Billing</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="invoices-and-receipts" href="#">Invoices &amp; Receipts</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="returns-and-refunds" href="#">Returns &amp; Refunds</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="product-exchanges" href="#">Product Exchanges</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="products" href="#">Products</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="restock" href="#">Restock</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-restock" href="#">AI Restock</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="inventory-ledger" href="#">Inventory Ledger</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="barcodes" href="#">Barcodes</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">People</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="staff" href="#">Staff</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Insights</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="reports" href="#">Reports</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-insights" href="#">AI Insights</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">System</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="backup-and-safety" href="#">Backup &amp; Safety</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="settings" href="#">Settings</a></nav></div><div class="p-space-sm bg-surface-container-low flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-primary-container inline-block"></span><span class="font-label-sm text-label-sm text-on-surface">Online Sync</span></div><span class="text-secondary font-label-sm text-label-sm">v2.4.1</span></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 bg-surface-container-lowest px-3 py-1.5 rounded-lg shadow-[0_1px_4px_rgba(0,0,0,0.02)] cursor-pointer hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-label-md text-label-md text-on-surface font-medium">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-[16px] text-outline">expand_more</span></div><div class="flex items-center gap-2 bg-surface-container-low px-2.5 py-1 rounded-full"><span class="h-1.5 w-1.5 rounded-full bg-primary-container animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm bg-surface-container-lowest px-3 py-1.5 rounded-lg w-72 text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors shadow-[0_1px_4px_rgba(0,0,0,0.02)]"><span class="material-symbols-outlined text-[18px] text-outline">search</span><span class="font-body-sm text-body-sm text-outline flex-1">Search records, SKUs...</span><kbd class="bg-surface-container-high px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface-variant">⌘K</kbd></div><button class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-error"></span></button><div class="flex items-center gap-space-sm pl-space-sm bg-transparent cursor-pointer"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Rajesh Verma</span><span class="font-label-sm text-label-sm text-secondary leading-tight">Store Owner &amp; Manager</span></div></div></div></header><main class="relative pt-16 w-full min-h-screen bg-surface"><div class="flex flex-col w-full px-margin-desktop py-space-lg space-y-space-lg bg-surface">
+<!-- Breadcrumb & Status Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<nav aria-label="Breadcrumb" class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+<span class="hover:text-on-surface cursor-pointer transition-colors">Store</span>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="hover:text-on-surface cursor-pointer transition-colors">Insights</span>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="text-on-surface font-medium">Reports &amp; Analytics</span>
+</nav>
+<div class="inline-flex items-center gap-2 px-2.5 py-1 bg-surface-container-low rounded-lg shadow-sm">
+<span class="h-2 w-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary">Updated 2 mins ago • Live Data</span>
+</div>
+</div>
+<!-- Primary Page Header & Export Actions -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div class="space-y-1">
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">Reports &amp; Analytics</h1>
+<p class="font-body-md text-body-md text-secondary">Sales, stock, ageing, supplier performance, and data movements</p>
+</div>
+<div class="flex items-center gap-2 flex-wrap">
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest text-on-surface hover:bg-surface-container-low font-label-md text-label-md rounded-lg shadow-sm transition-colors">
+<span class="material-symbols-outlined text-[16px] text-secondary">file_download</span>
+<span>CSV Export</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest text-on-surface hover:bg-surface-container-low font-label-md text-label-md rounded-lg shadow-sm transition-colors">
+<span class="material-symbols-outlined text-[16px] text-secondary">table_view</span>
+<span>Excel (.xls)</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest text-on-surface hover:bg-surface-container-low font-label-md text-label-md rounded-lg shadow-sm transition-colors">
+<span class="material-symbols-outlined text-[16px] text-secondary">print</span>
+<span>Print</span>
+</button>
+</div>
+</div>
+<!-- Tabs Bar -->
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-sm overflow-x-auto">
+<div class="flex items-center min-w-max px-2">
+<a class="inline-flex items-center gap-2 px-4 py-3.5 text-secondary hover:text-on-surface font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">query_stats</span>
+<span>Sales &amp; Profit</span>
+</a>
+<a class="inline-flex items-center gap-2 px-4 py-3.5 text-secondary hover:text-on-surface font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+<span>Stock Valuation</span>
+</a>
+<!-- Active Tab -->
+<a class="inline-flex items-center gap-2 px-4 py-3.5 text-primary-container font-label-md text-label-md relative font-medium" href="#">
+<span class="material-symbols-outlined text-[18px] text-primary-container" style="font-variation-settings: 'FILL' 1;">hourglass_bottom</span>
+<span>Stock Ageing &amp; Dead Stock</span>
+<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-container rounded-t"></span>
+</a>
+<a class="inline-flex items-center gap-2 px-4 py-3.5 text-secondary hover:text-on-surface font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+<span>Supplier Performance</span>
+</a>
+<a class="inline-flex items-center gap-2 px-4 py-3.5 text-secondary hover:text-on-surface font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">assignment_return</span>
+<span>Returns &amp; Damages</span>
+</a>
+<a class="inline-flex items-center gap-2 px-4 py-3.5 text-secondary hover:text-on-surface font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">badge</span>
+<span>Staff Audit</span>
+</a>
+</div>
+</div>
+<!-- Filter Toolbar -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md p-space-md bg-surface-container-lowest rounded-xl shadow-sm">
+<div class="flex flex-wrap items-center gap-space-sm">
+<!-- Date Preset -->
+<div class="inline-flex items-center justify-between gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg text-on-surface cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">calendar_today</span>
+<span class="font-label-sm text-label-sm text-secondary">Range:</span>
+<span class="font-label-md text-label-md font-medium">All Time</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+<!-- Category Filter -->
+<div class="inline-flex items-center justify-between gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg text-on-surface cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">category</span>
+<span class="font-label-sm text-label-sm text-secondary">Category:</span>
+<span class="font-label-md text-label-md font-medium">All Categories</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+<!-- Supplier Filter -->
+<div class="inline-flex items-center justify-between gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg text-on-surface cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">store</span>
+<span class="font-label-sm text-label-sm text-secondary">Supplier:</span>
+<span class="font-label-md text-label-md font-medium">All Suppliers</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+</div>
+<!-- Quick info & Reset -->
+<div class="flex items-center gap-space-md self-end lg:self-auto">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-container-low rounded-md">
+<span class="material-symbols-outlined text-[15px] text-secondary">timer</span>
+<span class="font-label-sm text-label-sm text-secondary">Inventory Age Threshold: <strong class="text-on-surface font-medium">90 Days</strong></span>
+</div>
+<button class="inline-flex items-center gap-1 text-secondary hover:text-primary-container font-label-sm text-label-sm transition-colors">
+<span class="material-symbols-outlined text-[15px]">restart_alt</span>
+<span>Reset Filters</span>
+</button>
+</div>
+</div>
+<!-- Four Ageing Metric Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+<!-- Tile 1: 0 - 30 Days -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary font-medium">0 – 30 Days</span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700">
+<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          Fresh Stock
+        </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">840 units</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">₹5,12,400</span>
+<span class="font-label-sm text-label-sm text-secondary">(59.2% of total)</span>
+</div>
+</div>
+<div class="pt-2 bg-surface-container-low -mx-space-lg -mb-space-lg px-space-lg py-2 rounded-b-xl flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary truncate">Fast moving recent intakes</span>
+<span class="material-symbols-outlined text-[16px] text-primary-container">arrow_outward</span>
+</div>
+</div>
+<!-- Tile 2: 31 - 60 Days -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary font-medium">31 – 60 Days</span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container-high text-secondary">
+<span class="h-1.5 w-1.5 rounded-full bg-outline"></span>
+          Normal Cycle
+        </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">320 units</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">₹1,95,200</span>
+<span class="font-label-sm text-label-sm text-secondary">(22.5% of total)</span>
+</div>
+</div>
+<div class="pt-2 bg-surface-container-low -mx-space-lg -mb-space-lg px-space-lg py-2 rounded-b-xl flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary truncate">Standard retail sales velocity</span>
+<span class="material-symbols-outlined text-[16px] text-outline">trending_flat</span>
+</div>
+</div>
+<!-- Tile 3: 61 - 90 Days -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary font-medium">61 – 90 Days</span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700">
+<span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+          Slow Moving
+        </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">165 units</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-amber-800 font-semibold">₹98,600</span>
+<span class="font-label-sm text-label-sm text-secondary">(11.6% of total)</span>
+</div>
+</div>
+<div class="pt-2 bg-surface-container-low -mx-space-lg -mb-space-lg px-space-lg py-2 rounded-b-xl flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary truncate">Promotional discount alert</span>
+<span class="material-symbols-outlined text-[16px] text-amber-600">warning</span>
+</div>
+</div>
+<!-- Tile 4: 90+ Days (Dead Stock) -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-error font-medium">90+ Days (Dead Stock)</span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-error-container text-on-error-container">
+<span class="h-1.5 w-1.5 rounded-full bg-error"></span>
+          Critical Risk
+        </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg text-error font-semibold tracking-tight">95 units</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm text-error font-semibold">₹39,000</span>
+<span class="font-label-sm text-label-sm text-secondary">(6.7% of total)</span>
+</div>
+</div>
+<div class="pt-2 bg-surface-container-low -mx-space-lg -mb-space-lg px-space-lg py-2 rounded-b-xl flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-error truncate">Stagnant capital / clearance</span>
+<span class="material-symbols-outlined text-[16px] text-error">priority_high</span>
+</div>
+</div>
+</div>
+<!-- Slow-Moving Table Section -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Table Header Toolbar -->
+<div class="p-space-md bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="space-y-0.5">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Ageing &amp; Slow-Moving Stock Audit</h2>
+<p class="font-body-sm text-body-sm text-secondary">Items exceeding 45 days in inventory sorted by longest shelf tenure</p>
+</div>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg shadow-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>Clearance Recommendations</span>
+</button>
+</div>
+<!-- Data Grid Container -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container">
+<th class="py-space-sm px-space-md font-table-header text-table-header uppercase tracking-wider text-secondary">Product Name</th>
+<th class="py-space-sm px-space-md font-table-header text-table-header uppercase tracking-wider text-secondary">SKU Code</th>
+<th class="py-space-sm px-space-md font-table-header text-table-header uppercase tracking-wider text-secondary text-right">Oldest Item</th>
+<th class="py-space-sm px-space-md font-table-header text-table-header uppercase tracking-wider text-secondary text-right">In Stock</th>
+<th class="py-space-sm px-space-md font-table-header text-table-header uppercase tracking-wider text-secondary text-right">Cost Value</th>
+<th class="py-space-sm px-space-md font-table-header text-table-header uppercase tracking-wider text-secondary text-center">Risk Tier</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 font-body-md text-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">Kashmiri Thread Embroidered Stole</div>
+<div class="font-body-sm text-body-sm text-secondary">Ivory Std • Handloom Stoles</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">KSH-STL-STD</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-error font-medium">142 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">24 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹14,400.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-error-container text-on-error-container">
+<span class="h-1.5 w-1.5 rounded-full bg-error"></span>
+                High
+              </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">Raw Silk Classic Waistcoat</div>
+<div class="font-body-sm text-body-sm text-secondary">Size 44 Navy • Men's Ethnic</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">RAW-WST-44</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-error font-medium">128 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">18 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹16,200.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-error-container text-on-error-container">
+<span class="h-1.5 w-1.5 rounded-full bg-error"></span>
+                High
+              </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">Silk Dupatta</div>
+<div class="font-body-sm text-body-sm text-secondary">Bandhani Red • Women's Dupattas</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">SLK-DUP-RED</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-error font-medium">104 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">12 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹8,400.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-error-container text-on-error-container">
+<span class="h-1.5 w-1.5 rounded-full bg-error"></span>
+                High
+              </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">Linen Casual Trousers</div>
+<div class="font-body-sm text-body-sm text-secondary">Beige 36 • Bottom Wear</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">LIN-TRS-BEG</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-amber-700 font-medium">88 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">22 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹15,400.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-amber-50 text-amber-700">
+<span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                Medium
+              </span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">H &amp; M Fleece Hoodie</div>
+<div class="font-body-sm text-body-sm text-secondary">Black S • Winter Wear</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">HM-HOOD-S</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-amber-700 font-medium">76 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">15 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹12,750.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-amber-50 text-amber-700">
+<span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                Medium
+              </span>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">Cotton Kurta Set</div>
+<div class="font-body-sm text-body-sm text-secondary">Printed XL • Daily Ethnic</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">COT-KRT-XL</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-amber-700 font-medium">58 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">30 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹19,500.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-amber-50 text-amber-700">
+<span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                Medium
+              </span>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">Blue Denim Jeans</div>
+<div class="font-body-sm text-body-sm text-secondary">Slim Fit 38 • Casual Apparel</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">BLUDENJE-38</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-secondary font-medium">48 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">16 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹11,200.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-surface-container text-secondary">
+<span class="h-1.5 w-1.5 rounded-full bg-outline"></span>
+                Low
+              </span>
+</td>
+</tr>
+<!-- Row 8 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-space-sm px-space-md">
+<div class="font-medium text-on-surface">Chanderi Silk Anarkali Suit</div>
+<div class="font-body-sm text-body-sm text-secondary">Size S • Occasion Wear</div>
+</td>
+<td class="py-space-sm px-space-md font-mono text-label-sm text-on-surface-variant">
+<span class="px-2 py-0.5 bg-surface-container rounded">CHN-SLK-S</span>
+</td>
+<td class="py-space-sm px-space-md font-mono text-right text-secondary font-medium">42 days</td>
+<td class="py-space-sm px-space-md text-right font-medium">8 units</td>
+<td class="py-space-sm px-space-md text-right font-medium">₹12,000.00</td>
+<td class="py-space-sm px-space-md text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[12px] font-medium bg-surface-container text-secondary">
+<span class="h-1.5 w-1.5 rounded-full bg-outline"></span>
+                Low
+              </span>
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr class="bg-surface-container font-headline-sm text-headline-sm text-on-surface">
+<td class="py-space-sm px-space-md" colspan="3">
+<span class="font-label-md text-label-md text-secondary">Audit Total (Slow-Moving &gt;45 Days):</span>
+</td>
+<td class="py-space-sm px-space-md text-right font-semibold">143 units</td>
+<td class="py-space-sm px-space-md text-right font-semibold text-primary">₹97,450.00</td>
+<td class="py-space-sm px-space-md text-center font-label-sm text-label-sm text-secondary">8 SKUs flagged</td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+<!-- Bottom Liquidation Advisory Callout -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="p-2.5 bg-primary-fixed/40 text-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">lightbulb</span>
+</div>
+<div class="space-y-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Dead Stock Capital Liquidation Advice</h3>
+<p class="font-body-md text-body-md text-secondary max-w-3xl">
+          ₹39,000 of locked capital is currently residing in stock over 90 days. We recommend grouping the High-Risk Kashmiri Stoles and Silk Dupattas into a festive combo markdown or running a 25% end-of-season clearance to release cash flow back into high-demand product lines.
+        </p>
+</div>
+</div>
+<div class="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+<button class="px-3.5 py-2 bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md rounded-lg transition-colors">
+        Dismiss
+      </button>
+<button class="px-4 py-2 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg shadow-sm hover:opacity-95 transition-opacity whitespace-nowrap">
+        Generate Discount Batch
+      </button>
+</div>
+</div>
+</div>
+<script>
+  // Simple interaction for tab switching visual confirmation if clicked
+  document.querySelectorAll('a[href="#"]').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+    });
+  });
+</script></main></div></body></html>

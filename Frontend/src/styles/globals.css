@@ -8,7 +8,11 @@
 @import './animations.css';
 @import './components.css';
 @import './pos.css';
+@import './billing.css';
+@import './products.css';
 @import './ai.css';
+@import './shell.css';
+@import './restock.css';
 
 /* ── Reset ──────────────────────────────────────────────────── */
 

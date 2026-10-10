@@ -22,6 +22,8 @@ function fmt(n: number): string {
   return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
+import '@/styles/dashboard.css';
+
 export default function DashboardPage() {
   const { user } = useAuthContext();
   const { store } = useStoreContext();
@@ -33,6 +35,7 @@ export default function DashboardPage() {
   const [ageing, setAgeing] = useState<StockAgeingSummary | null>(null);
   const [storageHealth, setStorageHealth] = useState<BackupStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showBanner, setShowBanner] = useState(true);
 
   const showChecklist = !store?.setupCompleted;
 
@@ -54,17 +57,14 @@ export default function DashboardPage() {
         const s = StoreService.getOnboardingSteps(user.id, store, user, onboarding.staffAdded);
         setSteps(s);
       } catch {
-        // fall back to basic steps without staff info
         const s = StoreService.getOnboardingSteps(user.id, store, user);
         setSteps(s);
       }
     };
     loadSteps();
 
-    // Load dashboard stats from the backend API (PostgreSQL)
     const loadDashboardData = async () => {
       try {
-        // apiClient attaches the token and unwraps errors; a failure just leaves zeros.
         const data = await apiClient.get<{
           salesKpi?: { todayRevenue?: number; todayOrders?: number };
           stockKpi?: { totalProducts?: number; totalInStock?: number; returnsToday?: number };
@@ -93,8 +93,6 @@ export default function DashboardPage() {
     let isMounted = true;
     setIsLoading(true);
 
-    // Each panel loads on its own and only for roles that may see it, so one
-    // 403 (e.g. a cashier has no reports access) cannot blank the others.
     const role = user?.role as Role | undefined;
     const canReports = !!role && evaluatePermission(role, 'reports:view');
     const canBackup = !!role && evaluatePermission(role, 'settings:edit');
@@ -123,189 +121,237 @@ export default function DashboardPage() {
 
   return (
     <PermissionGuard permissionKey="dashboard:view">
-      <div className="dashboard animate-fade-in-up">
-        <div className="dashboard__welcome" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="dash-container animate-fade-in-up">
+        
+        <div className="dash-header">
           <div>
-            <h1 className="dashboard__greeting" style={{ margin: 0 }}>
-              Welcome back, <span className="gradient-text">{user?.name?.split(' ')[0]}</span> 👋
-            </h1>
-            {store && <p className="dashboard__store-name" style={{ margin: '4px 0 0' }}>{store.name} — Retail Operations</p>}
+            <h1 className="dash-title">Shop Overview &amp; Daily Register</h1>
+            <p className="dash-subtitle">Real-time sales, inventory alerts, and quick actions for {store?.name || 'Store'}.</p>
           </div>
-
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <Link href="/products/new" id="dash-quick-add" className="btn btn--primary btn--sm">
-              + Add Product
+          <div className="dash-actions">
+            <Link href="/products/new" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>add</span>
+              Add Product
             </Link>
-            <Link href="/restock" id="dash-quick-restock" className="btn btn--secondary btn--sm">
-              ⚡ Restock
+            <Link href="/restock" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>move_to_inbox</span>
+              Restock Inward
             </Link>
-            <Link href="/inventory" id="dash-quick-inventory" className="btn btn--secondary btn--sm">
-              ▦ Inventory
+            <Link href="/inventory" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>checklist</span>
+              Inventory Count
             </Link>
-            <Link href="/reports" id="dash-quick-reports" className="btn btn--secondary btn--sm">
-              📊 Reports
+            <Link href="/reports" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>bar_chart</span>
+              View Reports
             </Link>
-            <Link href="/backup" id="dash-quick-backup" className="btn btn--ghost btn--sm">
-              💾 Backup
+            <Link href="/billing" className="dash-btn dash-btn-primary">
+              <span className="material-symbols-outlined">point_of_sale</span>
+              New Sale (POS)
             </Link>
           </div>
         </div>
 
-        {storageHealth?.backupDue && (
-          <div className="alert alert--warning" style={{ margin: 'var(--space-4) 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '8px' }}>
-              <div>
-                <strong>⚠️ Backup Reminder:</strong> Your store data has not been backed up recently. Protect your inventory and sales data offline.
+        {storageHealth?.backupDue && showBanner && (
+          <div className="dash-banner">
+            <div className="dash-banner-left">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-caution)'}}>shield</span>
+              <div className="dash-banner-text">
+                <strong>System Backup Due:</strong> Your store data has not been backed up recently. Recommended backup interval is 12 hours.
               </div>
-              <Link href="/backup" className="btn btn--primary btn--sm">
-                Create Backup Now →
+            </div>
+            <div className="dash-banner-actions">
+              <Link href="/backup" className="dash-banner-btn">
+                <span className="material-symbols-outlined" style={{fontSize: '16px'}}>cloud_upload</span>
+                Create Backup Now
               </Link>
+              <button className="dash-banner-close" onClick={() => setShowBanner(false)} aria-label="Dismiss Banner">
+                <span className="material-symbols-outlined">close</span>
+              </button>
             </div>
           </div>
         )}
 
-        {showChecklist && steps.length > 0 && (
-          <div className="dashboard__onboarding" style={{ margin: 'var(--space-4) 0' }}>
-            <OnboardingChecklist steps={steps} />
-          </div>
-        )}
-
-        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', margin: 'var(--space-5) 0' }}>
-          <div className="stat-card card">
-            <div className="stat-card__icon">💰</div>
-            <div className="stat-card__value">{fmt(salesReport?.totalRevenue || 0)}</div>
-            <div className="stat-card__label">Total Sales Revenue</div>
-          </div>
-
-          <div className="stat-card card">
-            <div className="stat-card__icon">🏷️</div>
-            <div className="stat-card__value" style={{ color: 'var(--color-paid)' }}>
-              {fmt(salesReport?.grossProfit || 0)}
+        <div className="dash-kpi-grid">
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Today's Sales</span>
+              <span className="material-symbols-outlined">payments</span>
             </div>
-            <div className="stat-card__label">
-              Gross Profit ({salesReport?.grossMarginPercent ? salesReport.grossMarginPercent.toFixed(1) : '0.0'}% margin)
+            <div>
+              <div className="dash-kpi-value">{fmt(stats.todaySales || 0)}</div>
             </div>
           </div>
 
-          <div className="stat-card card">
-            <div className="stat-card__icon">📦</div>
-            <div className="stat-card__value">{valuation?.totalStockQuantity || 0}</div>
-            <div className="stat-card__label">In-Stock Physical Units</div>
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Orders Today</span>
+              <span className="material-symbols-outlined">receipt</span>
+            </div>
+            <div>
+              <div className="dash-kpi-value">{stats.ordersToday || 0} <span>bills</span></div>
+            </div>
           </div>
 
-          <div className="stat-card card">
-            <div className="stat-card__icon">💵</div>
-            <div className="stat-card__value">{fmt(valuation?.totalStockCostValue || 0)}</div>
-            <div className="stat-card__label">Stock Valuation (Cost)</div>
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Gross Profit</span>
+              <span className="material-symbols-outlined">account_balance_wallet</span>
+            </div>
+            <div>
+              <div className="dash-kpi-value">{fmt(salesReport?.grossProfit || 0)}</div>
+              <div className="dash-kpi-trend positive">
+                {salesReport?.grossMarginPercent ? salesReport.grossMarginPercent.toFixed(1) : '0.0'}% realized margin
+              </div>
+            </div>
+          </div>
+
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">In-Stock Units</span>
+              <span className="material-symbols-outlined">inventory_2</span>
+            </div>
+            <div>
+              <div className="dash-kpi-value">{stats.inStockItems || 0} <span>pcs</span></div>
+              <div className="dash-kpi-desc">Across {stats.totalProducts || 0} SKUs</div>
+            </div>
+          </div>
+
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Stock Value (Cost)</span>
+              <span className="material-symbols-outlined">savings</span>
+            </div>
+            <div>
+              <div className="dash-kpi-value">{fmt(valuation?.totalStockCostValue || 0)}</div>
+            </div>
           </div>
         </div>
 
-        {user && evaluatePermission(user.role as Role, 'reports:view') && <AiOverviewCard />}
-
-        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
-          <div>
+        <div className="dash-layout-grid">
+          <div className="dash-col-7">
             <RestockRemindersCard storeId={storeId} />
           </div>
 
-          <div className="card">
-            <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 className="card__title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>⏳</span> Stock Ageing Distribution
-              </h2>
-              <Link href="/reports" className="btn btn--ghost btn--sm">
-                Full Report →
-              </Link>
-            </div>
-
-            <div style={{ marginTop: 'var(--space-3)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: 'var(--space-4)' }}>
-                <div className="stat-pill" style={{ padding: 'var(--space-3)' }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)' }}>0 - 30 Days (Fresh)</div>
-                    <strong style={{ fontSize: 'var(--text-lg)' }}>{ageing?.bins.age0To30Days.count || 0} units</strong>
-                  </div>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-paid)' }}>{fmt(ageing?.bins.age0To30Days.value || 0)}</span>
+          <div className="dash-col-5">
+            
+            <div className="dash-card">
+              <div className="dash-card-header">
+                <div>
+                  <h2 className="dash-card-title">Stock Ageing Analysis</h2>
                 </div>
-
-                <div className="stat-pill" style={{ padding: 'var(--space-3)' }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)' }}>31 - 60 Days (Steady)</div>
-                    <strong style={{ fontSize: 'var(--text-lg)' }}>{ageing?.bins.age31To60Days.count || 0} units</strong>
-                  </div>
-                  <span style={{ fontSize: 'var(--text-xs)' }}>{fmt(ageing?.bins.age31To60Days.value || 0)}</span>
-                </div>
-
-                <div className="stat-pill" style={{ padding: 'var(--space-3)', borderColor: 'var(--color-caution-border)' }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-caution)' }}>61 - 90 Days (Slow)</div>
-                    <strong style={{ fontSize: 'var(--text-lg)', color: 'var(--color-caution)' }}>
-                      {ageing?.bins.age61To90Days.count || 0} units
-                    </strong>
-                  </div>
-                  <span style={{ fontSize: 'var(--text-xs)' }}>{fmt(ageing?.bins.age61To90Days.value || 0)}</span>
-                </div>
-
-                <div className="stat-pill" style={{ padding: 'var(--space-3)', borderColor: 'var(--color-return-border)' }}>
-                  <div>
-                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-return)' }}>90+ Days (Dead Stock)</div>
-                    <strong style={{ fontSize: 'var(--text-lg)', color: 'var(--color-return)' }}>
-                      {ageing?.bins.ageOver90Days.count || 0} units
-                    </strong>
-                  </div>
-                  <span style={{ fontSize: 'var(--text-xs)' }}>{fmt(ageing?.bins.ageOver90Days.value || 0)}</span>
-                </div>
+                <span className="dash-card-subtitle">Total: {stats.inStockItems} pcs</span>
               </div>
-
-              {ageing && ageing.slowMovingProducts.length > 0 && (
-                <div style={{ fontSize: 'var(--text-xs)', background: 'var(--color-paper)', padding: 'var(--space-3)', borderRadius: '6px' }}>
-                  <strong>Oldest Garment in Store:</strong> {ageing.slowMovingProducts[0].productName} ({ageing.slowMovingProducts[0].oldestItemAgeDays} days in inventory).
+              <div className="dash-card-body">
+                <div className="dash-ageing-bar">
+                  <div style={{width: '64%', backgroundColor: 'var(--color-paid)'}}></div>
+                  <div style={{width: '21%', backgroundColor: 'var(--color-denim)'}}></div>
+                  <div style={{width: '10%', backgroundColor: 'var(--color-caution)'}}></div>
+                  <div style={{width: '5%', backgroundColor: 'var(--color-return)'}}></div>
                 </div>
-              )}
+                
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-paid)'}}></span>
+                    <span style={{fontWeight: 500}}>0 - 30 Days</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600}}>{ageing?.bins.age0To30Days.count || 0} pcs</span> ({fmt(ageing?.bins.age0To30Days.value || 0)})
+                  </div>
+                </div>
+
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-denim)'}}></span>
+                    <span style={{fontWeight: 500}}>31 - 60 Days</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600}}>{ageing?.bins.age31To60Days.count || 0} pcs</span> ({fmt(ageing?.bins.age31To60Days.value || 0)})
+                  </div>
+                </div>
+
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-caution)'}}></span>
+                    <span style={{fontWeight: 500}}>61 - 90 Days</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600}}>{ageing?.bins.age61To90Days.count || 0} pcs</span> ({fmt(ageing?.bins.age61To90Days.value || 0)})
+                  </div>
+                </div>
+
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-return)'}}></span>
+                    <span style={{fontWeight: 500}}>90+ Days (Dead Stock Risk)</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600, color: 'var(--color-return)'}}>{ageing?.bins.ageOver90Days.count || 0} pcs</span> ({fmt(ageing?.bins.ageOver90Days.value || 0)})
+                  </div>
+                </div>
+
+                {ageing && ageing.slowMovingProducts.length > 0 && (
+                  <div className="dash-ageing-warning">
+                    <span className="material-symbols-outlined" style={{color: 'var(--color-caution)', fontSize: '18px'}}>hourglass_bottom</span>
+                    <div style={{fontSize: '12px', color: 'var(--color-ink-secondary)'}}>
+                      <span style={{fontWeight: 600, color: 'var(--color-ink)'}}>Oldest active SKU:</span> {ageing.slowMovingProducts[0].productName} — in inventory for <span style={{fontWeight: 600, color: 'var(--color-return)'}}>{ageing.slowMovingProducts[0].oldestItemAgeDays} days</span>.
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {user && evaluatePermission(user.role as Role, 'reports:view') && <AiOverviewCard />}
+
           </div>
         </div>
 
-        <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
-          <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="card__title">Top-Selling Garments &amp; Performance</h2>
-            <Link href="/reports" className="btn btn--secondary btn--sm">
-              View All Analytics →
-            </Link>
+        <div className="dash-card">
+          <div className="dash-card-header">
+            <div>
+              <h2 className="dash-card-title">Top-Selling Garments</h2>
+              <p className="dash-card-subtitle" style={{marginTop: '4px'}}>Ranked by overall sales revenue generated over the last 7 billing days.</p>
+            </div>
           </div>
-
-          {salesReport && salesReport.salesByProduct.length > 0 ? (
-            <table className="table" style={{ width: '100%', fontSize: 'var(--text-sm)' }}>
+          
+          <div className="dash-table-wrap">
+            <table className="dash-table">
               <thead>
                 <tr>
-                  <th style={{ textAlign: 'left' }}>Garment Design</th>
-                  <th style={{ textAlign: 'left' }}>SKU</th>
-                  <th style={{ textAlign: 'center' }}>Units Sold</th>
-                  <th style={{ textAlign: 'right' }}>Revenue (₹)</th>
-                  <th style={{ textAlign: 'right' }}>Gross Profit (₹)</th>
-                  <th style={{ textAlign: 'right' }}>Margin</th>
+                  <th>Garment &amp; Variant</th>
+                  <th>SKU</th>
+                  <th style={{textAlign: 'center'}}>Units Sold</th>
+                  <th style={{textAlign: 'right'}}>Revenue</th>
+                  <th style={{textAlign: 'right'}}>Gross Profit</th>
+                  <th style={{textAlign: 'right'}}>Margin</th>
                 </tr>
               </thead>
               <tbody>
-                {salesReport.salesByProduct.slice(0, 5).map((p) => (
-                  <tr key={p.sku}>
-                    <td><strong>{p.productName}</strong></td>
-                    <td><code className="sku-badge">{p.sku}</code></td>
-                    <td style={{ textAlign: 'center' }}>{p.unitsSold}</td>
-                    <td style={{ textAlign: 'right' }}>{fmt(p.revenue)}</td>
-                    <td style={{ textAlign: 'right', color: 'var(--color-paid)', fontWeight: 600 }}>{fmt(p.profit)}</td>
-                    <td style={{ textAlign: 'right' }}>{p.margin.toFixed(1)}%</td>
+                {salesReport && salesReport.salesByProduct.length > 0 ? (
+                  salesReport.salesByProduct.slice(0, 5).map((p) => (
+                    <tr key={p.sku}>
+                      <td>
+                        <div style={{fontWeight: 600, color: 'var(--color-ink)'}}>{p.productName}</div>
+                      </td>
+                      <td style={{color: 'var(--color-ink-secondary)', fontSize: '12px'}}>{p.sku}</td>
+                      <td style={{textAlign: 'center', fontWeight: 500}}>{p.unitsSold}</td>
+                      <td style={{textAlign: 'right', fontWeight: 600}}>{fmt(p.revenue)}</td>
+                      <td style={{textAlign: 'right', color: 'var(--color-ink-secondary)'}}>{fmt(p.profit)}</td>
+                      <td style={{textAlign: 'right'}}>
+                        <span className="dash-status-pill success">{p.margin.toFixed(1)}%</span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} style={{textAlign: 'center', color: 'var(--color-ink-muted)', padding: '32px'}}>
+                      No sales records logged yet. Use the manual restock and barcode ledger to start selling.
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
-          ) : (
-            <div style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-ink-muted)' }}>
-              <p>No sales records logged yet. Use the manual restock and barcode ledger to start selling.</p>
-              <Link href="/backup" className="btn btn--ghost btn--sm">
-                Load Sample Store Data for Demo
-              </Link>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </PermissionGuard>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding - Complete - Ownly Retail Manager</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts for Newsreader (Serif) and Inter (Sans) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,600&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Newsreader', 'serif'],
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#0F766E',
+              hover: '#0D655E',
+              light: '#E6F4F2',
+            },
+            warmBg: '#F7F6F4',
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Typography & Layout Adjustments -->
+<style data-purpose="typography">
+    .font-serif-brand {
+      font-family: 'Newsreader', serif;
+    }
+  </style>
+</head>
+<body class="bg-[#F7F6F4] text-stone-800 font-sans min-h-screen flex flex-col justify-center items-center py-12 px-4 antialiased selection:bg-teal-100 selection:text-teal-900">
+<!-- BEGIN: BrandHeader -->
+<header class="flex flex-col items-center mb-8" data-purpose="brand-header">
+<!-- Logo Icon & Title Lockup -->
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-xl bg-[#0F766E] flex items-center justify-center shadow-sm">
+<span class="text-white font-serif-brand text-2xl font-bold leading-none select-none">O</span>
+</div>
+<div class="flex flex-col">
+<span class="font-serif-brand text-2xl font-bold tracking-tight text-stone-900 leading-none">Ownly</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-medium text-stone-500 mt-1">Retail Manager</span>
+</div>
+</div>
+<!-- 3-Step Progress Indicator -->
+<nav aria-label="Onboarding Progress" class="flex items-center gap-3 text-xs">
+<!-- Step 1: Retail Type (Completed) -->
+<div class="flex items-center gap-1.5 text-stone-600 font-medium">
+<span class="w-4 h-4 rounded-full bg-teal-50 border border-[#0F766E]/40 text-[#0F766E] flex items-center justify-center">
+<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24">
+<path d="M4.5 12.75l6 6 9-13.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<span>Retail Type</span>
+</div>
+<!-- Connector 1 -->
+<div aria-hidden="true" class="w-8 h-[1px] bg-stone-300"></div>
+<!-- Step 2: Store Setup (Completed) -->
+<div class="flex items-center gap-1.5 text-stone-600 font-medium">
+<span class="w-4 h-4 rounded-full bg-teal-50 border border-[#0F766E]/40 text-[#0F766E] flex items-center justify-center">
+<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24">
+<path d="M4.5 12.75l6 6 9-13.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</span>
+<span>Store Setup</span>
+</div>
+<!-- Connector 2 -->
+<div aria-hidden="true" class="w-8 h-[1px] bg-[#0F766E]"></div>
+<!-- Step 3: Done (Active) -->
+<div class="relative flex items-center gap-1.5 text-[#0F766E] font-semibold pb-1">
+<span class="w-4 h-4 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold">
+          3
+        </span>
+<span>Done</span>
+<!-- Active underline bar matching Screen 74 -->
+<div class="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0F766E] rounded-full"></div>
+</div>
+</nav>
+</header>
+<!-- END: BrandHeader -->
+<!-- BEGIN: MainCard -->
+<main class="w-full max-w-[500px]">
+<div class="bg-white border border-[#E7E5E4] rounded-2xl shadow-sm p-8 text-center" data-purpose="success-card">
+<!-- Visual Success Icon -->
+<div class="w-16 h-16 rounded-full bg-[#0F766E]/10 text-[#0F766E] flex items-center justify-center mx-auto mb-4" data-purpose="success-badge">
+<svg class="w-8 h-8" fill="none" stroke="#0F766E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M4.5 12.75l6 6 9-13.5"></path>
+</svg>
+</div>
+<!-- Headline and Narrative Context -->
+<h1 class="font-serif-brand text-2xl font-bold text-stone-900 mb-2">
+        Your store is ready
+      </h1>
+<p class="text-sm text-stone-500 mb-6 text-center leading-relaxed">
+<span class="font-medium text-stone-800">Tulsi Collection</span> is configured and ready for business. Complete these essential steps to get fully up and running:
+      </p>
+<!-- Checklist / Recommended Next Steps -->
+<div class="space-y-3 text-left mb-8" data-purpose="next-steps-list">
+<!-- Step Item 1 -->
+<a class="group flex items-center justify-between p-3.5 rounded-xl border border-stone-200/80 hover:border-[#0F766E]/40 hover:bg-stone-50/60 transition-all duration-150" href="#add-product">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-stone-100 group-hover:bg-[#0F766E]/10 group-hover:text-[#0F766E] text-stone-700 flex items-center justify-center flex-shrink-0 transition-colors">
+<!-- Tag/Product Icon -->
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="min-w-0">
+<h2 class="text-sm font-semibold text-stone-800 group-hover:text-[#0F766E] transition-colors leading-tight truncate">
+                Add your first product
+              </h2>
+<p class="text-xs text-stone-500 leading-normal truncate mt-0.5">
+                Create catalog items with sizes, SKUs, and retail pricing
+              </p>
+</div>
+</div>
+<svg class="w-4 h-4 text-stone-400 group-hover:text-[#0F766E] group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M8.25 4.5l7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</a>
+<!-- Step Item 2 -->
+<a class="group flex items-center justify-between p-3.5 rounded-xl border border-stone-200/80 hover:border-[#0F766E]/40 hover:bg-stone-50/60 transition-all duration-150" href="#restock-inventory">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-stone-100 group-hover:bg-[#0F766E]/10 group-hover:text-[#0F766E] text-stone-700 flex items-center justify-center flex-shrink-0 transition-colors">
+<!-- Box/Inventory Icon -->
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="min-w-0">
+<h2 class="text-sm font-semibold text-stone-800 group-hover:text-[#0F766E] transition-colors leading-tight truncate">
+                Restock inventory
+              </h2>
+<p class="text-xs text-stone-500 leading-normal truncate mt-0.5">
+                Log incoming batch units and assign individual barcode tags
+              </p>
+</div>
+</div>
+<svg class="w-4 h-4 text-stone-400 group-hover:text-[#0F766E] group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M8.25 4.5l7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</a>
+<!-- Step Item 3 -->
+<a class="group flex items-center justify-between p-3.5 rounded-xl border border-stone-200/80 hover:border-[#0F766E]/40 hover:bg-stone-50/60 transition-all duration-150" href="#pos-checkout">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-stone-100 group-hover:bg-[#0F766E]/10 group-hover:text-[#0F766E] text-stone-700 flex items-center justify-center flex-shrink-0 transition-colors">
+<!-- Receipt/Bill Icon -->
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 14.25l6-6m4.5-3.75H4.5a1.5 1.5 0 00-1.5 1.5v16.5l3-1.5 3 1.5 3-1.5 3 1.5 3-1.5 3 1.5V6a1.5 1.5 0 00-1.5-1.5z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="min-w-0">
+<h2 class="text-sm font-semibold text-stone-800 group-hover:text-[#0F766E] transition-colors leading-tight truncate">
+                Create your first bill
+              </h2>
+<p class="text-xs text-stone-500 leading-normal truncate mt-0.5">
+                Fast POS checkout with barcode scanner or manual entry
+              </p>
+</div>
+</div>
+<svg class="w-4 h-4 text-stone-400 group-hover:text-[#0F766E] group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M8.25 4.5l7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</a>
+</div>
+<!-- Action Button Section -->
+<div data-purpose="card-actions">
+<a class="w-full bg-[#0F766E] hover:bg-[#0D655E] text-white font-medium py-3 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors text-base active:scale-[0.99]" href="#dashboard">
+<span>Go to Dashboard</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</a>
+<a class="text-sm text-stone-500 hover:text-stone-800 transition-colors mt-4 inline-block font-medium" href="#sample-data">
+          or <span class="underline decoration-stone-300 underline-offset-4 hover:decoration-stone-600">Explore Sample Data first</span>
+</a>
+</div>
+</div>
+<!-- Footer Microcopy -->
+<div class="flex items-center justify-center gap-1.5 text-xs text-stone-400 text-center mt-6 select-none" data-purpose="security-note">
+<svg class="w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>All set • You can access all configuration tools from your main dashboard</span>
+</div>
+</main>
+<!-- END: MainCard -->
+</body></html>

@@ -45,15 +45,19 @@ export function RestockRemindersCard({ storeId, onSelectRestock, compact = false
 
   if (reminders.length === 0) {
     return (
-      <div className="card restock-reminder-card--empty">
-        <div className="restock-reminder-empty__icon">✓</div>
-        <div>
-          <h3 style={{ margin: 0, fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)' }}>
-            All Stock Levels Healthy
-          </h3>
-          <p style={{ margin: '4px 0 0', fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)' }}>
-            No products are currently low on stock or out of stock.
-          </p>
+      <div className="dash-card">
+        <div className="dash-card-body" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--color-paid-tint)', color: 'var(--color-paid)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span className="material-symbols-outlined">check_circle</span>
+          </div>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
+              All Stock Levels Healthy
+            </h3>
+            <p style={{ margin: '4px 0 0', fontSize: '14px', color: 'var(--color-ink-secondary)' }}>
+              No products are currently low on stock or out of stock.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -63,66 +67,84 @@ export function RestockRemindersCard({ storeId, onSelectRestock, compact = false
   const lowStockCount = reminders.filter((r) => r.urgency === 'LOW_STOCK').length;
 
   return (
-    <div className="card restock-reminders-card">
-      <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 className="card__title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>⚠️</span> Restock Reminders
-            <span className="badge badge--caution badge--sm">
-              {reminders.length} item{reminders.length === 1 ? '' : 's'} need attention
-            </span>
-          </h2>
-          <p style={{ margin: '4px 0 0', fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)' }}>
-            {outOfStockCount > 0 && <span style={{ color: 'var(--color-return)', fontWeight: 600 }}>{outOfStockCount} Out of Stock</span>}
-            {outOfStockCount > 0 && lowStockCount > 0 && ' · '}
-            {lowStockCount > 0 && <span>{lowStockCount} Low Stock</span>}
-          </p>
+    <div className="dash-card">
+      <div className="dash-card-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h2 className="dash-card-title">Restock Reminders &amp; Critical Alerts</h2>
+          <span className="dash-card-badge danger">
+            {reminders.length} items need attention
+          </span>
         </div>
-
-        <Link href="/restock" className="btn btn--secondary btn--sm">
-          Open Restock Console →
-        </Link>
+        
+        <div style={{ display: 'flex', backgroundColor: 'var(--color-paper)', padding: '2px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+          <button style={{ padding: '4px 10px', backgroundColor: 'var(--color-surface)', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 600, boxShadow: 'var(--shadow-raised)', color: 'var(--color-ink)' }}>All ({reminders.length})</button>
+          <button style={{ padding: '4px 10px', backgroundColor: 'transparent', border: 'none', fontSize: '12px', fontWeight: 500, color: 'var(--color-ink-secondary)', cursor: 'pointer' }}>Out of Stock ({outOfStockCount})</button>
+          <button style={{ padding: '4px 10px', backgroundColor: 'transparent', border: 'none', fontSize: '12px', fontWeight: 500, color: 'var(--color-ink-secondary)', cursor: 'pointer' }}>Low Stock ({lowStockCount})</button>
+        </div>
       </div>
 
-      <div className="restock-reminders-list" style={{ marginTop: 'var(--space-3)' }}>
-        {reminders.slice(0, compact ? 4 : 8).map((r) => (
-          <div key={r.variantId} className="restock-reminder-item">
-            <div className="restock-reminder-item__main">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className={`status-pill ${r.urgency === 'OUT_OF_STOCK' ? 'status-pill--error' : 'status-pill--warning'}`}>
-                  {r.urgency === 'OUT_OF_STOCK' ? 'Out of Stock' : 'Low Stock'}
-                </span>
-                <strong>{r.productName}</strong>
-                <code className="sku-badge">{r.sizeName}</code>
-              </div>
-              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', marginTop: '2px' }}>
-                SKU: <span className="font-mono">{r.variantSku}</span>
-                {r.supplierName && ` · Supplier: ${r.supplierName}`}
-              </div>
-            </div>
-
-            <div className="restock-reminder-item__meta">
-              <div className="restock-qty-pill">
-                <span className="restock-qty-pill__current">{r.currentStock} in stock</span>
-                <span className="restock-qty-pill__suggested">+ Suggest {r.suggestedQuantity}</span>
-              </div>
-
-              {onSelectRestock ? (
-                <button
-                  type="button"
-                  className="btn btn--primary btn--sm"
-                  onClick={() => onSelectRestock(r.productId)}
-                >
-                  Restock
-                </button>
-              ) : (
-                <Link href={`/restock?productId=${r.productId}`} className="btn btn--primary btn--sm">
-                  Restock
-                </Link>
-              )}
-            </div>
-          </div>
-        ))}
+      <div className="dash-table-wrap">
+        <table className="dash-table">
+          <thead>
+            <tr>
+              <th>Garment &amp; SKU</th>
+              <th style={{ textAlign: 'center' }}>Stock / Need</th>
+              <th>Severity</th>
+              <th style={{ textAlign: 'right' }}>Quick Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reminders.slice(0, compact ? 4 : 8).map((r) => (
+              <tr key={r.variantId}>
+                <td>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-ink)' }}>
+                    {r.productName} <span style={{ fontWeight: 400, color: 'var(--color-ink-secondary)' }}>({r.sizeName})</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-ink-secondary)', marginTop: '2px' }}>
+                    SKU: {r.variantSku}
+                  </div>
+                </td>
+                <td style={{ textAlign: 'center' }}>
+                  <span style={{ fontWeight: 700, color: r.urgency === 'OUT_OF_STOCK' ? 'var(--color-return)' : 'var(--color-caution)' }}>
+                    {r.currentStock}
+                  </span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-ink-secondary)' }}> / +{r.suggestedQuantity}</span>
+                </td>
+                <td>
+                  <span className={`dash-status-pill ${r.urgency === 'OUT_OF_STOCK' ? 'danger' : 'warning'}`}>
+                    {r.urgency === 'OUT_OF_STOCK' ? 'Out of Stock' : 'Low Stock'}
+                  </span>
+                </td>
+                <td style={{ textAlign: 'right' }}>
+                  {onSelectRestock ? (
+                    <button
+                      type="button"
+                      style={{ height: '32px', padding: '0 10px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '4px', fontSize: '12px', fontWeight: 500, color: 'var(--color-denim)', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                      onClick={() => onSelectRestock(r.productId)}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>add_shopping_cart</span>
+                      Restock
+                    </button>
+                  ) : (
+                    <Link href={`/restock?productId=${r.productId}`} style={{ height: '32px', padding: '0 10px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '4px', fontSize: '12px', fontWeight: 500, color: 'var(--color-denim)', display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>add_shopping_cart</span>
+                      Restock
+                    </Link>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      <div className="dash-card-footer">
+        <span style={{ fontSize: '12px', color: 'var(--color-ink-secondary)' }}>
+          Showing {Math.min(compact ? 4 : 8, reminders.length)} of {reminders.length} critical items
+        </span>
+        <Link href="/restock" style={{ fontSize: '12px', fontWeight: 500, color: 'var(--color-denim)', display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
+          View All {reminders.length} Items <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
+        </Link>
       </div>
     </div>
   );

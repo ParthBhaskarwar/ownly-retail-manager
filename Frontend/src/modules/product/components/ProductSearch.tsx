@@ -25,7 +25,9 @@ export function ProductSearch({ value, onChange, placeholder = 'Search by name o
 
   return (
     <div className="product-search">
-      <span className="product-search__icon" aria-hidden="true">⊕</span>
+      <div className="product-search__icon">
+        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>search</span>
+      </div>
       <input
         id="product-search-input"
         type="search"
@@ -39,11 +41,11 @@ export function ProductSearch({ value, onChange, placeholder = 'Search by name o
       {localValue && (
         <button
           type="button"
-          className="product-search__clear"
           onClick={() => { setLocalValue(''); onChange(''); }}
           aria-label="Clear search"
+          className="product-search__clear"
         >
-          ×
+          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>close</span>
         </button>
       )}
     </div>

@@ -15,7 +15,7 @@
  */
 
 import request from 'supertest';
-import app from '@/app';
+import app from '../src/app';
 import { db } from '@/db/client';
 
 const RUN_ID = Date.now();

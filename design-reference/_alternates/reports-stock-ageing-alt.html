@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-primary": "#80d5cb", "tertiary-fixed-dim": "#ffb598", "on-tertiary-fixed-variant": "#72361b", "surface-dim": "#e0d8d5", "on-error": "#ffffff", "primary": "#005c55", "secondary": "#645d58", "secondary-fixed-dim": "#cec5bf", "on-surface": "#1e1b19", "on-error-container": "#93000a", "surface-container-low": "#faf2ee", "background": "#fff8f5", "secondary-fixed": "#eae1da", "on-background": "#1e1b19", "surface-container-highest": "#e9e1dd", "on-primary": "#ffffff", "surface-container-lowest": "#ffffff", "surface-tint": "#006a63", "tertiary-fixed": "#ffdbce", "surface-container-high": "#eee7e3", "on-secondary": "#ffffff", "on-secondary-fixed": "#1f1b17", "error": "#ba1a1a", "primary-fixed-dim": "#80d5cb", "tertiary": "#7f4025", "on-primary-fixed": "#00201d", "surface": "#fff8f5", "on-tertiary-container": "#ffe5db", "inverse-surface": "#33302d", "error-container": "#ffdad6", "on-secondary-fixed-variant": "#4b4641", "on-tertiary": "#ffffff", "secondary-container": "#eae1da", "on-primary-container": "#a3faef", "outline": "#6e7977", "on-surface-variant": "#3e4947", "tertiary-container": "#9c573a", "on-primary-fixed-variant": "#00504a", "primary-fixed": "#9cf2e8", "inverse-on-surface": "#f7efeb", "surface-variant": "#e9e1dd", "primary-container": "#0f766e", "surface-container": "#f4ece8", "surface-bright": "#fff8f5", "on-secondary-container": "#6a635e", "outline-variant": "#bdc9c6", "on-tertiary-fixed": "#370e00" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-sm": "0.5rem", "margin": "1.5rem", "space-xl": "2rem", "gutter-desktop": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "space-lg": "1.5rem", "margin-desktop": "2rem", "gutter": "1rem" }, "fontFamily": { "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "display-lg": ["Inter"], "table-header": ["Inter"] }, "fontSize": { "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "display-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "table-header": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md antialiased min-h-screen"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col h-full"><div class="h-16 px-space-md flex items-center justify-between gap-space-sm bg-surface-container-lowest"><div class="flex items-center gap-space-sm overflow-hidden"><img alt="Brand logo. - Primary color: #2b4c7e
+- Font: newsreader
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X0--XUhwiTWxURVHjkFrsBc5D1fTgJEdp_1kUlMEBrWzqOSIXRp_CeLm4G3tAvj-_5yKvKmSfTkW8GB30PbeNrsJp4chwGOoULxp-vu1Q9qwDQaFX0e4Kug3imJBoG_oT7PkeyGujYQwPS1hm0ZC_wXnwq5kLPgLyRiHmG-FpKz5t0CTKU8gUFf7vmAzKRViJV2WiKVAMcNjYDH4QWdNNYjD6K6Hb69pjyBCUnzNQcNc2SP8TuOpMDIA"/><div class="flex flex-col truncate"><span class="font-headline-sm text-headline-sm text-primary tracking-tight leading-none">Ownly</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none mt-1">Retail Manager</span></div></div><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface text-[18px]">unfold_more</span></div><div class="flex-1 overflow-y-auto px-space-sm py-space-sm space-y-space-md"><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Main</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="dashboard" href="#">Dashboard</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Store</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="pos-billing" href="#">POS Billing</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="invoices-and-receipts" href="#">Invoices &amp; Receipts</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="returns-and-refunds" href="#">Returns &amp; Refunds</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="product-exchanges" href="#">Product Exchanges</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="products" href="#">Products</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="restock" href="#">Restock</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-restock" href="#">AI Restock</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="inventory-ledger" href="#">Inventory Ledger</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="barcodes" href="#">Barcodes</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">People</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="staff" href="#">Staff</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Insights</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="reports" href="#">Reports</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-insights" href="#">AI Insights</a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-fixed/30 text-primary border-l-2 border-primary font-medium rounded-r-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">System</div><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="backup-and-safety" href="#">Backup &amp; Safety</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="settings" href="#">Settings</a></nav></div><div class="p-space-sm bg-surface-container-low flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-primary-container inline-block"></span><span class="font-label-sm text-label-sm text-on-surface">Online Sync</span></div><span class="text-secondary font-label-sm text-label-sm">v2.4.1</span></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 bg-surface-container-lowest px-3 py-1.5 rounded-lg shadow-[0_1px_4px_rgba(0,0,0,0.02)] cursor-pointer hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-label-md text-label-md text-on-surface font-medium">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-[16px] text-outline">expand_more</span></div><div class="flex items-center gap-2 bg-surface-container-low px-2.5 py-1 rounded-full"><span class="h-1.5 w-1.5 rounded-full bg-primary-container animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm bg-surface-container-lowest px-3 py-1.5 rounded-lg w-72 text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors shadow-[0_1px_4px_rgba(0,0,0,0.02)]"><span class="material-symbols-outlined text-[18px] text-outline">search</span><span class="font-body-sm text-body-sm text-outline flex-1">Search records, SKUs...</span><kbd class="bg-surface-container-high px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface-variant">⌘K</kbd></div><button class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-error"></span></button><div class="flex items-center gap-space-sm pl-space-sm bg-transparent cursor-pointer"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Rajesh Verma</span><span class="font-label-sm text-label-sm text-secondary leading-tight">Store Owner &amp; Manager</span></div></div></div></header><main class="relative pt-16 w-full min-h-screen bg-surface"><div class="flex flex-col w-full">
+<div class="p-space-lg space-y-space-md">
+<!-- 1. Breadcrumb & Action Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-secondary">Store</span>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="font-label-sm text-label-sm text-secondary">Insights</span>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="font-label-sm text-label-sm text-on-surface font-medium">Reports &amp; Analytics</span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-[11px] ml-1">
+<span class="h-1.5 w-1.5 rounded-full bg-primary-container animate-pulse"></span>
+            Updated 2 mins ago • Live Data
+          </span>
+</div>
+<div class="mt-1">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Reports &amp; Analytics</h1>
+<p class="font-body-md text-body-md text-secondary mt-0.5">Sales, stock, ageing, supplier performance, and data movements</p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-2 self-start md:self-auto">
+<button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container-low transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.03)] font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px] text-secondary">table_view</span>
+          CSV Export
+        </button>
+<button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container-low transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.03)] font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px] text-secondary">grid_on</span>
+          Excel (.xls)
+        </button>
+<button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container-low transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.03)] font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px] text-secondary">print</span>
+          Print
+        </button>
+</div>
+</div>
+<!-- 2. 6-Tab Navigation Bar -->
+<div class="flex items-center gap-1 overflow-x-auto pb-px bg-surface-container-lowest rounded-xl p-1 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg font-label-md text-label-md text-secondary hover:text-on-surface hover:bg-surface-container-high transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+        Sales &amp; Profit
+      </button>
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg font-label-md text-label-md text-secondary hover:text-on-surface hover:bg-surface-container-high transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+        Stock Valuation
+      </button>
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg font-label-md text-label-md text-primary bg-primary-fixed/25 font-medium whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">hourglass_bottom</span>
+        Stock Ageing &amp; Dead Stock
+      </button>
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg font-label-md text-label-md text-secondary hover:text-on-surface hover:bg-surface-container-high transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+        Supplier Performance
+      </button>
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg font-label-md text-label-md text-secondary hover:text-on-surface hover:bg-surface-container-high transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">assignment_return</span>
+        Returns &amp; Damages
+      </button>
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg font-label-md text-label-md text-secondary hover:text-on-surface hover:bg-surface-container-high transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">badge</span>
+        Staff Audit
+      </button>
+</div>
+<!-- 3. Filter Bar -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex flex-wrap items-center gap-space-sm flex-1">
+<!-- Date Preset -->
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[16px] text-secondary">calendar_today</span>
+<span class="font-label-md text-label-md text-on-surface">All Time</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+<!-- Category Dropdown -->
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[16px] text-secondary">category</span>
+<span class="font-label-md text-label-md text-on-surface">All Categories</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+<!-- Supplier Dropdown -->
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[16px] text-secondary">inventory</span>
+<span class="font-label-md text-label-md text-on-surface">All Suppliers</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+<!-- Ageing Threshold Tag -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-primary-fixed/20 text-primary font-label-sm text-label-sm rounded-lg">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span>
+<span>Ageing Threshold: 45+ Days</span>
+</div>
+</div>
+<!-- Reset Filter Button -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-label-md text-label-md text-secondary hover:text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">refresh</span>
+        Reset Filters
+      </button>
+</div>
+<!-- 4. Four Ageing Tiles (4-column Grid) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Tile 1: 0–30 Days -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface">0–30 Days</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700">
+<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            Fresh
+          </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">840 <span class="font-body-md text-body-md font-normal text-secondary">units</span></div>
+<div class="font-headline-sm text-headline-sm text-primary tracking-tight">₹5,12,400.00</div>
+</div>
+<p class="font-body-sm text-body-sm text-secondary pt-1">59.2% of active inventory • Regular turnover</p>
+</div>
+<!-- Tile 2: 31–60 Days -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface">31–60 Days</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container text-secondary">
+<span class="h-1.5 w-1.5 rounded-full bg-secondary"></span>
+            Steady
+          </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">320 <span class="font-body-md text-body-md font-normal text-secondary">units</span></div>
+<div class="font-headline-sm text-headline-sm text-on-surface tracking-tight">₹1,95,200.00</div>
+</div>
+<p class="font-body-sm text-body-sm text-secondary pt-1">22.5% of inventory • Normal sales pace</p>
+</div>
+<!-- Tile 3: 61–90 Days -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface">61–90 Days</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700">
+<span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+            Slow
+          </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">165 <span class="font-body-md text-body-md font-normal text-secondary">units</span></div>
+<div class="font-headline-sm text-headline-sm text-on-surface tracking-tight">₹98,600.00</div>
+</div>
+<p class="font-body-sm text-body-sm text-secondary pt-1">11.6% of inventory • Review markdowns</p>
+</div>
+<!-- Tile 4: 90+ Days -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface">90+ Days</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-red-50 text-red-700">
+<span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+            Dead Stock
+          </span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-lg text-headline-lg font-bold text-error tracking-tight">95 <span class="font-body-md text-body-md font-normal text-secondary">units</span></div>
+<div class="font-headline-sm text-headline-sm text-error tracking-tight">₹39,000.00</div>
+</div>
+<p class="font-body-sm text-body-sm text-secondary pt-1">6.7% of inventory • Critical liquidation risk</p>
+</div>
+</div>
+<!-- 5. Slow-Moving Stock Card with Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.02)] overflow-hidden">
+<!-- Card Header -->
+<div class="p-space-md bg-surface-container-lowest flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Slow-Moving Stock</h2>
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-medium">6 SKUs Identified</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-secondary">Sort by:</span>
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors font-label-md text-label-md text-on-surface">
+<span>Longest In Stock</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Table Component -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left font-body-md text-body-md border-collapse">
+<thead>
+<tr class="bg-surface-container text-secondary font-table-header text-table-header uppercase tracking-wider">
+<th class="py-2.5 px-space-md" scope="col">Product Name</th>
+<th class="py-2.5 px-space-md" scope="col">SKU</th>
+<th class="py-2.5 px-space-md" scope="col">Oldest Item</th>
+<th class="py-2.5 px-space-md text-right" scope="col">In Stock</th>
+<th class="py-2.5 px-space-md text-right" scope="col">Cost Value</th>
+<th class="py-2.5 px-space-md text-center" scope="col">Risk Tier</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">apparel</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Kashmiri Thread Embroidered Stole</span>
+<span class="font-body-sm text-body-sm text-secondary leading-tight mt-0.5">Ivory Std • Handloom Stoles</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-mono font-label-sm text-label-sm px-2 py-0.5 bg-surface-container text-on-surface-variant rounded">KSH-STL-STD</span>
+</td>
+<td class="py-3 px-space-md font-mono text-on-surface font-medium">142 days</td>
+<td class="py-3 px-space-md text-right font-medium text-on-surface">24 units</td>
+<td class="py-3 px-space-md text-right font-semibold text-on-surface font-mono">₹14,400.00</td>
+<td class="py-3 px-space-md text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-red-50 text-red-700">High</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">checkroom</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Raw Silk Classic Waistcoat</span>
+<span class="font-body-sm text-body-sm text-secondary leading-tight mt-0.5">Size 44 Navy • Men's Ethnic</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-mono font-label-sm text-label-sm px-2 py-0.5 bg-surface-container text-on-surface-variant rounded">RAW-WST-44</span>
+</td>
+<td class="py-3 px-space-md font-mono text-on-surface font-medium">128 days</td>
+<td class="py-3 px-space-md text-right font-medium text-on-surface">18 units</td>
+<td class="py-3 px-space-md text-right font-semibold text-on-surface font-mono">₹16,200.00</td>
+<td class="py-3 px-space-md text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-red-50 text-red-700">High</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">dry_cleaning</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Silk Dupatta</span>
+<span class="font-body-sm text-body-sm text-secondary leading-tight mt-0.5">Bandhani Red • Women's Dupattas</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-mono font-label-sm text-label-sm px-2 py-0.5 bg-surface-container text-on-surface-variant rounded">SLK-DUP-RED</span>
+</td>
+<td class="py-3 px-space-md font-mono text-on-surface font-medium">104 days</td>
+<td class="py-3 px-space-md text-right font-medium text-on-surface">12 units</td>
+<td class="py-3 px-space-md text-right font-semibold text-on-surface font-mono">₹8,400.00</td>
+<td class="py-3 px-space-md text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-red-50 text-red-700">High</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">style</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Linen Casual Trousers</span>
+<span class="font-body-sm text-body-sm text-secondary leading-tight mt-0.5">Beige 36 • Bottom Wear</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-mono font-label-sm text-label-sm px-2 py-0.5 bg-surface-container text-on-surface-variant rounded">LIN-TRS-BEG</span>
+</td>
+<td class="py-3 px-space-md font-mono text-on-surface font-medium">88 days</td>
+<td class="py-3 px-space-md text-right font-medium text-on-surface">22 units</td>
+<td class="py-3 px-space-md text-right font-semibold text-on-surface font-mono">₹15,400.00</td>
+<td class="py-3 px-space-md text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700">Medium</span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">styler</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium leading-tight">H &amp; M Fleece Hoodie</span>
+<span class="font-body-sm text-body-sm text-secondary leading-tight mt-0.5">Black S • Winter Wear</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-mono font-label-sm text-label-sm px-2 py-0.5 bg-surface-container text-on-surface-variant rounded">HM-HOOD-S</span>
+</td>
+<td class="py-3 px-space-md font-mono text-on-surface font-medium">76 days</td>
+<td class="py-3 px-space-md text-right font-medium text-on-surface">15 units</td>
+<td class="py-3 px-space-md text-right font-semibold text-on-surface font-mono">₹12,750.00</td>
+<td class="py-3 px-space-md text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700">Medium</span>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">checkroom</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Cotton Kurta Set</span>
+<span class="font-body-sm text-body-sm text-secondary leading-tight mt-0.5">Printed XL • Daily Ethnic</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-mono font-label-sm text-label-sm px-2 py-0.5 bg-surface-container text-on-surface-variant rounded">COT-KRT-XL</span>
+</td>
+<td class="py-3 px-space-md font-mono text-on-surface font-medium">58 days</td>
+<td class="py-3 px-space-md text-right font-medium text-on-surface">30 units</td>
+<td class="py-3 px-space-md text-right font-semibold text-on-surface font-mono">₹19,500.00</td>
+<td class="py-3 px-space-md text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container text-secondary">Low</span>
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr class="bg-surface-container-low font-label-md text-label-md font-medium text-on-surface">
+<td class="py-3 px-space-md text-on-surface font-semibold" colspan="3">
+                Slow-Moving Total (6 SKUs)
+              </td>
+<td class="py-3 px-space-md text-right font-bold text-on-surface font-mono">121 units</td>
+<td class="py-3 px-space-md text-right font-bold text-primary font-mono">₹86,650.00</td>
+<td class="py-3 px-space-md text-center text-secondary font-label-sm text-[12px]">Tied-up capital</td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+<!-- 6. Collapsible Clean Alternative / Threshold Control (Empty State Presentation) -->
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col items-center justify-center text-center">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-secondary mb-3">
+<span class="material-symbols-outlined text-[24px]">hourglass_empty</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Clean Cycle View (Preview)</h3>
+<p class="font-body-md text-body-md text-secondary max-w-md mt-1 mb-4">
+        All inventory items are turning over within the normal 45-day sales cycle for current filters when custom thresholds are raised.
+      </p>
+<div class="flex items-center gap-space-sm">
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-secondary">tune</span>
+          Adjust Ageing Threshold
+        </button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container-lowest text-secondary hover:text-on-surface hover:bg-surface-container-low transition-colors font-label-md text-label-md">
+          Reset to All Categories
+        </button>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

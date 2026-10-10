@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-primary": "#80d5cb", "tertiary-fixed-dim": "#ffb598", "on-tertiary-fixed-variant": "#72361b", "surface-dim": "#e0d8d5", "on-error": "#ffffff", "primary": "#005c55", "secondary": "#645d58", "secondary-fixed-dim": "#cec5bf", "on-surface": "#1e1b19", "on-error-container": "#93000a", "surface-container-low": "#faf2ee", "background": "#fff8f5", "secondary-fixed": "#eae1da", "on-background": "#1e1b19", "surface-container-highest": "#e9e1dd", "on-primary": "#ffffff", "surface-container-lowest": "#ffffff", "surface-tint": "#006a63", "tertiary-fixed": "#ffdbce", "surface-container-high": "#eee7e3", "on-secondary": "#ffffff", "on-secondary-fixed": "#1f1b17", "error": "#ba1a1a", "primary-fixed-dim": "#80d5cb", "tertiary": "#7f4025", "on-primary-fixed": "#00201d", "surface": "#fff8f5", "on-tertiary-container": "#ffe5db", "inverse-surface": "#33302d", "error-container": "#ffdad6", "on-secondary-fixed-variant": "#4b4641", "on-tertiary": "#ffffff", "secondary-container": "#eae1da", "on-primary-container": "#a3faef", "outline": "#6e7977", "on-surface-variant": "#3e4947", "tertiary-container": "#9c573a", "on-primary-fixed-variant": "#00504a", "primary-fixed": "#9cf2e8", "inverse-on-surface": "#f7efeb", "surface-variant": "#e9e1dd", "primary-container": "#0f766e", "surface-container": "#f4ece8", "surface-bright": "#fff8f5", "on-secondary-container": "#6a635e", "outline-variant": "#bdc9c6", "on-tertiary-fixed": "#370e00" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-sm": "0.5rem", "margin": "1.5rem", "space-xl": "2rem", "gutter-desktop": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "space-lg": "1.5rem", "margin-desktop": "2rem", "gutter": "1rem" }, "fontFamily": { "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "display-lg": ["Inter"], "table-header": ["Inter"] }, "fontSize": { "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "display-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "table-header": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md antialiased min-h-screen"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col h-full"><div class="h-16 px-space-md flex items-center justify-between gap-space-sm bg-surface-container-lowest"><div class="flex items-center gap-space-sm overflow-hidden"><img alt="Brand logo. - Primary color: #2b4c7e
+- Font: newsreader
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X0--XUhwiTWxURVHjkFrsBc5D1fTgJEdp_1kUlMEBrWzqOSIXRp_CeLm4G3tAvj-_5yKvKmSfTkW8GB30PbeNrsJp4chwGOoULxp-vu1Q9qwDQaFX0e4Kug3imJBoG_oT7PkeyGujYQwPS1hm0ZC_wXnwq5kLPgLyRiHmG-FpKz5t0CTKU8gUFf7vmAzKRViJV2WiKVAMcNjYDH4QWdNNYjD6K6Hb69pjyBCUnzNQcNc2SP8TuOpMDIA"/><div class="flex flex-col truncate"><span class="font-headline-sm text-headline-sm text-primary tracking-tight leading-none">Ownly</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none mt-1">Retail Manager</span></div></div><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface text-[18px]">unfold_more</span></div><div class="flex-1 overflow-y-auto px-space-sm py-space-sm space-y-space-md"><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Main</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[18px]">grid_view</span><span>Dashboard</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Store</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="pos-billing" href="#"><span class="material-symbols-outlined text-[18px]">point_of_sale</span><span>POS Billing</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="invoices-and-receipts" href="#"><span class="material-symbols-outlined text-[18px]">receipt_long</span><span>Invoices &amp; Receipts</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="returns-and-refunds" href="#"><span class="material-symbols-outlined text-[18px]">assignment_return</span><span>Returns &amp; Refunds</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="product-exchanges" href="#"><span class="material-symbols-outlined text-[18px]">sync_alt</span><span>Product Exchanges</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="products" href="#"><span class="material-symbols-outlined text-[18px]">inventory_2</span><span>Products</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="restock" href="#"><span class="material-symbols-outlined text-[18px]">pallet</span><span>Restock</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-restock" href="#"><span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>AI Restock</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="inventory-ledger" href="#"><span class="material-symbols-outlined text-[18px]">fact_check</span><span>Inventory Ledger</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="barcodes" href="#"><span class="material-symbols-outlined text-[18px]">barcode_scanner</span><span>Barcodes</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">People</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="staff" href="#"><span class="material-symbols-outlined text-[18px]">badge</span><span>Staff</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Insights</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="reports" href="#"><span class="material-symbols-outlined text-[18px]">analytics</span><span>Reports</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-insights" href="#"><span class="material-symbols-outlined text-[18px]">psychology</span><span>AI Insights</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">System</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="backup-and-safety" href="#"><span class="material-symbols-outlined text-[18px]">security</span><span>Backup &amp; Safety</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[18px]">settings</span><span>Settings</span></a></nav></div><div class="p-space-sm bg-surface-container-low flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-primary-container inline-block"></span><span class="font-label-sm text-label-sm text-on-surface">Online Sync</span></div><span class="text-secondary font-label-sm text-label-sm">v2.4.1</span></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 bg-surface-container-lowest px-3 py-1.5 rounded-lg shadow-[0_1px_4px_rgba(0,0,0,0.02)] cursor-pointer hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-label-md text-label-md text-on-surface font-medium">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-[16px] text-outline">expand_more</span></div><div class="flex items-center gap-2 bg-surface-container-low px-2.5 py-1 rounded-full"><span class="h-1.5 w-1.5 rounded-full bg-primary-container animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm bg-surface-container-lowest px-3 py-1.5 rounded-lg w-72 text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors shadow-[0_1px_4px_rgba(0,0,0,0.02)]"><span class="material-symbols-outlined text-[18px] text-outline">search</span><span class="font-body-sm text-body-sm text-outline flex-1">Search records, SKUs...</span><kbd class="bg-surface-container-high px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface-variant">⌘K</kbd></div><button class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-error"></span></button><div class="flex items-center gap-space-sm pl-space-sm bg-transparent cursor-pointer"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Rajesh Verma</span><span class="font-label-sm text-label-sm text-secondary leading-tight">Store Owner &amp; Manager</span></div></div></div></header><main class="relative pt-16 w-full min-h-screen bg-surface"><div class="flex flex-col w-full">
+<!-- Interactive Script for Tab/State Toggling -->
+<script>
+    function switchSettlementScenario(scenario) {
+      const paySection = document.getElementById('scenario-pay-section');
+      const creditSection = document.getElementById('scenario-credit-section');
+      const btnPay = document.getElementById('tab-btn-pay');
+      const btnCredit = document.getElementById('tab-btn-credit');
+      const mainActionBtn = document.getElementById('main-submit-btn');
+
+      if (scenario === 'pay') {
+        paySection.classList.remove('hidden');
+        creditSection.classList.add('hidden');
+        btnPay.className = "px-3 py-1 text-label-sm font-label-sm rounded-lg bg-surface-container-lowest text-on-surface shadow-sm";
+        btnCredit.className = "px-3 py-1 text-label-sm font-label-sm rounded-lg text-secondary hover:text-on-surface transition-colors";
+        mainActionBtn.innerHTML = `<span>Complete Exchange (₹1,620.00)</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span>`;
+      } else {
+        paySection.classList.add('hidden');
+        creditSection.classList.remove('hidden');
+        btnCredit.className = "px-3 py-1 text-label-sm font-label-sm rounded-lg bg-surface-container-lowest text-on-surface shadow-sm";
+        btnPay.className = "px-3 py-1 text-label-sm font-label-sm rounded-lg text-secondary hover:text-on-surface transition-colors";
+        mainActionBtn.innerHTML = `<span>Issue Credit & Complete (₹450.00)</span><span class="material-symbols-outlined text-[18px]">verified</span>`;
+      }
+    }
+
+    function toggleLookupError() {
+      const alert = document.getElementById('lookup-error-banner');
+      alert.classList.toggle('hidden');
+    }
+  </script>
+<!-- Top Hero Header Area -->
+<div class="px-margin-desktop pt-6 pb-4 bg-surface-container-lowest shadow-sm">
+<!-- Breadcrumbs & Status Badge -->
+<div class="flex flex-wrap items-center justify-between gap-4 pb-3">
+<nav class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+<a class="hover:text-primary transition-colors" href="#">Store</a>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Product Exchanges</a>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="text-on-surface font-medium">New Exchange Workflow</span>
+</nav>
+<div class="flex items-center gap-3">
+<div class="inline-flex items-center gap-2 bg-surface-container-low px-3 py-1 rounded-full text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-primary">point_of_sale</span>
+<span class="font-label-sm text-label-sm">POS Register #04 • Counter 2</span>
+</div>
+<div class="inline-flex items-center gap-1.5 bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm">
+<span class="h-2 w-2 rounded-full bg-primary-container"></span>
+<span>Sync Active</span>
+</div>
+</div>
+</div>
+<!-- Title & Description -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Product Exchanges</h1>
+<p class="font-body-md text-body-md text-secondary mt-1">
+          Swap returned items for new ones, adjust inventory ledgers, and settle price differences instantly.
+        </p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-2 px-3 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface-variant rounded-lg font-label-md text-label-md transition-colors shadow-sm" onclick="toggleLookupError()">
+<span class="material-symbols-outlined text-[18px]">bug_report</span>
+<span>Toggle Not-Found State</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface-variant rounded-lg font-label-md text-label-md transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">history</span>
+<span>Exchange Logs</span>
+</button>
+</div>
+</div>
+<!-- 4-Step Stepper -->
+<div class="mt-6 pt-5 pb-2 bg-surface-container-low/70 rounded-xl px-4 md:px-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+<!-- Step 1 -->
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-primary font-semibold uppercase tracking-wider">Step 1</span>
+<span class="font-label-md text-label-md text-on-surface truncate">Find Invoice</span>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-primary font-semibold uppercase tracking-wider">Step 2</span>
+<span class="font-label-md text-label-md text-on-surface truncate">Items to Return</span>
+</div>
+</div>
+<!-- Step 3 (Active) -->
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary-container text-on-primary font-label-md text-label-md shadow-sm">
+<span>3</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-primary-container font-semibold uppercase tracking-wider">Active</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Replacement Items</span>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="flex items-center gap-3 opacity-60">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-highest text-secondary font-label-md text-label-md">
+<span>4</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-secondary font-semibold uppercase tracking-wider">Step 4</span>
+<span class="font-label-md text-label-md text-secondary truncate">Settle Difference</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Canvas Container -->
+<div class="p-margin-desktop space-y-space-lg">
+<!-- Collapsible Error Simulation Box -->
+<div class="hidden rounded-xl bg-error-container text-on-error-container p-4 shadow-sm" id="lookup-error-banner">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[24px] text-error mt-0.5">error</span>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<h4 class="font-headline-sm text-headline-sm text-error">Invoice Lookup Failed: INV-20261003-9999</h4>
+<button class="text-error hover:opacity-75" onclick="toggleLookupError()">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-md text-body-md mt-1 text-on-error-container">
+            No active transaction found matching this invoice ID in Tulsi Main Store or connected cloud stores within the 30-day exchange window.
+          </p>
+<div class="mt-3 flex flex-wrap gap-2">
+<button class="px-3 py-1.5 bg-surface-container-lowest text-error rounded-lg font-label-sm text-label-sm shadow-sm hover:bg-surface-container-low transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Search by Customer Mobile (+91)</span>
+</button>
+<button class="px-3 py-1.5 bg-surface-container-lowest text-error rounded-lg font-label-sm text-label-sm shadow-sm hover:bg-surface-container-low transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">document_scanner</span>
+<span>Scan Physical Receipt Barcode</span>
+</button>
+<button class="px-3 py-1.5 bg-error text-on-error rounded-lg font-label-sm text-label-sm shadow-sm hover:opacity-90 transition-opacity">
+              Create Offline Manual Exchange
+            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Two-Column Primary Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT COLUMN: Workflow Steps (8 cols) -->
+<div class="lg:col-span-8 space-y-space-lg">
+<!-- STEP 1: Invoice Lookup Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold">1</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Original Invoice Lookup</h2>
+</div>
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">lock</span> Verified Transaction
+            </span>
+</div>
+<!-- Lookup Input Group -->
+<div class="flex flex-col sm:flex-row gap-2 mt-2">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[20px]">receipt_long</span>
+<input class="w-full pl-10 pr-10 py-2 bg-surface-container-low rounded-lg text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" placeholder="Scan or enter invoice ID (e.g. INV-20260827-0001)" type="text" value="INV-20261003-0089"/>
+<button class="absolute right-2.5 top-2 text-outline hover:text-on-surface" title="Scan Barcode">
+<span class="material-symbols-outlined text-[20px]">barcode_scanner</span>
+</button>
+</div>
+<button class="px-4 py-2 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary transition-colors shadow-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span>Look Up</span>
+</button>
+</div>
+<!-- Loaded Invoice Summary Subcard -->
+<div class="mt-4 rounded-xl bg-surface-container-low p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<div class="p-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">INV-20261003-0089</span>
+<span class="px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-primary-fixed text-on-primary-fixed">Completed • Paid</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 font-body-sm text-body-sm text-secondary">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span> 03 Oct 2026, 14:32
+                  </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">person</span> Priya Sharma (+91 98201 44321)
+                  </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span> ₹4,999.00 (2 items)
+                  </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-center">
+<button class="text-primary hover:text-on-surface text-label-sm font-label-sm font-medium flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+<span>Change Invoice</span>
+</button>
+<button class="text-secondary hover:text-on-surface text-label-sm font-label-sm px-2 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</div>
+</div>
+</div>
+<!-- STEP 2: Items to Return (Origin Items) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 gap-2">
+<div class="flex items-center gap-2">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold">2</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Select Items to Return</h2>
+<p class="font-body-sm text-body-sm text-secondary">Mark condition to determine inventory inward destination</p>
+</div>
+</div>
+<div class="text-label-sm font-label-sm text-primary-container bg-primary-fixed/40 px-2.5 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warehouse</span>
+<span>Auto-triage destination ready</span>
+</div>
+</div>
+<!-- Items Table -->
+<div class="overflow-x-auto rounded-lg bg-surface-container-low mt-2 shadow-sm">
+<table class="w-full text-left font-body-md text-body-md border-collapse">
+<thead>
+<tr class="bg-surface-container-high text-secondary font-table-header text-table-header uppercase">
+<th class="py-2.5 px-3 w-10">Select</th>
+<th class="py-2.5 px-3">Item Details</th>
+<th class="py-2.5 px-2 text-center">Sold Qty</th>
+<th class="py-2.5 px-3 text-right">Unit Price</th>
+<th class="py-2.5 px-2 text-center">Exchange Qty</th>
+<th class="py-2.5 px-3">Condition Triage</th>
+<th class="py-2.5 px-3">Reason</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<!-- Checked Row (Returning) -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low/60 transition-colors">
+<td class="py-3 px-3 align-top">
+<input checked="" class="w-4 h-4 rounded text-primary-container accent-primary-container mt-1 cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-3 px-3 align-top min-w-[180px]">
+<div class="font-label-md text-label-md text-on-surface font-semibold leading-tight">Chanderi Silk Anarkali Suit</div>
+<div class="font-body-sm text-body-sm text-secondary mt-0.5">SKU: CHN-SLK-042</div>
+<div class="inline-flex items-center gap-1.5 mt-1 font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded">
+<span class="h-2 w-2 rounded-full bg-primary-container"></span>
+<span>Size: XL • Emerald</span>
+</div>
+</td>
+<td class="py-3 px-2 text-center align-top font-label-md text-label-md text-on-surface">1</td>
+<td class="py-3 px-3 text-right align-top font-label-md text-label-md text-on-surface font-medium">₹3,499.00</td>
+<td class="py-3 px-2 text-center align-top">
+<span class="inline-block px-2.5 py-1 bg-surface-container-low rounded-lg font-label-md text-label-md text-on-surface font-medium">1</span>
+</td>
+<td class="py-3 px-3 align-top">
+<!-- Segmented triage toggle -->
+<div class="inline-flex p-0.5 bg-surface-container-low rounded-lg shadow-inner">
+<button class="px-2 py-1 text-label-sm font-label-sm rounded-md bg-surface-container-lowest text-primary-container font-semibold shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">inventory_2</span>
+<span>Saleable</span>
+</button>
+<button class="px-2 py-1 text-label-sm font-label-sm rounded-md text-secondary hover:text-error transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">heart_broken</span>
+<span>Damaged</span>
+</button>
+</div>
+<div class="font-body-sm text-body-sm text-primary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">store</span> Restock to Main Floor
+                    </div>
+</td>
+<td class="py-3 px-3 align-top">
+<select class="w-full text-label-sm font-label-sm bg-surface-container-low py-1.5 px-2 rounded-lg text-on-surface focus:outline-none">
+<option selected="">Size too small / Fit issue</option>
+<option>Fabric defect</option>
+<option>Customer changed preference</option>
+<option>Color mismatch</option>
+</select>
+</td>
+</tr>
+<!-- Unchecked Row (Not Returning) -->
+<tr class="bg-surface-container-lowest/50 opacity-60 hover:opacity-80 transition-opacity">
+<td class="py-3 px-3 align-top">
+<input class="w-4 h-4 rounded text-primary-container accent-primary-container mt-1 cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-3 px-3 align-top min-w-[180px]">
+<div class="font-label-md text-label-md text-on-surface font-medium leading-tight">Kashmiri Thread Stole</div>
+<div class="font-body-sm text-body-sm text-secondary mt-0.5">SKU: KSH-STL-STD</div>
+<div class="inline-flex items-center gap-1 mt-1 font-label-sm text-label-sm text-secondary bg-surface-container-low px-2 py-0.5 rounded">
+<span>Free Size • Ivory Embroidered</span>
+</div>
+</td>
+<td class="py-3 px-2 text-center align-top font-label-md text-label-md text-secondary">1</td>
+<td class="py-3 px-3 text-right align-top font-label-md text-label-md text-secondary">₹1,500.00</td>
+<td class="py-3 px-2 text-center align-top text-secondary font-label-sm text-label-sm">0</td>
+<td class="py-3 px-3 align-top text-secondary font-label-sm text-label-sm italic">— Not selected —</td>
+<td class="py-3 px-3 align-top text-secondary font-label-sm text-label-sm italic">—</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Inventory Movement Helper Card -->
+<div class="mt-3 p-3 rounded-lg bg-surface-container-low flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-primary mt-0.5">info</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+<strong class="font-medium text-on-surface">Auto-Inventory Rule:</strong> Marked <strong>Saleable</strong> items are immediately added back into Tulsi Main Store inventory under batch <code class="font-mono text-[11px] bg-surface-container-lowest px-1 py-0.5 rounded">RET-OCT26</code>. Damaged items bypass regular stock and move to the QC Damaged Bay.
+            </p>
+</div>
+</div>
+<!-- STEP 3: Replacement Items (Inward & Scan) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 gap-2">
+<div class="flex items-center gap-2">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold">3</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Replacement Items</h2>
+<p class="font-body-sm text-body-sm text-secondary">Scan replacement barcodes or pick from catalogue</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-secondary">2 Items Scanned</span>
+<span class="text-primary-container font-label-md text-label-md font-semibold bg-primary-fixed/40 px-2.5 py-0.5 rounded-full">₹5,119.00</span>
+</div>
+</div>
+<!-- Barcode Scanner Bar -->
+<div class="flex flex-col sm:flex-row gap-2 mt-2">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-primary text-[20px]">barcode_scanner</span>
+<input class="w-full pl-10 pr-24 py-2 bg-surface-container-low rounded-lg text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" placeholder="Scan replacement barcode (e.g. 162AD2-CHNSLK-0055) or search SKU / Title..." type="text"/>
+<div class="absolute right-2 top-1.5 flex items-center gap-1">
+<kbd class="hidden sm:inline bg-surface-container-high px-1.5 py-0.5 rounded text-[11px] font-medium text-secondary">F2 Scan</kbd>
+</div>
+</div>
+<button class="px-4 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Add Item</span>
+</button>
+<button class="px-3 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md rounded-lg transition-colors shadow-sm flex items-center justify-center" title="Browse Catalogue">
+<span class="material-symbols-outlined text-[18px]">category</span>
+</button>
+</div>
+<!-- Replacement Items Table -->
+<div class="overflow-x-auto rounded-lg bg-surface-container-low mt-4 shadow-sm">
+<table class="w-full text-left font-body-md text-body-md border-collapse">
+<thead>
+<tr class="bg-surface-container-high text-secondary font-table-header text-table-header uppercase">
+<th class="py-2.5 px-3">Barcode / SKU</th>
+<th class="py-2.5 px-3">Replacement Item</th>
+<th class="py-2.5 px-3">Size / Variant</th>
+<th class="py-2.5 px-3 text-right">Unit Price</th>
+<th class="py-2.5 px-2 text-center">Qty</th>
+<th class="py-2.5 px-3 text-right">Subtotal</th>
+<th class="py-2.5 px-3 text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high bg-surface-container-lowest">
+<!-- Replacement Item 1 (Direct Size Exchange) -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-3 align-middle font-mono font-body-sm text-body-sm text-secondary">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-primary">qr_code_2</span>
+<span>162AD2-0055</span>
+</div>
+<span class="text-[11px] text-outline block">CHN-SLK-XXL</span>
+</td>
+<td class="py-3 px-3 align-middle">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Chanderi Silk Anarkali Suit</div>
+<span class="text-label-sm font-label-sm text-primary font-medium">Exact Style Exchange (Upsize)</span>
+</td>
+<td class="py-3 px-3 align-middle">
+<span class="inline-flex items-center gap-1 text-label-sm font-label-sm bg-surface-container-low px-2 py-0.5 rounded text-on-surface">
+                      Size: XXL • Emerald
+                    </span>
+</td>
+<td class="py-3 px-3 text-right align-middle font-label-md text-label-md text-on-surface">₹3,499.00</td>
+<td class="py-3 px-2 text-center align-middle">
+<div class="inline-flex items-center bg-surface-container-low rounded-lg p-0.5">
+<button class="w-6 h-6 flex items-center justify-center text-secondary hover:text-on-surface rounded">-</button>
+<span class="w-6 text-center font-label-sm text-label-sm text-on-surface font-semibold">1</span>
+<button class="w-6 h-6 flex items-center justify-center text-secondary hover:text-on-surface rounded">+</button>
+</div>
+</td>
+<td class="py-3 px-3 text-right align-middle font-label-md text-label-md font-semibold text-on-surface">₹3,499.00</td>
+<td class="py-3 px-3 text-center align-middle">
+<button class="p-1 text-secondary hover:text-error rounded-md transition-colors" title="Remove Item">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Replacement Item 2 (Additional Upsell Item) -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-3 align-middle font-mono font-body-sm text-body-sm text-secondary">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-primary">qr_code_2</span>
+<span>162AD2-0054</span>
+</div>
+<span class="text-[11px] text-outline block">RAW-WST-40</span>
+</td>
+<td class="py-3 px-3 align-middle">
+<div class="font-label-md text-label-md text-on-surface font-semibold">Raw Silk Classic Waistcoat</div>
+<span class="text-label-sm font-label-sm text-secondary">Complementary Cross-Sell</span>
+</td>
+<td class="py-3 px-3 align-middle">
+<span class="inline-flex items-center gap-1 text-label-sm font-label-sm bg-surface-container-low px-2 py-0.5 rounded text-on-surface">
+                      Size: 40 Reg • Navy
+                    </span>
+</td>
+<td class="py-3 px-3 text-right align-middle font-label-md text-label-md text-on-surface">₹1,620.00</td>
+<td class="py-3 px-2 text-center align-middle">
+<div class="inline-flex items-center bg-surface-container-low rounded-lg p-0.5">
+<button class="w-6 h-6 flex items-center justify-center text-secondary hover:text-on-surface rounded">-</button>
+<span class="w-6 text-center font-label-sm text-label-sm text-on-surface font-semibold">1</span>
+<button class="w-6 h-6 flex items-center justify-center text-secondary hover:text-on-surface rounded">+</button>
+</div>
+</td>
+<td class="py-3 px-3 text-right align-middle font-label-md text-label-md font-semibold text-on-surface">₹1,620.00</td>
+<td class="py-3 px-3 text-center align-middle">
+<button class="p-1 text-secondary hover:text-error rounded-md transition-colors" title="Remove Item">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Total Replacement Row -->
+<div class="flex items-center justify-between mt-3 px-3 py-2 bg-surface-container-low rounded-lg">
+<span class="font-label-md text-label-md text-secondary">Total New Items Value (2 SKUs)</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">₹5,119.00</span>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Sticky Summary & Settlement (4 cols) -->
+<div class="lg:col-span-4 space-y-space-md sticky top-20">
+<!-- Sticky Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md p-space-md">
+<!-- Card Header & Simulation Toggle Tabs -->
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">balance</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Exchange Summary</h3>
+</div>
+<!-- Dual Scenario Toggle -->
+<div class="flex p-0.5 bg-surface-container-low rounded-lg text-secondary">
+<button class="px-2 py-1 text-label-sm font-label-sm rounded-lg bg-surface-container-lowest text-on-surface shadow-sm" id="tab-btn-pay" onclick="switchSettlementScenario('pay')" title="Replacement &gt; Return">
+                Due (+₹)
+              </button>
+<button class="px-2 py-1 text-label-sm font-label-sm rounded-lg text-secondary hover:text-on-surface" id="tab-btn-credit" onclick="switchSettlementScenario('credit')" title="Return &gt; Replacement">
+                Credit (-₹)
+              </button>
+</div>
+</div>
+<!-- Calculation Ledger Breakup -->
+<div class="space-y-2.5 pt-2">
+<!-- Returned Credit -->
+<div class="flex items-center justify-between font-body-md text-body-md">
+<span class="text-secondary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">arrow_downward</span>
+<span>Returned Item Credit (1x)</span>
+</span>
+<span class="font-label-md text-label-md text-primary font-semibold">- ₹3,499.00</span>
+</div>
+<!-- Replacement Total -->
+<div class="flex items-center justify-between font-body-md text-body-md">
+<span class="text-secondary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">arrow_upward</span>
+<span>Replacement Total (2x)</span>
+</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">₹5,119.00</span>
+</div>
+<!-- Tax Adjustment -->
+<div class="flex items-center justify-between font-body-md text-body-md">
+<span class="text-secondary">Net GST Adjustment (12%)</span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Included</span>
+</div>
+<!-- Restocking Fee -->
+<div class="flex items-center justify-between font-body-md text-body-md">
+<span class="text-secondary">Exchange / Restocking Fee</span>
+<span class="font-label-md text-label-md text-primary font-medium">₹0.00 (Waived)</span>
+</div>
+</div>
+<div class="my-3.5 h-[1px] bg-surface-container-high"></div>
+<!-- SCENARIO A: Customer Pays Difference (Active Default) -->
+<div class="space-y-4" id="scenario-pay-section">
+<div class="bg-surface-container-low p-3 rounded-xl">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider block">Balance to Collect</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-display-lg text-display-lg font-bold text-on-surface leading-tight">₹1,620.00</span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-primary-fixed text-on-primary-fixed font-semibold">Payment Due</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Replacement items value exceeds returned credit balance.</p>
+</div>
+<!-- Payment Method Selection -->
+<div>
+<label class="block font-label-sm text-label-sm text-secondary mb-2 font-medium">Select Settlement Mode</label>
+<div class="grid grid-cols-3 gap-2">
+<!-- UPI (Selected) -->
+<button class="flex flex-col items-center justify-center p-2.5 rounded-lg bg-primary-fixed/40 text-primary-container shadow-sm">
+<span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+<span class="font-label-sm text-label-sm mt-1 font-semibold">UPI QR</span>
+</button>
+<!-- Cash -->
+<button class="flex flex-col items-center justify-center p-2.5 rounded-lg bg-surface-container-low text-secondary hover:text-on-surface transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="font-label-sm text-label-sm mt-1">Cash</span>
+</button>
+<!-- Card -->
+<button class="flex flex-col items-center justify-center p-2.5 rounded-lg bg-surface-container-low text-secondary hover:text-on-surface transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">credit_card</span>
+<span class="font-label-sm text-label-sm mt-1">Card / POS</span>
+</button>
+</div>
+<!-- Quick Tender Input -->
+<div class="mt-3 flex items-center justify-between p-2.5 bg-surface-container-low rounded-lg">
+<span class="font-label-sm text-label-sm text-secondary">Tender Amount</span>
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md font-bold text-on-surface">₹</span>
+<input class="w-20 text-right bg-surface-container-lowest font-headline-sm text-headline-sm font-bold text-on-surface rounded px-2 py-0.5 focus:outline-none" type="text" value="1620.00"/>
+</div>
+</div>
+</div>
+</div>
+<!-- SCENARIO B: Store Credit Due (Toggled View) -->
+<div class="hidden space-y-4" id="scenario-credit-section">
+<div class="bg-surface-container-low p-3 rounded-xl">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider block">Refund Balance Remaining</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-display-lg text-display-lg font-bold text-primary leading-tight">₹450.00</span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-primary-fixed text-on-primary-fixed font-semibold">Credit Store</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Returned merchandise value exceeds replacement selection.</p>
+</div>
+<!-- Store Credit Allocation -->
+<div class="p-3 bg-surface-container-low rounded-lg space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface font-medium">Issue Store Voucher</span>
+<span class="font-mono text-label-sm font-label-sm text-primary font-semibold">VOUCH-OCT-9912</span>
+</div>
+<div class="flex items-center gap-2">
+<input checked="" class="rounded text-primary-container accent-primary-container" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-secondary">Send SMS voucher to Priya Sharma (+91 98201 44321)</span>
+</div>
+<div class="font-body-sm text-body-sm text-outline">Validity: 180 Days at any Tulsi Collection outlet.</div>
+</div>
+</div>
+<!-- Primary & Secondary Actions -->
+<div class="mt-5 space-y-2">
+<button class="w-full py-3 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg hover:bg-primary transition-colors shadow-md flex items-center justify-center gap-2" id="main-submit-btn">
+<span>Complete Exchange (₹1,620.00)</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="w-full py-2 bg-surface-container-low text-secondary hover:text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors shadow-sm">
+              Cancel &amp; Return to Invoices
+            </button>
+</div>
+<!-- Audit Metadata -->
+<div class="mt-4 pt-3 flex items-center justify-between text-secondary font-label-sm text-label-sm">
+<span>Cashier: Rajesh Verma</span>
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[14px]">shield</span> Audit Logged
+            </span>
+</div>
+</div>
+<!-- Quick Policies Collapsible Mini-Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-4">
+<div class="flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">verified_user</span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Store Exchange Rules</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+<ul class="mt-2.5 space-y-1.5 font-body-sm text-body-sm text-secondary list-disc pl-4">
+<li>Exchanges permitted within 30 days of purchase with valid invoice.</li>
+<li>Intimate tags and barcode labels must remain unaltered for floor restock.</li>
+<li>Difference settled immediately via POS or store credit credit note.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- BOTTOM WORKFLOW PREVIEWS & CONFIRMATIONS SECTION -->
+<div class="pt-6">
+<div class="flex items-center justify-between mb-4">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Downstream Workflow Parity</h3>
+<p class="font-body-sm text-body-sm text-secondary">Previewing generated receipts, invoice reconciliation, and inventory ledger updates.</p>
+</div>
+<span class="px-3 py-1 bg-surface-container-low text-on-surface-variant rounded-full font-label-sm text-label-sm">
+          Auto-Ledger Integration Active
+        </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<!-- PREVIEW 1: Success State Slip -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-5 relative overflow-hidden">
+<div class="flex items-start justify-between pb-3">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary-fixed text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Exchange Slip Sample: Completed</h4>
+<div class="flex items-center gap-2 font-mono text-label-sm font-label-sm text-secondary">
+<span>EXC-20261003-0008</span>
+<span>•</span>
+<span>New Invoice: INV-20261003-0090</span>
+</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-primary-fixed text-on-primary-fixed font-semibold">Settled UPI</span>
+</div>
+<!-- Micro Receipt Summary -->
+<div class="p-3 bg-surface-container-low rounded-lg space-y-2 mt-2">
+<div class="flex justify-between font-body-sm text-body-sm text-secondary">
+<span>Original Invoice Reference:</span>
+<span class="font-medium text-on-surface">INV-20261003-0089</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm text-secondary">
+<span>Inward Restock:</span>
+<span class="font-medium text-primary">1x Chanderi Silk (XL) → Tulsi Floor</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm text-secondary">
+<span>Outward Dispatched:</span>
+<span class="font-medium text-on-surface">1x Chanderi (XXL) + 1x Waistcoat (40)</span>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface pt-1.5 font-bold">
+<span>Net Additional Received:</span>
+<span>₹1,620.00</span>
+</div>
+</div>
+<!-- Action buttons -->
+<div class="mt-4 flex flex-wrap gap-2">
+<button class="px-3 py-1.5 bg-primary-container text-on-primary rounded-lg font-label-sm text-label-sm shadow-sm hover:bg-primary transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">print</span>
+<span>Print Receipt &amp; Slip</span>
+</button>
+<button class="px-3 py-1.5 bg-surface-container-low text-on-surface rounded-lg font-label-sm text-label-sm shadow-sm hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">restart_alt</span>
+<span>New Exchange</span>
+</button>
+<button class="px-3 py-1.5 bg-surface-container-low text-secondary hover:text-on-surface rounded-lg font-label-sm text-label-sm transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+<span>View in Ledger</span>
+</button>
+</div>
+</div>
+<!-- PREVIEW 2: Real-time Stock Ledger Sync -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-5">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-low text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[20px]">sync_saved_locally</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Real-Time Inventory Ledger Impact</h4>
+<span class="font-label-sm text-label-sm text-secondary">Auto-posted to Tulsi Main Store Stock Account</span>
+</div>
+</div>
+<span class="text-label-sm font-label-sm text-primary font-semibold">Immediate</span>
+</div>
+<!-- Movement Badges -->
+<div class="space-y-2 mt-2">
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed font-semibold">+1 IN</span>
+<span class="font-body-sm text-body-sm text-on-surface">CHN-SLK-042 (Size XL Emerald)</span>
+</div>
+<span class="font-mono text-label-sm font-label-sm text-secondary">Bal: 12 pcs</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded font-label-sm text-label-sm bg-surface-container-highest text-secondary font-semibold">-1 OUT</span>
+<span class="font-body-sm text-body-sm text-on-surface">CHN-SLK-XXL (Size XXL Emerald)</span>
+</div>
+<span class="font-mono text-label-sm font-label-sm text-secondary">Bal: 4 pcs</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded font-label-sm text-label-sm bg-surface-container-highest text-secondary font-semibold">-1 OUT</span>
+<span class="font-body-sm text-body-sm text-on-surface">RAW-WST-40 (Waistcoat 40 Navy)</span>
+</div>
+<span class="font-mono text-label-sm font-label-sm text-secondary">Bal: 7 pcs</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

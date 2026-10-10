@@ -204,7 +204,7 @@ function NewProductContent() {
   if (submitSuccess) {
     return (
       <div className="pe-success-screen" role="status" aria-live="polite">
-        <div className="pe-success-icon" aria-hidden="true">✓</div>
+        <div className="pe-success-icon" aria-hidden="true" style={{ fontFamily: 'Material Symbols Outlined' }}>check_circle</div>
         <h2 className="pe-success-title">Product Created Successfully</h2>
         <p className="pe-success-desc">
           {summary.totalQty} physical item{summary.totalQty !== 1 ? 's' : ''} added to stock with unique barcodes.
@@ -218,7 +218,7 @@ function NewProductContent() {
 
   return (
     <form id="new-product-form" className="pe-layout" onSubmit={handleSubmit} noValidate aria-label="Add new clothing product form">
-      <div className="pe-main space-y-6">
+      <div className="pe-main" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
         {/* Header */}
         <div className="pe-page-header">
           <a href="/products" className="page-back-link" aria-label="Back to products">
@@ -241,7 +241,7 @@ function NewProductContent() {
           <header className="pe-card__header">
             <h2 className="pe-card__title">1. Product Taxonomy</h2>
           </header>
-          <div className="pe-card__body space-y-4">
+          <div className="pe-card__body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <div className={fieldErrors.category ? 'form-field--error' : ''}>
               <CategorySelect
                 retailTemplateId={retailTemplateId}
@@ -257,7 +257,7 @@ function NewProductContent() {
             </div>
 
             {selectedCategoryName && (
-              <div className="p-3 bg-violet-950/40 border border-violet-500/30 text-violet-300 text-xs rounded-lg">
+              <div style={{ padding: 12, backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-foreground)', fontSize: 'var(--text-xs)', borderRadius: 'var(--radius-lg)' }}>
                 Selected Category: <strong>{selectedCategoryName}</strong>. Applicable clothing attributes will automatically render below.
               </div>
             )}
@@ -269,7 +269,7 @@ function NewProductContent() {
           <header className="pe-card__header">
             <h2 className="pe-card__title">2. Basic Information</h2>
           </header>
-          <div className="pe-card__body space-y-4">
+          <div className="pe-card__body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <div className={`form-field ${fieldErrors.name ? 'form-field--error' : ''}`}>
               <label className="form-label" htmlFor="pe-name">
                 Product Name <span className="form-required">*</span>
@@ -382,7 +382,7 @@ function NewProductContent() {
                 );
               })}
             </div>
-            {fieldErrors.sizes && <span className="form-error mt-2">{fieldErrors.sizes}</span>}
+            {fieldErrors.sizes && <span className="form-error" style={{ marginTop: 8 }}>{fieldErrors.sizes}</span>}
           </div>
         </section>
 
@@ -471,9 +471,9 @@ function NewProductContent() {
           </dl>
 
           {checkedSizes.length > 0 && (
-            <div className="pe-summary__sizes pt-2">
+            <div className="pe-summary__sizes" style={{ paddingTop: 8 }}>
               <span className="pe-summary__sizes-label">Sizes Selected:</span>
-              <div className="pe-summary__sizes-chips mt-1">
+              <div className="pe-summary__sizes-chips" style={{ marginTop: 4 }}>
                 {checkedSizes.map((s) => (
                   <span key={s.size} className="badge badge--neutral badge--sm">
                     {s.size} × {s.qty}

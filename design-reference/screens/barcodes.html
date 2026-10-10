@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "outline-variant": "#bdc9c6", "outline": "#6e7977", "surface": "#fff8f5", "on-tertiary-container": "#ffe5db", "on-tertiary": "#ffffff", "tertiary-fixed": "#ffdbce", "secondary-container": "#eae1da", "surface-dim": "#e0d8d5", "inverse-primary": "#80d5cb", "tertiary-container": "#9c573a", "primary-container": "#0f766e", "secondary-fixed-dim": "#cec5bf", "surface-variant": "#e9e1dd", "on-secondary": "#ffffff", "on-primary-fixed-variant": "#00504a", "primary": "#005c55", "on-tertiary-fixed-variant": "#72361b", "secondary-fixed": "#eae1da", "on-error-container": "#93000a", "surface-tint": "#006a63", "tertiary-fixed-dim": "#ffb598", "background": "#fff8f5", "on-secondary-fixed": "#1f1b17", "inverse-surface": "#33302d", "on-primary-fixed": "#00201d", "secondary": "#645d58", "on-background": "#1e1b19", "surface-container-high": "#eee7e3", "surface-container-lowest": "#ffffff", "on-surface-variant": "#3e4947", "on-secondary-fixed-variant": "#4b4641", "inverse-on-surface": "#f7efeb", "tertiary": "#7f4025", "primary-fixed": "#9cf2e8", "on-surface": "#1e1b19", "surface-container": "#f4ece8", "on-primary": "#ffffff", "on-primary-container": "#a3faef", "on-secondary-container": "#6a635e", "on-tertiary-fixed": "#370e00", "primary-fixed-dim": "#80d5cb", "error-container": "#ffdad6", "surface-bright": "#fff8f5", "surface-container-highest": "#e9e1dd", "error": "#ba1a1a", "on-error": "#ffffff", "surface-container-low": "#faf2ee" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "gutter-desktop": "1.5rem", "margin": "1.5rem", "space-md": "1rem", "margin-desktop": "2rem", "space-lg": "1.5rem", "space-xl": "2rem", "space-sm": "0.5rem", "gutter": "1rem", "space-xs": "0.25rem" }, "fontFamily": { "headline-lg": ["Inter"], "display-lg": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"], "body-sm": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"], "table-header": ["Inter"] }, "fontSize": { "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}], "display-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}], "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}], "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}], "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}], "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600"}], "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}], "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "table-header": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}] } } } };</script></head><body class="bg-background font-body-md text-on-surface"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest border-r border-surface-variant z-50 flex flex-col justify-between select-none"><div class="flex flex-col h-[calc(100vh-140px)]"><div class="h-16 flex items-center gap-3 px-space-md border-b border-surface-variant shrink-0"><img alt="Brand logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X0--XUhwiTWxURVHjkFrsBc5D1fTgJEdp_1kUlMEBrWzqOSIXRp_CeLm4G3tAvj-_5yKvKmSfTkW8GB30PbeNrsJp4chwGOoULxp-vu1Q9qwDQaFX0e4Kug3imJBoG_oT7PkeyGujYQwPS1hm0ZC_wXnwq5kLPgLyRiHmG-FpKz5t0CTKU8gUFf7vmAzKRViJV2WiKVAMcNjYDH4QWdNNYjD6K6Hb69pjyBCUnzNQcNc2SP8TuOpMDIA"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight tracking-tight">Ownly</span><span class="font-table-header text-table-header text-secondary uppercase tracking-wider">Retail Manager</span></div></div><div class="flex-1 overflow-y-auto px-space-xs py-space-sm space-y-space-md"><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">Main</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="dashboard" href="#"><span class="material-symbols-outlined text-lg">dashboard</span><span>Dashboard</span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">Store</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="pos-billing" href="#"><span class="material-symbols-outlined text-lg">point_of_sale</span><span>POS Billing</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="invoices-receipts" href="#"><span class="material-symbols-outlined text-lg">receipt_long</span><span>Invoices &amp; Receipts</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="returns-refunds" href="#"><span class="material-symbols-outlined text-lg">replay</span><span>Returns &amp; Refunds</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="product-exchanges" href="#"><span class="material-symbols-outlined text-lg">swap_horiz</span><span>Product Exchanges</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="products" href="#"><span class="material-symbols-outlined text-lg">inventory_2</span><span>Products</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="restock" href="#"><span class="material-symbols-outlined text-lg">sync</span><span>Restock</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="ai-restock" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg">auto_awesome</span><span>AI Restock</span></div><span class="w-1.5 h-1.5 rounded-full bg-primary"></span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="inventory-ledger" href="#"><span class="material-symbols-outlined text-lg">table_chart</span><span>Inventory Ledger</span></a><a aria-current="page" class="flex items-center justify-between px-space-sm py-1.5 transition-colors bg-surface-container text-primary font-medium rounded-lg" data-path="barcodes" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg text-primary">barcode_scanner</span><span>Barcodes</span></div><span class="w-1.5 h-1.5 rounded-full bg-primary"></span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">People</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="staff" href="#"><span class="material-symbols-outlined text-lg">group</span><span>Staff</span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">Insights</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="reports" href="#"><span class="material-symbols-outlined text-lg">bar_chart</span><span>Reports</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="ai-insights" href="#"><span class="material-symbols-outlined text-lg">insights</span><span>AI Insights</span></a></nav><nav class="space-y-0.5" data-active-classes="bg-surface-container text-primary font-medium rounded-lg"><div class="px-space-sm py-1 font-table-header text-table-header uppercase text-secondary tracking-wider">System</div><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="backup-safety" href="#"><span class="material-symbols-outlined text-lg">shield</span><span>Backup &amp; Safety</span></a><a class="flex items-center gap-3 px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-md text-label-md" data-path="settings" href="#"><span class="material-symbols-outlined text-lg">settings</span><span>Settings</span></a></nav></div></div><div class="border-t border-surface-variant bg-surface-container-lowest p-space-sm shrink-0 flex flex-col gap-2"><div class="flex items-center justify-between px-space-xs py-1 rounded bg-surface-container-low"><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Online Sync v2.4.1</span></div><span class="material-symbols-outlined text-sm text-secondary">cloud_done</span></div><div class="flex items-center justify-between pt-1"><div class="flex items-center gap-2.5 overflow-hidden"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-surface font-semibold truncate leading-tight">Rajesh Verma</span><span class="font-body-sm text-body-sm text-secondary truncate leading-tight">Store Owner &amp; Manager</span></div></div><button class="p-1 text-secondary hover:text-error hover:bg-surface-container rounded transition-colors" title="Sign out"><span class="material-symbols-outlined text-lg">logout</span></button></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-md border-b border-surface-variant z-40 flex items-center justify-between px-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low hover:bg-surface-container border border-surface-variant rounded-lg cursor-pointer transition-colors"><span class="material-symbols-outlined text-primary text-lg">storefront</span><span class="font-label-md text-label-md text-on-surface font-medium">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-secondary text-sm">expand_more</span></div><div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-container rounded-lg border border-surface-variant"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-label-sm text-label-sm text-on-surface font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-space-md"><div class="relative flex items-center w-72"><span class="material-symbols-outlined absolute left-2.5 text-secondary text-base pointer-events-none">search</span><input class="w-full bg-surface-container-low border border-surface-variant rounded-lg pl-8 pr-3 py-1.5 font-body-sm text-body-sm text-on-surface placeholder:text-secondary focus:outline-none focus:border-primary focus:bg-surface-container-lowest transition-colors" placeholder="Search records, SKUs... (Cmd+K)" type="text"/></div><button class="relative p-2 text-secondary hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors"><span class="material-symbols-outlined text-xl">notifications</span><span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span></button><div class="flex items-center gap-2 pl-2 border-l border-surface-variant"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col text-left"><span class="font-label-sm text-label-sm font-semibold text-on-surface leading-tight">Rajesh V.</span><span class="font-body-sm text-body-sm text-secondary text-[10px] leading-tight">Owner</span></div></div></div></header><main class="w-full pt-16 bg-background min-h-screen"><div class="flex flex-col w-full">
+<!-- Top Command Context Bar -->
+<div class="px-space-md py-space-sm bg-surface-container-low flex flex-col md:flex-row md:items-center md:justify-between gap-space-sm">
+<div class="flex items-center gap-2">
+<a class="inline-flex items-center gap-1.5 text-secondary hover:text-primary transition-colors font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-sm">inventory_2</span>
+<span>Inventory</span>
+</a>
+<span class="text-secondary font-label-sm text-label-sm">/</span>
+<span class="font-label-sm text-label-sm font-semibold text-primary">Barcode Management</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors shadow-sm" href="#">
+<span class="material-symbols-outlined text-base">arrow_back</span>
+<span>Back to Inventory</span>
+</a>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest text-secondary hover:text-on-surface font-label-md text-label-md transition-colors shadow-sm">
+<span class="material-symbols-outlined text-base">settings_input_component</span>
+<span>Printer Setup &amp; Calibration</span>
+</button>
+<button class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-primary transition-all shadow-sm">
+<span class="material-symbols-outlined text-base">print</span>
+<span>Print Selected (12)</span>
+</button>
+</div>
+</div>
+<!-- Main Viewport Canvas -->
+<div class="p-space-md lg:p-space-lg space-y-space-md">
+<!-- Title & Description Strip -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-sm pb-space-xs">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-table-header text-table-header uppercase text-secondary tracking-widest">Physical Merchandising Operations</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="font-table-header text-table-header uppercase text-primary tracking-wide">TSPL / ZPL Ready</span>
+</div>
+<h1 class="font-display-lg text-display-lg font-bold tracking-tight text-on-surface" style="font-family: 'Newsreader', serif, Georgia;">Barcode Management</h1>
+<p class="font-body-md text-body-md text-secondary mt-1">Search, generate, preview high-density Code-128 stickers and queue thermal batch printing for store inventory.</p>
+</div>
+<div class="flex items-center gap-2 self-start lg:self-auto bg-surface-container-lowest px-3 py-2 rounded-lg shadow-sm">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></div>
+<span class="font-label-sm text-label-sm font-medium text-on-surface">Thermal Station #02 (TSC-TE244)</span>
+</div>
+<span class="font-table-header text-table-header uppercase px-2 py-0.5 rounded bg-surface-container font-semibold text-primary">Connected</span>
+</div>
+</div>
+<!-- Query, Filter & Batch Control Console -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm space-y-space-md">
+<!-- Search and Dropdowns Filter Row -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-sm items-center">
+<!-- Universal Scan / Search Input -->
+<div class="md:col-span-6 relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-lg pointer-events-none">barcode_scanner</span>
+<input class="w-full bg-surface-container-low pl-10 pr-24 py-2 rounded-lg font-body-md text-body-md text-on-surface placeholder:text-secondary focus:outline-none focus:bg-surface-container-lowest transition-colors" placeholder="Type barcode (e.g. 162AD2-...), SKU, product name, or trigger USB scanner..." type="text" value="162AD2-BLUDENJE"/>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+<kbd class="px-1.5 py-0.5 text-[10px] font-semibold bg-surface-container text-secondary rounded">ESC</kbd>
+<kbd class="px-1.5 py-0.5 text-[10px] font-semibold bg-surface-container text-secondary rounded">⌘K</kbd>
+</div>
+</div>
+<!-- Category Dropdown -->
+<div class="md:col-span-3">
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low py-2 pl-3 pr-8 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest cursor-pointer transition-colors">
+<option selected="">Category: All (Bottomwear, Ethnic...)</option>
+<option>Ethnic &amp; Fusion</option>
+<option>Western Bottomwear</option>
+<option>Winter Outerwear</option>
+<option>Casual Shirting</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-base">expand_more</span>
+</div>
+</div>
+<!-- Size Dropdown -->
+<div class="md:col-span-3">
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low py-2 pl-3 pr-8 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest cursor-pointer transition-colors">
+<option selected="">Size: All Variants (XXL, XL, L, M...)</option>
+<option>Small (S)</option>
+<option>Medium (M)</option>
+<option>Large (L)</option>
+<option>Extra Large (XL)</option>
+<option>Double XL (XXL)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-base">tune</span>
+</div>
+</div>
+</div>
+<!-- Segmented Status Pills and Fast Selection Strip -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-2">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="font-table-header text-table-header uppercase text-secondary mr-1">Status:</span>
+<button class="px-3 py-1 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-medium transition-colors">
+            In Stock (26)
+          </button>
+<button class="px-3 py-1 rounded-full bg-surface-container-low text-secondary hover:text-on-surface font-label-sm text-label-sm font-medium transition-colors">
+            All (31)
+          </button>
+<button class="px-3 py-1 rounded-full bg-surface-container-low text-secondary hover:text-on-surface font-label-sm text-label-sm font-medium transition-colors">
+            Sold (3)
+          </button>
+<button class="px-3 py-1 rounded-full bg-surface-container-low text-secondary hover:text-on-surface font-label-sm text-label-sm font-medium transition-colors">
+            Returned (1)
+          </button>
+<button class="px-3 py-1 rounded-full bg-surface-container-low text-secondary hover:text-on-surface font-label-sm text-label-sm font-medium transition-colors">
+            Damaged (1)
+          </button>
+</div>
+<div class="flex items-center gap-3">
+<button class="text-secondary hover:text-primary font-label-sm text-label-sm inline-flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-sm">filter_alt_off</span>
+<span>Reset Filters</span>
+</button>
+<span class="w-1 h-3 bg-surface-container-high rounded-full"></span>
+<button class="text-secondary hover:text-on-surface font-label-sm text-label-sm inline-flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-sm">file_download</span>
+<span>Export CSV</span>
+</button>
+</div>
+</div>
+<!-- Active Selection Action Toolbar -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-sm px-3.5 py-2.5 bg-surface-container-low rounded-lg">
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<label class="inline-flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary focus:ring-0 cursor-pointer" type="checkbox"/>
+<span class="font-label-md text-label-md font-semibold text-on-surface">Select All (31)</span>
+</label>
+<span class="text-secondary font-body-sm text-body-sm">•</span>
+<span class="font-label-sm text-label-sm text-primary font-medium bg-surface-container px-2 py-0.5 rounded">12 of 31 selected</span>
+<button class="font-label-sm text-label-sm text-secondary hover:text-error transition-colors underline">Clear</button>
+</div>
+<div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+<span class="font-body-sm text-body-sm text-secondary hidden md:inline">Print sequence: Ascending SKU</span>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-medium hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Print 12 Barcodes</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Core Split Workstation: Ledger (Left) vs Live Thermal Preview (Right) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
+<!-- LEFT WORKSPACE: Inventory Barcodes Ledger Table (7 of 12 cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Table Header Bar -->
+<div class="px-space-md py-space-sm flex items-center justify-between bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">format_list_bulleted</span>
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Inventory Barcodes</h2>
+<span class="font-label-sm text-label-sm text-secondary bg-surface-container px-2 py-0.5 rounded-full">31 Items Total</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-sm text-body-sm text-secondary">Columns: Standard</span>
+<button class="p-1 hover:bg-surface-container rounded transition-colors text-secondary hover:text-on-surface">
+<span class="material-symbols-outlined text-base">view_column</span>
+</button>
+</div>
+</div>
+<!-- Responsive Table Container -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-secondary font-table-header text-table-header uppercase tracking-wider select-none">
+<th class="w-10 px-3 py-2.5 text-center">
+<input checked="" class="w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</th>
+<th class="px-3 py-2.5">Barcode / ID</th>
+<th class="px-3 py-2.5">Product &amp; Variant</th>
+<th class="px-3 py-2.5">Price</th>
+<th class="px-3 py-2.5 text-center">Status</th>
+<th class="px-3 py-2.5 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y-0">
+<!-- ROW 1 (ACTIVELY SELECTED & LIVE PREVIEW TOGGLED) -->
+<tr class="bg-surface-container transition-colors group cursor-pointer">
+<td class="px-3 py-3 text-center">
+<input checked="" class="w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-3 py-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-[12px] font-semibold tracking-tight text-primary bg-surface-container-lowest px-2 py-1 rounded">162AD2-BLUDENJE-00032</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary text-[11px] block mt-0.5">Code-128 • Lot #B-409</span>
+</td>
+<td class="px-3 py-3">
+<div class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Blue Denim Jeans</div>
+<div class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5 mt-0.5">
+<span class="bg-surface-container-low px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface">Size: XXL</span>
+<span>•</span>
+<span class="text-[11px]">Regular Fit</span>
+</div>
+</td>
+<td class="px-3 py-3 whitespace-nowrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">₹1,299</span>
+<span class="block text-[10px] text-secondary">Tax incl.</span>
+</td>
+<td class="px-3 py-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-lowest text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    IN STOCK
+                  </span>
+</td>
+<td class="px-3 py-3 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary text-on-primary font-label-sm text-label-sm font-medium shadow-xs">
+<span class="material-symbols-outlined text-sm">visibility</span>
+<span class="text-[11px]">Previewing</span>
+</button>
+<button class="p-1 text-secondary hover:text-on-surface rounded hover:bg-surface-container-lowest transition-colors" title="Print this barcode">
+<span class="material-symbols-outlined text-base">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 2 -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="px-3 py-3 text-center">
+<input checked="" class="w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-3 py-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-[12px] font-medium tracking-tight text-on-surface bg-surface-container-low px-2 py-1 rounded">162AD2-BLUDENJE-00021</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary text-[11px] block mt-0.5">Code-128 • Lot #B-409</span>
+</td>
+<td class="px-3 py-3">
+<div class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Blue Denim Jeans</div>
+<div class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5 mt-0.5">
+<span class="bg-surface-container-low px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface">Size: M</span>
+<span>•</span>
+<span class="text-[11px]">Slim Tapered</span>
+</div>
+</td>
+<td class="px-3 py-3 whitespace-nowrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">₹1,299</span>
+<span class="block text-[10px] text-secondary">Tax incl.</span>
+</td>
+<td class="px-3 py-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-low text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    IN STOCK
+                  </span>
+</td>
+<td class="px-3 py-3 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-secondary hover:text-on-surface font-label-sm text-label-sm transition-colors">
+<span class="material-symbols-outlined text-sm">visibility</span>
+<span class="text-[11px]">Preview</span>
+</button>
+<button class="p-1 text-secondary hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Print this barcode">
+<span class="material-symbols-outlined text-base">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 3 -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="px-3 py-3 text-center">
+<input checked="" class="w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-3 py-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-[12px] font-medium tracking-tight text-on-surface bg-surface-container-low px-2 py-1 rounded">162AD2-BLUDENJE-00022</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary text-[11px] block mt-0.5">Code-128 • Lot #B-409</span>
+</td>
+<td class="px-3 py-3">
+<div class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Blue Denim Jeans</div>
+<div class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5 mt-0.5">
+<span class="bg-surface-container-low px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface">Size: L</span>
+<span>•</span>
+<span class="text-[11px]">Regular Fit</span>
+</div>
+</td>
+<td class="px-3 py-3 whitespace-nowrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">₹1,299</span>
+<span class="block text-[10px] text-secondary">Tax incl.</span>
+</td>
+<td class="px-3 py-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-low text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    IN STOCK
+                  </span>
+</td>
+<td class="px-3 py-3 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-secondary hover:text-on-surface font-label-sm text-label-sm transition-colors">
+<span class="material-symbols-outlined text-sm">visibility</span>
+<span class="text-[11px]">Preview</span>
+</button>
+<button class="p-1 text-secondary hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Print this barcode">
+<span class="material-symbols-outlined text-base">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 4 -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="px-3 py-3 text-center">
+<input checked="" class="w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-3 py-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-[12px] font-medium tracking-tight text-on-surface bg-surface-container-low px-2 py-1 rounded">162AD2-BLUDENJE-00023</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary text-[11px] block mt-0.5">Code-128 • Lot #B-409</span>
+</td>
+<td class="px-3 py-3">
+<div class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Blue Denim Jeans</div>
+<div class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5 mt-0.5">
+<span class="bg-surface-container-low px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface">Size: XL</span>
+<span>•</span>
+<span class="text-[11px]">Comfort Fit</span>
+</div>
+</td>
+<td class="px-3 py-3 whitespace-nowrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">₹1,299</span>
+<span class="block text-[10px] text-secondary">Tax incl.</span>
+</td>
+<td class="px-3 py-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-surface-container-high text-secondary">
+                    SOLD
+                  </span>
+</td>
+<td class="px-3 py-3 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-secondary hover:text-on-surface font-label-sm text-label-sm transition-colors">
+<span class="material-symbols-outlined text-sm">visibility</span>
+<span class="text-[11px]">Preview</span>
+</button>
+<button class="p-1 text-secondary hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Print this barcode">
+<span class="material-symbols-outlined text-base">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 5 -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="px-3 py-3 text-center">
+<input class="w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-3 py-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-[12px] font-medium tracking-tight text-on-surface bg-surface-container-low px-2 py-1 rounded">162AD2-HMHD01-00014</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary text-[11px] block mt-0.5">Code-128 • Lot #H-102</span>
+</td>
+<td class="px-3 py-3">
+<div class="font-label-md text-label-md font-semibold text-on-surface leading-tight">H &amp; M Pullover Hoodie</div>
+<div class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5 mt-0.5">
+<span class="bg-surface-container-low px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface">Size: L</span>
+<span>•</span>
+<span class="text-[11px]">Heather Grey</span>
+</div>
+</td>
+<td class="px-3 py-3 whitespace-nowrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">₹1,499</span>
+<span class="block text-[10px] text-secondary">Tax incl.</span>
+</td>
+<td class="px-3 py-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-low text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    IN STOCK
+                  </span>
+</td>
+<td class="px-3 py-3 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-secondary hover:text-on-surface font-label-sm text-label-sm transition-colors">
+<span class="material-symbols-outlined text-sm">visibility</span>
+<span class="text-[11px]">Preview</span>
+</button>
+<button class="p-1 text-secondary hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Print this barcode">
+<span class="material-symbols-outlined text-base">print</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 6 -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+<td class="px-3 py-3 text-center">
+<input class="w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-3 py-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-[12px] font-medium tracking-tight text-on-surface bg-surface-container-low px-2 py-1 rounded">162AD2-CHSLK-00088</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary text-[11px] block mt-0.5">Code-128 • Lot #E-311</span>
+</td>
+<td class="px-3 py-3">
+<div class="font-label-md text-label-md font-semibold text-on-surface leading-tight">Chanderi Silk Nehru Jacket</div>
+<div class="font-body-sm text-body-sm text-secondary flex items-center gap-1.5 mt-0.5">
+<span class="bg-surface-container-low px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface">Size: 42</span>
+<span>•</span>
+<span class="text-[11px]">Raw Silk Blend</span>
+</div>
+</td>
+<td class="px-3 py-3 whitespace-nowrap">
+<span class="font-label-md text-label-md font-bold text-on-surface">₹2,199</span>
+<span class="block text-[10px] text-secondary">Tax incl.</span>
+</td>
+<td class="px-3 py-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-secondary-container text-on-secondary-container">
+                    RETURNED
+                  </span>
+</td>
+<td class="px-3 py-3 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-secondary hover:text-on-surface font-label-sm text-label-sm transition-colors">
+<span class="material-symbols-outlined text-sm">visibility</span>
+<span class="text-[11px]">Preview</span>
+</button>
+<button class="p-1 text-secondary hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Print this barcode">
+<span class="material-symbols-outlined text-base">print</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="p-space-sm bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-sm">
+<span class="font-body-sm text-body-sm text-secondary">
+            Showing <strong class="text-on-surface">1–6</strong> of <strong class="text-on-surface">31</strong> barcodes
+          </span>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors disabled:opacity-50" disabled="">
+              Previous
+            </button>
+<span class="px-2.5 py-1 rounded bg-primary text-on-primary text-label-sm font-semibold">1</span>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors">2</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors">3</button>
+<span class="text-secondary px-1 text-xs">...</span>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors">6</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-secondary hover:text-on-surface text-label-sm font-medium transition-colors">
+              Next
+            </button>
+</div>
+</div>
+<!-- Inventory Reference Image Anchor (Non-intrusive metadata strip) -->
+<div class="p-space-sm bg-surface-container border-t-0 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img alt="System Reference Blueprint" class="w-12 h-6 object-cover rounded opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbWt6zLVAXHMegpBXlc7idLXtMvcKhq-MZwCdu0UD_yIxJ73hmERvWFl1fkOtCMWdC5BduYrIcGVaNfHpmdMcacOLVwRvigZm6q4MYRQ7CIn8Jhrbmf_9TG_J1VKZqPCzVSGF0lz7k0Vjkh0uaN4yKVoHj2SM6X5JawAO_TaH12ZCmhhxoUJJQuakmZJQmg3r0RKEJ7JJrsgUTe8xWY32wWQHRaY6iBsGL8mvoQbiloptCs9-42_7g9UoS_ertJ8DS"/>
+<div class="flex flex-col">
+<span class="font-table-header text-table-header text-secondary uppercase">Source Reference Trace</span>
+<span class="text-[11px] text-on-surface font-mono">Barcode Module Revision: Oct 2026 Live Catalog</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-medium">Synced with Store Ledger</span>
+</div>
+</div>
+<!-- RIGHT WORKSPACE: Thermal Label Simulator & Print Config (5 of 12 cols) -->
+<div class="lg:col-span-5 sticky top-20 space-y-space-md">
+<!-- Live Thermal Simulation Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md space-y-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-table-header text-table-header uppercase text-secondary tracking-widest">Live Sticker Preview</span>
+</div>
+<span class="font-mono text-[11px] text-secondary bg-surface-container px-2 py-0.5 rounded">Scale: 100% Real Size</span>
+</div>
+<!-- Realistic Retail Thermal Sticker Visual Container -->
+<div class="bg-surface-container-high p-4 rounded-xl flex items-center justify-center">
+<!-- PHYSICAL STICKER SURFACE (50mm x 25mm ratio emulation) -->
+<div class="w-full max-w-[340px] bg-white rounded-md p-3.5 shadow-md flex flex-col justify-between text-black relative select-none">
+<!-- Subtle Sticker Edge Notch Indicators -->
+<div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-3 bg-surface-container-high rounded-r-full"></div>
+<div class="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-3 bg-surface-container-high rounded-l-full"></div>
+<!-- Top Store Brand -->
+<div class="flex items-center justify-between border-b border-neutral-200 pb-1 mb-1.5">
+<span class="text-[11px] font-extrabold tracking-wider uppercase text-neutral-900">Tulsi Collection</span>
+<span class="text-[9px] font-mono tracking-tight text-neutral-600">RT-5025</span>
+</div>
+<!-- Product Details -->
+<div class="flex flex-col mb-1.5">
+<div class="flex items-baseline justify-between">
+<h3 class="text-[13px] font-bold tracking-tight text-neutral-900 leading-tight">Blue Denim Jeans</h3>
+<span class="text-[11px] font-extrabold bg-neutral-100 px-1 rounded text-neutral-900">XXL</span>
+</div>
+<div class="flex items-center justify-between text-[9px] text-neutral-600 mt-0.5">
+<span>Regular Fit • Wash: Dark Indigo</span>
+<span class="font-mono">BLUDENJE-XXL</span>
+</div>
+</div>
+<!-- Realistic Code-128 SVG Barcode Generator Output -->
+<div class="py-1 flex flex-col items-center justify-center bg-white">
+<svg class="w-full h-11" fill="none" viewbox="0 0 280 44" xmlns="http://www.w3.org/2000/svg">
+<!-- Guard pattern left -->
+<rect fill="#000" height="40" width="3" x="10" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="15" y="0"></rect>
+<rect fill="#000" height="40" width="4" x="18" y="0"></rect>
+<!-- Variable Code-128 Payload Stripes -->
+<rect fill="#000" height="40" width="2" x="25" y="0"></rect>
+<rect fill="#000" height="40" width="4" x="29" y="0"></rect>
+<rect fill="#000" height="40" width="1" x="36" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="40" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="46" y="0"></rect>
+<rect fill="#000" height="40" width="5" x="50" y="0"></rect>
+<rect fill="#000" height="40" width="2" x="58" y="0"></rect>
+<rect fill="#000" height="40" width="2.5" x="62" y="0"></rect>
+<rect fill="#000" height="40" width="4" x="68" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="75" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="79" y="0"></rect>
+<rect fill="#000" height="40" width="2" x="85" y="0"></rect>
+<rect fill="#000" height="40" width="4.5" x="90" y="0"></rect>
+<rect fill="#000" height="40" width="1" x="97" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="101" y="0"></rect>
+<rect fill="#000" height="40" width="2" x="107" y="0"></rect>
+<rect fill="#000" height="40" width="5" x="112" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="120" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="124" y="0"></rect>
+<rect fill="#000" height="40" width="4" x="130" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="137" y="0"></rect>
+<rect fill="#000" height="40" width="2" x="141" y="0"></rect>
+<rect fill="#000" height="40" width="5" x="146" y="0"></rect>
+<rect fill="#000" height="40" width="2.5" x="154" y="0"></rect>
+<rect fill="#000" height="40" width="1" x="159" y="0"></rect>
+<rect fill="#000" height="40" width="4" x="163" y="0"></rect>
+<rect fill="#000" height="40" width="2" x="170" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="175" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="181" y="0"></rect>
+<rect fill="#000" height="40" width="4.5" x="185" y="0"></rect>
+<rect fill="#000" height="40" width="2" x="192" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="197" y="0"></rect>
+<rect fill="#000" height="40" width="1" x="203" y="0"></rect>
+<rect fill="#000" height="40" width="4" x="207" y="0"></rect>
+<rect fill="#000" height="40" width="2.5" x="214" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="220" y="0"></rect>
+<rect fill="#000" height="40" width="5" x="224" y="0"></rect>
+<rect fill="#000" height="40" width="2" x="232" y="0"></rect>
+<rect fill="#000" height="40" width="3.5" x="237" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="243" y="0"></rect>
+<rect fill="#000" height="40" width="4" x="247" y="0"></rect>
+<rect fill="#000" height="40" width="1.5" x="254" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="258" y="0"></rect>
+<!-- Guard pattern right -->
+<rect fill="#000" height="40" width="2" x="264" y="0"></rect>
+<rect fill="#000" height="40" width="3" x="268" y="0"></rect>
+</svg>
+<!-- Human Readable Code Below Strip -->
+<span class="font-mono text-[10px] tracking-[0.2em] font-bold text-neutral-800 mt-0.5">162AD2-BLUDENJE-00032</span>
+</div>
+<!-- Price & Tax Disclaimer Footer Strip -->
+<div class="flex items-end justify-between pt-1 border-t border-neutral-200 mt-1">
+<div>
+<span class="text-[8px] uppercase tracking-wider text-neutral-500 block">Maximum Retail Price</span>
+<span class="text-[15px] font-black text-neutral-900 leading-tight">₹1,299.00</span>
+<span class="text-[7.5px] text-neutral-600 block">(Incl. of all taxes)</span>
+</div>
+<div class="text-right">
+<span class="text-[8px] font-mono text-neutral-600 block">Pkd: 08/2026</span>
+<span class="text-[8px] font-semibold text-neutral-800 block uppercase">Made in India</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Label Layout Dimensions Selector -->
+<div class="space-y-space-sm pt-2">
+<div>
+<label class="block font-label-sm text-label-sm font-semibold text-on-surface mb-1">Sticker Format / Roll Size</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low py-2 pl-3 pr-8 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest cursor-pointer">
+<option selected="">50mm × 25mm (Standard 2"x1" Thermal Roll)</option>
+<option>38mm × 25mm (Jewellery &amp; Accessories)</option>
+<option>75mm × 50mm (Large Garment Hangtag)</option>
+<option>A4 Sheet (24 Stickers - 3x8 Grid)</option>
+<option>A4 Sheet (40 Stickers - 4x10 Grid)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-base">expand_more</span>
+</div>
+</div>
+<!-- Print Copies Stepper -->
+<div class="flex items-center justify-between pt-1">
+<div>
+<span class="font-label-sm text-label-sm font-semibold text-on-surface block">Copies Per SKU</span>
+<span class="font-body-sm text-body-sm text-secondary text-[11px]">Print 1 label for each physical piece in stock</span>
+</div>
+<div class="flex items-center bg-surface-container-low rounded-lg p-0.5">
+<button class="w-7 h-7 flex items-center justify-center text-on-surface hover:bg-surface-container rounded transition-colors text-sm font-bold">-</button>
+<span class="w-8 text-center font-mono font-semibold text-label-sm text-on-surface">1</span>
+<button class="w-7 h-7 flex items-center justify-center text-on-surface hover:bg-surface-container rounded transition-colors text-sm font-bold">+</button>
+</div>
+</div>
+<!-- Sticker Data Fields Toggles -->
+<div class="pt-2 space-y-2 border-t border-surface-container">
+<span class="font-table-header text-table-header uppercase text-secondary tracking-wider block">Visible Data Elements</span>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface font-medium">Store Name Header</span>
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface font-medium">MRP &amp; Tax Line</span>
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface font-medium">Human-Readable Barcode String</span>
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface font-medium">Manufacture / Packing Month</span>
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+</div>
+</div>
+<!-- Print Action Buttons -->
+<div class="pt-3 space-y-2">
+<button class="w-full py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-base">print</span>
+<span>Print This Single Label Now</span>
+</button>
+<button class="w-full py-2 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md font-medium transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">picture_as_pdf</span>
+<span>Download Print-Ready PDF</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Help & Thermal Printer Status Card -->
+<div class="bg-surface-container-low rounded-xl p-space-md space-y-space-xs">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-base">info</span>
+<span class="font-label-sm text-label-sm font-semibold">Thermal Printing Note</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary">
+            Ensure your direct thermal printer darkness density is set between 8–11 in system drivers to prevent barcode optical bleed at POS checkouts.
+          </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Micro-interaction: Allow toggle preview button to update label preview visual
+  document.querySelectorAll('tbody tr').forEach((row) => {
+    row.addEventListener('click', (e) => {
+      if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'button') {
+        return;
+      }
+      document.querySelectorAll('tbody tr').forEach(r => {
+        r.classList.remove('bg-surface-container');
+        r.classList.add('bg-surface-container-lowest');
+      });
+      row.classList.remove('bg-surface-container-lowest');
+      row.classList.add('bg-surface-container');
+    });
+  });
+</script></main></div></body></html>

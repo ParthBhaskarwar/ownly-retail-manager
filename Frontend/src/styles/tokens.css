@@ -27,11 +27,17 @@
   --color-ink-muted:      #A8A29E;    /* Placeholders, disabled, hints */
   --color-ink-inverse:    #FFFFFF;    /* Text on dark/accent fills */
 
-  /* Denim — mapped to Teal */
-  --color-denim:          #0F766E;
-  --color-denim-dark:     #115E59;    /* Hover / pressed */
-  --color-denim-tint:     #F0FDFA;    /* Badge bg, focus ring, active nav bg */
-  --color-denim-border:   #5EEAD4;    /* Accent-tinted border */
+  /* Accent (Teal) */
+  --color-accent:         #0F766E;
+  --color-accent-dark:    #115E59;
+  --color-accent-tint:    #F0FDFA;
+  --color-accent-border:  #5EEAD4;
+
+  /* Denim — mapped to Accent for backwards compatibility */
+  --color-denim:          var(--color-accent);
+  --color-denim-dark:     var(--color-accent-dark);
+  --color-denim-tint:     var(--color-accent-tint);
+  --color-denim-border:   var(--color-accent-border);
 
   /* Semantic — named for their retail meaning, not their hue */
   --color-paid:           #16A34A;    /* Success */

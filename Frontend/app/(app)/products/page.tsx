@@ -71,36 +71,57 @@ function ProductsPageContent() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="page-content">
+    <div className="dash-container animate-fade-in-up">
       {/* Header */}
-      <div className="page-header">
-        <div className="page-header__left">
-          <h1 className="page-header__title">Products</h1>
-          <span className="page-header__count">{total} total</span>
+      <div className="products-header">
+        <div className="products-header__title-group">
+          <h1 className="products-header__title">Products</h1>
+          <span className="products-header__count">{total} total</span>
         </div>
-        {canEdit && (
-          <Link href="/products/new" id="add-product-btn" className="btn btn--primary">
-            + Add Product
-          </Link>
-        )}
+        <div className="products-header__actions">
+          {canEdit && (
+            <button className="btn btn-secondary" type="button">
+              <span className="material-symbols-outlined">upload</span>
+              Import CSV
+            </button>
+          )}
+          {canEdit && (
+            <Link href="/products/new" id="add-product-btn" className="btn btn-primary">
+              <span className="material-symbols-outlined">add</span>
+              Add Product
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="product-toolbar">
-        <ProductSearch value={query} onChange={handleQueryChange} />
-        <div className="filter-tabs" role="tablist" aria-label="Filter by status">
-          {STATUS_TABS.map((tab) => (
-            <button
-              key={tab.value}
-              id={`status-tab-${tab.value.toLowerCase()}`}
-              role="tab"
-              className={`filter-tab ${statusFilter === tab.value ? 'filter-tab--active' : ''}`}
-              aria-selected={statusFilter === tab.value}
-              onClick={() => handleStatusChange(tab.value)}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <div className="products-toolbar">
+        <div className="products-toolbar__left">
+          <ProductSearch value={query} onChange={handleQueryChange} />
+          <div className="products-filter-tabs" role="tablist" aria-label="Filter by status">
+            {STATUS_TABS.map((tab) => (
+              <button
+                key={tab.value}
+                id={`status-tab-${tab.value.toLowerCase()}`}
+                role="tab"
+                className={`products-filter-tab ${statusFilter === tab.value ? 'products-filter-tab--active' : ''}`}
+                aria-selected={statusFilter === tab.value}
+                onClick={() => handleStatusChange(tab.value)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="products-toolbar__right">
+          <button className="btn btn-secondary" type="button">
+            <span className="material-symbols-outlined">filter_list</span>
+            Category: All
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>expand_more</span>
+          </button>
+          <button className="btn btn-secondary" style={{ padding: '0 12px' }} title="Export products list" type="button">
+            <span className="material-symbols-outlined">download</span>
+          </button>
         </div>
       </div>
 
@@ -109,26 +130,53 @@ function ProductsPageContent() {
 
       {/* Pagination */}
       {!isLoading && totalPages > 1 && (
-        <div className="pagination" aria-label="Pagination">
-          <button
-            id="pagination-prev"
-            className="btn btn--ghost btn--sm"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-          >
-            ← Prev
-          </button>
-          <span className="pagination__info">
-            Page {page} of {totalPages}
-          </span>
-          <button
-            id="pagination-next"
-            className="btn btn--ghost btn--sm"
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page >= totalPages}
-          >
-            Next →
-          </button>
+        <div className="products-pagination" aria-label="Pagination">
+          <div className="products-pagination__info">
+            Showing page <strong>{page}</strong> of <strong>{totalPages}</strong> ({total} total)
+          </div>
+          <div className="products-pagination__controls">
+            <button
+              id="pagination-prev"
+              className="products-pagination__btn"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              Previous
+            </button>
+            <div className="products-pagination__pages">
+              {Array.from({ length: totalPages }).map((_, idx) => {
+                const pNum = idx + 1;
+                // Simple logic for ellipsis if there are many pages, omitted here for simplicity
+                if (
+                  pNum === 1 || 
+                  pNum === totalPages || 
+                  (pNum >= page - 1 && pNum <= page + 1)
+                ) {
+                  return (
+                    <button
+                      key={pNum}
+                      className={`products-pagination__page ${pNum === page ? 'products-pagination__page--active' : ''}`}
+                      onClick={() => setPage(pNum)}
+                    >
+                      {pNum}
+                    </button>
+                  );
+                }
+                if (pNum === page - 2 || pNum === page + 2) {
+                  return <span key={pNum}>...</span>;
+                }
+                return null;
+              })}
+            </div>
+            <button
+              id="pagination-next"
+              className="products-pagination__btn"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

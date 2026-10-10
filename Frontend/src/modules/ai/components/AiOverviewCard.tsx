@@ -23,65 +23,56 @@ export function AiOverviewCard() {
   if (failed) return null;
 
   return (
-    <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
-      <div className="card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <h2 className="card__title" style={{ margin: 0 }}>✦ AI Restock &amp; Dead-Stock Signals</h2>
-        <div className="ai-actions">
-          <Link href="/ai-restock" className="btn btn--primary btn--sm">AI Restock</Link>
-          <Link href="/ai-insights" className="btn btn--ghost btn--sm">Accuracy →</Link>
-        </div>
+    <div className="dash-card" style={{ position: 'relative' }}>
+      <div className="dash-card-header" style={{ paddingBottom: '12px', marginBottom: '12px', borderBottom: '1px solid var(--color-border)' }}>
+        <h2 className="dash-card-title">
+          <span className="material-symbols-outlined" style={{ color: 'var(--color-denim)' }}>psychology</span> 
+          AI Demand Signals
+        </h2>
+        <span className="dash-card-badge ai">
+          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>auto_awesome</span>
+          Gemini Retail AI
+        </span>
       </div>
 
       {!data ? (
-        <div className="skeleton" style={{ height: 160, borderRadius: 8, marginTop: 12 }} />
+        <div className="dash-card-body">
+          <div className="skeleton" style={{ height: 60, borderRadius: 8, marginBottom: 10 }} />
+          <div className="skeleton" style={{ height: 60, borderRadius: 8 }} />
+        </div>
       ) : !data.hasHistory ? (
-        <p className="ai-meta">The AI learns from your own sales. Recommendations appear once products have started selling.</p>
+        <div className="dash-card-body">
+          <p style={{ fontSize: '12px', color: 'var(--color-ink-secondary)' }}>The AI learns from your own sales. Recommendations appear once products have started selling.</p>
+        </div>
       ) : (
-        <div className="ai-section" style={{ marginTop: 'var(--space-3)' }}>
-          <div className="ai-tiles">
-            <div className="ai-tile"><div className="ai-tile__label">Expected sales · 30 days</div><div className="ai-tile__value">{data.expectedUnits30.toLocaleString('en-IN')} units</div><div className="ai-tile__sub">{inr(data.expectedRevenue30)} at list price</div></div>
-            <div className="ai-tile"><div className="ai-tile__label">Buy now</div><div className="ai-tile__value">{data.decisions.STRONG_BUY + data.decisions.CONTROLLED_BUY}</div><div className="ai-tile__sub">{data.decisions.STRONG_BUY} strong · {data.decisions.CONTROLLED_BUY} controlled</div></div>
-            <div className="ai-tile"><div className="ai-tile__label">Discount / clear</div><div className="ai-tile__value">{(data.actions.DISCOUNT ?? 0) + (data.actions.CLEARANCE ?? 0)}</div><div className="ai-tile__sub">products</div></div>
-            <div className="ai-tile"><div className="ai-tile__label">Stock at risk</div><div className="ai-tile__value">{inr(data.stockValueAtRisk)}</div><div className="ai-tile__sub">cost likely unsold in 90 days</div></div>
-          </div>
-
-          <div className="ai-columns">
-            <div>
-              <h3 className="ai-subhead">Restock first</h3>
-              <table className="ai-table">
-                <thead><tr><th>Product</th><th>Decision</th><th className="num">Stock</th><th className="num">Buy</th></tr></thead>
-                <tbody>
-                  {data.restockCandidates.slice(0, 6).map((r) => (
-                    <tr key={r.productId}>
-                      <td><Link href={`/ai-restock?productId=${r.productId}`}>{r.name}</Link><div className="ai-meta">{r.unitsPerWeek}/week</div></td>
-                      <td><DecisionBadge decision={r.decision} /></td>
-                      <td className="num">{r.stockOnHand}</td>
-                      <td className="num"><strong>{r.quantity}</strong></td>
-                    </tr>
-                  ))}
-                  {data.restockCandidates.length === 0 && <tr><td colSpan={4} className="ai-meta">Nothing needs restocking right now.</td></tr>}
-                </tbody>
-              </table>
+        <div className="dash-card-body" style={{ paddingTop: 0 }}>
+          {data.restockCandidates.slice(0, 2).map((r) => (
+            <div key={r.productId} className="dash-ai-alert">
+              <span className="material-symbols-outlined" style={{ color: 'var(--color-denim)' }}>trending_up</span>
+              <div className="dash-ai-alert-content">
+                <span className="dash-ai-alert-title">{r.decision === 'STRONG_BUY' ? 'Strong Buy Signal' : 'Steady Demand'}</span>
+                {r.name} demand is projected at {r.unitsPerWeek} units/week. Restock {r.quantity} units to maintain coverage.
+              </div>
             </div>
-            <div>
-              <h3 className="ai-subhead">Turning into dead stock</h3>
-              <table className="ai-table">
-                <thead><tr><th>Product</th><th>Action</th><th className="num">Units</th><th className="num">Cost value</th></tr></thead>
-                <tbody>
-                  {data.deadStock.slice(0, 6).map((d) => (
-                    <tr key={d.productId}>
-                      <td><Link href={`/products/${d.productId}`}>{d.name}</Link><div className="ai-meta">{d.avgStockAgeDays !== null ? `${d.avgStockAgeDays} days old` : ''}</div></td>
-                      <td><span className={`ai-badge ai-badge--${ACTION_META[d.action as keyof typeof ACTION_META]?.tone ?? 'neutral'}`}>{ACTION_META[d.action as keyof typeof ACTION_META]?.label ?? d.action}</span></td>
-                      <td className="num">{d.stockOnHand}</td>
-                      <td className="num">{inr(d.stockValue)}</td>
-                    </tr>
-                  ))}
-                  {data.deadStock.length === 0 && <tr><td colSpan={4} className="ai-meta">No dead-stock risk detected.</td></tr>}
-                </tbody>
-              </table>
+          ))}
+          {data.deadStock.slice(0, 1).map((d) => (
+            <div key={d.productId} className="dash-ai-alert">
+              <span className="material-symbols-outlined" style={{ color: 'var(--color-caution)' }}>swap_horiz</span>
+              <div className="dash-ai-alert-content">
+                <span className="dash-ai-alert-title">Dead Stock Risk</span>
+                {d.name} has been in inventory for {d.avgStockAgeDays} days. Consider {ACTION_META[d.action as keyof typeof ACTION_META]?.label?.toLowerCase() ?? 'clearing'}.
+              </div>
             </div>
-          </div>
-          <div className="ai-meta">{data.productsScored} products scored by {data.modelVersion} · offline, from your own sales history</div>
+          ))}
+          {data.restockCandidates.length === 0 && data.deadStock.length === 0 && (
+            <div className="dash-ai-alert">
+              <span className="material-symbols-outlined" style={{ color: 'var(--color-ink-secondary)' }}>check_circle</span>
+              <div className="dash-ai-alert-content">
+                <span className="dash-ai-alert-title">Optimal Inventory</span>
+                No critical demand shifts or dead stock risks detected today.
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

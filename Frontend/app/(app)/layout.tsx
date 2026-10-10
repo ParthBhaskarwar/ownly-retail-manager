@@ -46,13 +46,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <AuthGuard>
       <StoreProvider>
         <StoreOnboardingGate>
-          <div className="app-layout">
+          <div className="shell-app-layout">
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-            <main className="app-main" id="main-content">
-              <Header onMenuToggle={() => setSidebarOpen((o) => !o)} />
-              <div className="app-content page-enter">
-                {children}
-              </div>
+            <Header onMenuToggle={() => setSidebarOpen((o) => !o)} />
+            <main className="shell-main" id="main-content">
+              {children}
             </main>
           </div>
           <ToastContainer toasts={toasts} onRemove={removeToast} />
