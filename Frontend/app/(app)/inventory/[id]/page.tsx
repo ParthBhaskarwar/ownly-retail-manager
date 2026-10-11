@@ -142,8 +142,8 @@ function ItemDetailContent() {
           >
             🖨 Print Label
           </button>
-          <Link href={`/inventory/barcodes`} className="btn btn-secondary btn-sm">
-            ▦ All Barcodes
+          <Link href="/inventory" className="btn btn-secondary btn-sm">
+            ▦ Inventory Ledger
           </Link>
           <Link href={`/products/${item.productId}`} className="btn btn-secondary btn-sm">
             View Product

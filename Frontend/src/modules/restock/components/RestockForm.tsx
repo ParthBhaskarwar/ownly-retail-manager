@@ -2,10 +2,17 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { createPortal } from 'react-dom';
 import { useAuthContext } from '@/context/AuthContext';
+import { useStoreContext } from '@/context/StoreContext';
+import { BarcodeLabelPrint, MultiLabelSheet } from '@/modules/inventory/components/BarcodeLabelPrint';
+import type { BarcodeLabelData } from '@/modules/inventory/components/BarcodeLabelPrint';
 import { ProductService } from '@/modules/product/services/ProductService';
 import { SupplierSelect } from '@/modules/catalog/components/SupplierSelect';
 import { RestockService } from '../services/RestockService';
+import { InwardSlip, type InwardSlipData } from './InwardSlip';
+import { SupplierService } from '@/modules/catalog/services/CategoryService';
+import { printSection } from '@/lib/printSection';
 import type { ProductSummary } from '@/modules/product/types';
 import type { RestockVariantLine, RestockResult } from '../types';
 
@@ -19,6 +26,7 @@ export function RestockForm() {
   const initialProductId = searchParams.get('productId') || '';
 
   const { user } = useAuthContext();
+  const { store } = useStoreContext();
   const storeId = user?.storeId || '';
 
   const [products, setProducts] = useState<ProductSummary[]>([]);
@@ -142,6 +150,68 @@ export function RestockForm() {
     return products.filter((p) => p.name.toLowerCase().includes(q) || p.baseSku.toLowerCase().includes(q));
   }, [products, searchQuery]);
 
+  // One label per physical unit just received, grouped by size so they can be
+  // printed and stuck on garments size by size.
+  const labelGroups = useMemo(() => {
+    if (!restockResult || !productDetail) return [];
+    const byVariant = new Map<string, BarcodeLabelData[]>();
+    for (const item of restockResult.generatedItems ?? []) {
+      const variant = productDetail.variants.find((v) => v.id === item.variantId);
+      const line = lines.find((l) => l.variantId === item.variantId);
+      const label: BarcodeLabelData = {
+        barcode: item.barcode,
+        productName: productDetail.name,
+        variantDisplayName: line?.sizeName || variant?.displayName,
+        sku: variant?.sku ?? productDetail.baseSku,
+        sellingPrice: line?.sellingPriceOverride ?? variant?.effectiveSellingPrice ?? productDetail.baseSellingPrice,
+        storeName: store?.name,
+      };
+      byVariant.set(item.variantId, [...(byVariant.get(item.variantId) ?? []), label]);
+    }
+    return Array.from(byVariant.entries()).map(([variantId, labels]) => ({
+      variantId,
+      size: labels[0].variantDisplayName ?? 'Size',
+      labels,
+    }));
+  }, [restockResult, productDetail, lines, store?.name]);
+
+  const allLabels = useMemo(() => labelGroups.flatMap((g) => g.labels), [labelGroups]);
+
+  const printLabels = () => printSection('labels');
+  const printSlip = () => printSection('slip');
+
+  const [supplierName, setSupplierName] = useState<string | undefined>();
+  useEffect(() => {
+    if (!restockResult || !selectedSupplierId) { setSupplierName(undefined); return; }
+    SupplierService.getSuppliers(storeId)
+      .then((list) => setSupplierName(list.find((x) => x.id === selectedSupplierId)?.name))
+      .catch(() => setSupplierName(undefined));
+  }, [restockResult, selectedSupplierId, storeId]);
+
+  const slipData: InwardSlipData | null = useMemo(() => {
+    if (!restockResult || !productDetail) return null;
+    return {
+      storeName: store?.name,
+      storeAddress: store?.address,
+      receivedAt: new Date(),
+      receivedBy: user?.name,
+      productName: productDetail.name,
+      productSku: productDetail.baseSku,
+      supplierName,
+      notes: notes.trim() || undefined,
+      lines: lines
+        .filter((l) => l.restockQty > 0)
+        .map((l) => ({
+          size: l.sizeName,
+          sku: l.sku,
+          qty: l.restockQty,
+          unitCost: l.costPriceOverride ?? productDetail.baseCostPrice,
+          unitPrice: l.sellingPriceOverride ?? productDetail.baseSellingPrice,
+        })),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restockResult, productDetail, supplierName]);
+
   if (restockResult) {
     return (
       <div className="page-content" style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -161,14 +231,14 @@ export function RestockForm() {
             <p className="restock-success-desc">
               Successfully logged <strong>{restockResult.totalQuantity}</strong> units of{' '}
               <strong>{productDetail?.name} ({productDetail?.baseSku})</strong> into the inventory ledger. 
-              Supplier invoice verified and matched.
+              Print the inward slip to file with the supplier invoice.
             </p>
           </div>
           <div className="restock-success-actions">
             <button
               type="button"
               className="restock-btn restock-btn--secondary"
-              onClick={() => window.print()}
+              onClick={printSlip}
               style={{ width: 'auto' }}
             >
               <span className="material-symbols-outlined">receipt_long</span>
@@ -221,29 +291,38 @@ export function RestockForm() {
             </p>
           </div>
           <div className="restock-barcodes-canvas">
-            <div className="restock-barcodes-grid">
-              {restockResult.barcodes.map((bc, idx) => (
-                <div key={bc} className="restock-barcode-chip">
-                  <div className="restock-barcode-chip__left">
-                    <span className="material-symbols-outlined restock-barcode-chip__icon">qr_code_2</span>
-                    <div className="restock-barcode-chip__col">
-                      <span className="restock-barcode-chip__val">{bc}</span>
-                    </div>
-                  </div>
-                  <span className="restock-barcode-chip__num">#{idx + 1}</span>
+            {labelGroups.length === 0 && (
+              <p className="restock-card__meta">
+                Labels could not be built for this restock. Open <strong>Barcodes</strong> in the sidebar to print them from the ledger.
+              </p>
+            )}
+            {labelGroups.map((group) => (
+              <section key={group.variantId} className="restock-label-group">
+                <header className="restock-label-group__head">
+                  <span className="restock-label-group__size">Size {group.size}</span>
+                  <span className="restock-badge restock-badge--primary">{group.labels.length} label{group.labels.length === 1 ? '' : 's'}</span>
+                </header>
+                <div className="restock-label-grid">
+                  {group.labels.slice(0, 12).map((label) => (
+                    <BarcodeLabelPrint key={label.barcode} label={label} compact />
+                  ))}
                 </div>
-              ))}
-            </div>
+                {group.labels.length > 12 && (
+                  <p className="restock-card__meta">+ {group.labels.length - 12} more — all {group.labels.length} are included when you print.</p>
+                )}
+              </section>
+            ))}
           </div>
           <div style={{ display: 'flex', gap: '12px', padding: '16px 20px', borderTop: '1px solid var(--color-border)', justifyContent: 'flex-start', background: 'var(--color-surface)' }}>
             <button
               type="button"
               className="restock-btn restock-btn--primary"
               style={{ width: 'auto' }}
-              onClick={() => window.print()}
+              onClick={printLabels}
+              disabled={allLabels.length === 0}
             >
               <span className="material-symbols-outlined">print</span>
-              Print All Labels
+              Print All Labels ({allLabels.length})
             </button>
             <button
               type="button"
@@ -260,6 +339,8 @@ export function RestockForm() {
             </button>
           </div>
         </div>
+        {typeof document !== 'undefined' && allLabels.length > 0 && createPortal(<MultiLabelSheet labels={allLabels} />, document.body)}
+        {typeof document !== 'undefined' && slipData && createPortal(<InwardSlip data={slipData} />, document.body)}
       </div>
     );
   }

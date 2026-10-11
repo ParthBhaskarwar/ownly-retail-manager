@@ -84,12 +84,22 @@ export const StoreService = {
     user: Pick<User, 'verifiedAt'>,
     staffAdded?: boolean
   ): OnboardingStep[] {
+    // Judge the real details, not just that a store row exists.
+    const missing: string[] = [];
+    if (!store?.name?.trim()) missing.push('store name');
+    if (!store?.address?.trim()) missing.push('address');
+    if (!store?.phone?.trim()) missing.push('phone');
+    if (store?.taxSettings?.gstEnabled && !store?.gstNumber?.trim()) missing.push('GSTIN');
+    const detailsDone = !!store && missing.length === 0;
+    const verified = !!user.verifiedAt;
+    const typeDone = !!store?.retailType;
+
     return [
       {
         key: 'account_verified',
         label: 'Verify Your Account',
         description: 'Confirm your email address to secure your account.',
-        completed: !!user.verifiedAt,
+        completed: verified,
         href: '/verify',
         optional: false,
       },
@@ -97,16 +107,20 @@ export const StoreService = {
         key: 'retail_type_selected',
         label: 'Choose Retail Type',
         description: 'Select the type of store you operate.',
-        completed: !!store?.retailType,
+        completed: typeDone,
         href: '/onboarding/retail-type',
         optional: false,
       },
       {
         key: 'store_details_saved',
         label: 'Set Up Your Store',
-        description: 'Add your store name, address, and contact details.',
-        completed: !!store?.name,
-        href: '/onboarding/store-setup',
+        description: detailsDone
+          ? 'Store name, address and contact details are saved.'
+          : store
+            ? `Still missing: ${missing.join(', ')}.`
+            : 'Add your store name, address, and contact details.',
+        completed: detailsDone,
+        href: store ? '/settings' : '/onboarding/store-setup',
         optional: false,
       },
       {
@@ -125,7 +139,7 @@ export const StoreService = {
         // It is optional so the completion percentage reflects the three core steps
         // (verified account, retail type, store details) rather than requiring the
         // owner to click a separate "complete setup" button before reaching 100%.
-        completed: !!store?.setupCompleted,
+        completed: !!store?.setupCompleted && verified && typeDone && detailsDone,
         href: '/onboarding/complete',
         optional: true,
       },

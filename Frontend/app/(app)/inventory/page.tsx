@@ -1,6 +1,10 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { BarcodeLabelPrint, MultiLabelSheet } from '@/modules/inventory/components/BarcodeLabelPrint';
+import type { BarcodeLabelData } from '@/modules/inventory/components/BarcodeLabelPrint';
+import { printSection } from '@/lib/printSection';
 import Link from 'next/link';
 import { useAuthContext } from '@/context/AuthContext';
 import { useStoreContext } from '@/context/StoreContext';
@@ -36,6 +40,17 @@ export default function InventoryPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('IN_STOCK');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Label printing lives here too: tick items, then print their barcode labels.
+  const [selected, setSelected] = useState<Map<string, InventoryItemRow>>(new Map());
+  const [showPreview, setShowPreview] = useState(false);
+  const toggleSelected = (item: InventoryItemRow) =>
+    setSelected((prev) => {
+      const next = new Map(prev);
+      if (next.has(item.id)) next.delete(item.id);
+      else next.set(item.id, item);
+      return next;
+    });
 
   const [valuation, setValuation] = useState<StockValuation | null>(null);
   const [soldTotal, setSoldTotal] = useState(0);
@@ -115,6 +130,28 @@ export default function InventoryPage() {
   };
 
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const allOnPageSelected = items.length > 0 && items.every((i) => selected.has(i.id));
+  const togglePage = () =>
+    setSelected((prev) => {
+      const next = new Map(prev);
+      if (allOnPageSelected) items.forEach((i) => next.delete(i.id));
+      else items.forEach((i) => next.set(i.id, i));
+      return next;
+    });
+
+  const labels: BarcodeLabelData[] = useMemo(
+    () =>
+      Array.from(selected.values()).map((i) => ({
+        barcode: i.barcode,
+        productName: i.productName,
+        variantDisplayName: i.size || i.variantDisplayName || undefined,
+        sku: i.variantSku,
+        sellingPrice: i.sellingPrice,
+        storeName: store?.name,
+      })),
+    [selected, store?.name]
+  );
 
   return (
     <PermissionGuard permissionKey="inventory:view">
@@ -216,7 +253,32 @@ export default function InventoryPage() {
               </button>
             ))}
           </div>
+
+          <div className="ledger-label-actions">
+            <span className="ledger-label-actions__count">{selected.size} selected</span>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={togglePage} disabled={items.length === 0}>
+              {allOnPageSelected ? 'Unselect page' : 'Select page'}
+            </button>
+            {selected.size > 0 && (
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelected(new Map())}>Clear</button>
+            )}
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowPreview((v) => !v)} disabled={selected.size === 0}>
+              {showPreview ? 'Hide preview' : 'Preview labels'}
+            </button>
+            <button type="button" id="print-labels-btn" className="btn btn-primary btn-sm" onClick={() => printSection('labels')} disabled={selected.size === 0}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18, verticalAlign: -4 }}>print</span> Print labels ({selected.size})
+            </button>
+          </div>
         </div>
+
+        {showPreview && labels.length > 0 && (
+          <div className="card" style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-4)' }}>
+            <div className="restock-label-grid">
+              {labels.slice(0, 12).map((l) => <BarcodeLabelPrint key={l.barcode} label={l} compact />)}
+            </div>
+            {labels.length > 12 && <p className="restock-card__meta" style={{ marginTop: 8 }}>+ {labels.length - 12} more — all {labels.length} print.</p>}
+          </div>
+        )}
 
         {loadError && (
           <div className="alert alert--error" role="alert" style={{ marginBottom: 'var(--space-4)' }}>
@@ -251,6 +313,9 @@ export default function InventoryPage() {
               <table className="table" style={{ width: '100%', fontSize: 'var(--text-sm)' }}>
                 <thead>
                   <tr>
+                    <th style={{ width: 36 }}>
+                      <input type="checkbox" aria-label="Select all items on this page" checked={allOnPageSelected} onChange={togglePage} />
+                    </th>
                     <th style={{ textAlign: 'left' }}>Unique Barcode</th>
                     <th style={{ textAlign: 'left' }}>Garment Design</th>
                     <th style={{ textAlign: 'left' }}>Size / Variant</th>
@@ -262,7 +327,10 @@ export default function InventoryPage() {
                 </thead>
                 <tbody>
                   {items.map((item) => (
-                    <tr key={item.id}>
+                    <tr key={item.id} className={selected.has(item.id) ? 'ledger-row--selected' : undefined}>
+                      <td>
+                        <input type="checkbox" aria-label={`Select ${item.barcode}`} checked={selected.has(item.id)} onChange={() => toggleSelected(item)} />
+                      </td>
                       <td>
                         <code className="sku-badge" style={{ fontWeight: 600 }}>
                           {item.barcode}
@@ -358,6 +426,7 @@ export default function InventoryPage() {
           </div>
         )}
       </div>
+      {typeof document !== 'undefined' && labels.length > 0 && createPortal(<MultiLabelSheet labels={labels} />, document.body)}
     </PermissionGuard>
   );
 }
