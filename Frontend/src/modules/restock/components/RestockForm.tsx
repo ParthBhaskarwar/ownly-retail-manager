@@ -10,6 +10,9 @@ import type { BarcodeLabelData } from '@/modules/inventory/components/BarcodeLab
 import { ProductService } from '@/modules/product/services/ProductService';
 import { SupplierSelect } from '@/modules/catalog/components/SupplierSelect';
 import { RestockService } from '../services/RestockService';
+import { InwardSlip, type InwardSlipData } from './InwardSlip';
+import { SupplierService } from '@/modules/catalog/services/CategoryService';
+import { printSection } from '@/lib/printSection';
 import type { ProductSummary } from '@/modules/product/types';
 import type { RestockVariantLine, RestockResult } from '../types';
 
@@ -174,17 +177,40 @@ export function RestockForm() {
 
   const allLabels = useMemo(() => labelGroups.flatMap((g) => g.labels), [labelGroups]);
 
-  const printLabels = () => {
-    // The print stylesheet hides the app and shows only the portalled label sheet
-    // while body.print-labels is set.
-    document.body.classList.add('print-labels');
-    const cleanup = () => {
-      document.body.classList.remove('print-labels');
-      window.removeEventListener('afterprint', cleanup);
+  const printLabels = () => printSection('labels');
+  const printSlip = () => printSection('slip');
+
+  const [supplierName, setSupplierName] = useState<string | undefined>();
+  useEffect(() => {
+    if (!restockResult || !selectedSupplierId) { setSupplierName(undefined); return; }
+    SupplierService.getSuppliers(storeId)
+      .then((list) => setSupplierName(list.find((x) => x.id === selectedSupplierId)?.name))
+      .catch(() => setSupplierName(undefined));
+  }, [restockResult, selectedSupplierId, storeId]);
+
+  const slipData: InwardSlipData | null = useMemo(() => {
+    if (!restockResult || !productDetail) return null;
+    return {
+      storeName: store?.name,
+      storeAddress: store?.address,
+      receivedAt: new Date(),
+      receivedBy: user?.name,
+      productName: productDetail.name,
+      productSku: productDetail.baseSku,
+      supplierName,
+      notes: notes.trim() || undefined,
+      lines: lines
+        .filter((l) => l.restockQty > 0)
+        .map((l) => ({
+          size: l.sizeName,
+          sku: l.sku,
+          qty: l.restockQty,
+          unitCost: l.costPriceOverride ?? productDetail.baseCostPrice,
+          unitPrice: l.sellingPriceOverride ?? productDetail.baseSellingPrice,
+        })),
     };
-    window.addEventListener('afterprint', cleanup);
-    window.print();
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restockResult, productDetail, supplierName]);
 
   if (restockResult) {
     return (
@@ -205,14 +231,14 @@ export function RestockForm() {
             <p className="restock-success-desc">
               Successfully logged <strong>{restockResult.totalQuantity}</strong> units of{' '}
               <strong>{productDetail?.name} ({productDetail?.baseSku})</strong> into the inventory ledger. 
-              Supplier invoice verified and matched.
+              Print the inward slip to file with the supplier invoice.
             </p>
           </div>
           <div className="restock-success-actions">
             <button
               type="button"
               className="restock-btn restock-btn--secondary"
-              onClick={() => window.print()}
+              onClick={printSlip}
               style={{ width: 'auto' }}
             >
               <span className="material-symbols-outlined">receipt_long</span>
@@ -314,6 +340,7 @@ export function RestockForm() {
           </div>
         </div>
         {typeof document !== 'undefined' && allLabels.length > 0 && createPortal(<MultiLabelSheet labels={allLabels} />, document.body)}
+        {typeof document !== 'undefined' && slipData && createPortal(<InwardSlip data={slipData} />, document.body)}
       </div>
     );
   }
