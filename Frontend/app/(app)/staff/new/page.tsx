@@ -12,7 +12,7 @@ import type { CreateStaffInput } from '@/modules/staff/types';
 
 export default function NewStaffPage() {
   const { user } = useAuth();
-  const { store } = useStoreContext();
+  const { store, isLoading: isStoreLoading } = useStoreContext();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState('');
@@ -31,7 +31,26 @@ export default function NewStaffPage() {
     }
   };
 
-  if (!store?.id) return null;
+  if (!store?.id) {
+    if (isStoreLoading) {
+      return (
+        <div className="page">
+          <div className="skeleton" style={{ height: 40, width: 300, marginBottom: 24 }} />
+          <div className="skeleton" style={{ height: 400 }} />
+        </div>
+      );
+    }
+    return (
+      <div className="page-content">
+        <div className="empty-state">
+          <span className="empty-state__icon" aria-hidden="true">▦</span>
+          <h3 className="empty-state__title">No store found</h3>
+          <p className="empty-state__desc">Finish setting up your store before adding staff.</p>
+          <Link href="/onboarding/store-setup" className="btn btn-secondary">Set Up Store</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <PermissionGuard permissionKey="staff:create">

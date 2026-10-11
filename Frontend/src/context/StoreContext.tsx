@@ -7,7 +7,10 @@ import { useAuthContext } from './AuthContext';
 
 interface StoreContextValue {
   store: Store | null;
+  /** True while a store fetch is in flight. */
   isLoading: boolean;
+  /** True once the first store fetch for the current user has finished (found a store or not). */
+  isLoaded: boolean;
   refresh: () => Promise<void>;
   setStore: (store: Store) => void;
 }
@@ -16,31 +19,37 @@ const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuthContext();
+  const userId = user?.id;
+  const userStoreId = user?.storeId;
   const [store, setStore] = useState<Store | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!user?.id) {
+    if (!userId) {
       setStore(null);
+      setIsLoaded(false);
       return;
     }
     setIsLoading(true);
     try {
-      const s = await StoreService.getByOwnerId(user.id);
-      // Also try by storeId if owner already has one
-      const result = s ?? (user.storeId ? await StoreService.getById(user.storeId) : null);
-      setStore(result);
+      // The backend resolves the store from the caller's own account.
+      setStore(await StoreService.getByOwnerId(userId));
+    } catch {
+      setStore(null);
     } finally {
       setIsLoading(false);
+      setIsLoaded(true);
     }
-  }, [user]);
+    // userStoreId is a dependency so the store is re-read once onboarding assigns one.
+  }, [userId, userStoreId]);
 
   useEffect(() => {
-    refresh();
+    void refresh();
   }, [refresh]);
 
   return (
-    <StoreContext.Provider value={{ store, isLoading, refresh, setStore }}>
+    <StoreContext.Provider value={{ store, isLoading, isLoaded, refresh, setStore }}>
       {children}
     </StoreContext.Provider>
   );

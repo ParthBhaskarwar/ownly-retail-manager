@@ -20,6 +20,9 @@ import type {
   UpdateProductInput,
   UpdateVariantInput,
   ProductSearchFilters,
+  PhotoAnalysisResult,
+  SimilarProduct,
+  ProductPerformanceMetrics,
 } from '@/modules/product/types';
 
 export const ProductService = {
@@ -42,15 +45,26 @@ export const ProductService = {
       baseSellingPrice: input.baseSellingPrice,
       baseCostPrice: input.baseCostPrice,
       status: input.status,
+      imageUrls: input.imageUrls,
       attributeValues: input.attributeValues,
       variants: input.variants,
     });
     return product;
   },
 
-  async updateProduct(id: string, updates: UpdateProductInput, _storeId?: string): Promise<Product> {
-    const { updatedBy: _ignored, ...body } = updates;
-    const { product } = await apiClient.put<{ product: Product }>(`/api/products/${id}`, body);
+  /**
+   * Update a product. Logs price changes to audit trail.
+   */
+  async updateProduct(
+    id: string,
+    updates: UpdateProductInput,
+    storeId?: string
+  ): Promise<Product> {
+    const { product } = await apiClient.put<{ product: Product }>(
+      `/api/products/${id}`,
+      updates
+    );
+
     return product;
   },
 
@@ -80,6 +94,62 @@ export const ProductService = {
         pageSize: filters.pageSize,
       },
     });
+  },
+
+  // ── Week 6: Photo intelligence ────────────────────────────────────────────
+
+  /**
+   * Analyse a photo (base64) with the offline photo AI: quality check, colour and
+   * pattern suggestions, and existing products that look like it. Nothing is
+   * saved — embeddings are stored when the product's photos are saved.
+   * Pass excludeProductId for a saved product so it never matches itself.
+   */
+  async analyzePhoto(base64Image: string, excludeProductId?: string): Promise<PhotoAnalysisResult> {
+    return apiClient.post<PhotoAnalysisResult>('/api/products/analyze-photo', {
+      image: base64Image,
+      excludeProductId,
+    });
+  },
+
+  /**
+   * Find products visually similar to the given product (requires photo embeddings).
+   * Returns `{ enabled: false }` when the product has no photo embeddings.
+   */
+  async getSimilarProducts(
+    productId: string,
+    limit = 5
+  ): Promise<{ enabled: boolean; similar: SimilarProduct[]; duplicateThreshold?: number }> {
+    return apiClient.get<{ enabled: boolean; similar: SimilarProduct[]; duplicateThreshold?: number }>(
+      `/api/products/${productId}/similar`,
+      { query: { limit } }
+    );
+  },
+
+  // ── Week 6: Performance analytics ────────────────────────────────────────
+
+  /**
+   * Get (or compute) performance metrics for a product.
+   * Pass refresh=true to force re-computation from raw data.
+   */
+  async getPerformanceMetrics(
+    productId: string,
+    refresh = false
+  ): Promise<ProductPerformanceMetrics> {
+    const { metrics } = await apiClient.get<{ metrics: ProductPerformanceMetrics }>(
+      `/api/products/${productId}/performance`,
+      { query: refresh ? { refresh: 'true' } : {} }
+    );
+    return metrics;
+  },
+
+  /**
+   * Trigger a full store-wide performance metrics refresh.
+   */
+  async refreshAllPerformanceMetrics(): Promise<{ refreshed: number }> {
+    return apiClient.post<{ refreshed: number }>(
+      '/api/products/performance/refresh',
+      {}
+    );
   },
 };
 

@@ -12,6 +12,7 @@ import { ZodError } from 'zod';
 import { config } from './config/env';
 import { assertDbConnection } from './db/client';
 import { AppError } from './shared/AppError';
+import { EmbeddingService } from './services/embedding.service';
 
 // ─── Routers ─────────────────────────────────────────────────────────────────
 import { authRouter } from './api/auth/auth.router';
@@ -26,6 +27,13 @@ import { returnsRouter } from './api/returns/returns.router';
 import { exchangesRouter } from './api/exchanges/exchanges.router';
 import { creditNotesRouter } from './api/credit_notes/credit_notes.router';
 import { customersRouter } from './api/customers/customers.router';
+// Week 5 — restocking, dashboard, reports, backup
+import { restockRouter } from './api/inventory/restock.router';
+import { dashboardRouter } from './api/dashboard/dashboard.router';
+import { reportsRouter } from './api/reports/reports.router';
+import { backupRouter } from './api/backup/backup.router';
+// Week 7 — offline AI scoring and AI-assisted restocking
+import { aiRouter } from './api/ai/ai.router';
 
 const app = express();
 
@@ -37,11 +45,15 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json({ limit: '2mb' }));
+// Product photos are sent as base64 JSON (~33% larger than the raw file, and a
+// product can carry several 5MB images), so this needs headroom well beyond
+// the old 2mb default — that limit was silently turning photo uploads and
+// edits of photographed products into generic 500s.
+app.use(express.json({ limit: '20mb' }));
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', version: '0.3.0', env: config.nodeEnv });
+  res.json({ status: 'ok', version: '0.7.0', env: config.nodeEnv });
 });
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
@@ -57,6 +69,13 @@ app.use('/api/returns', returnsRouter);
 app.use('/api/exchanges', exchangesRouter);
 app.use('/api/credit-notes', creditNotesRouter);
 app.use('/api/customers', customersRouter);
+// Week 5 routes
+app.use('/api/inventory/restock', restockRouter);
+app.use('/api/dashboard', dashboardRouter);
+app.use('/api/reports', reportsRouter);
+app.use('/api/backup', backupRouter);
+// Week 7 routes
+app.use('/api/ai', aiRouter);
 
 // ─── 404 handler ──────────────────────────────────────────────────────────────
 app.use((_req, res) => {
@@ -73,6 +92,11 @@ app.use((
   res: express.Response,
   _next: express.NextFunction
 ) => {
+  if (typeof err === 'object' && err !== null && (err as { type?: string }).type === 'entity.too.large') {
+    res.status(413).json({ error: 'That upload is too large. Please use a smaller image.' });
+    return;
+  }
+
   if (err instanceof ZodError) {
     // Surface the first validation message — the forms show a single error line.
     const first = err.issues[0];
@@ -95,6 +119,20 @@ app.use((
     return;
   }
 
+  // Malformed id (e.g. a non-UUID in a path or body) reaching a uuid column.
+  if (typeof err === 'object' && err !== null && (err as { code?: string }).code === '22P02') {
+    console.warn('[ERROR 22P02]', (err as Error).message);
+    res.status(400).json({ error: 'That request contained an invalid identifier.' });
+    return;
+  }
+
+  // Foreign-key violation: the request referenced something that does not exist.
+  if (typeof err === 'object' && err !== null && (err as { code?: string }).code === '23503') {
+    console.warn('[ERROR 23503]', (err as Error).message);
+    res.status(400).json({ error: 'That request referenced a record that does not exist.' });
+    return;
+  }
+
   console.error('[ERROR]', err);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -112,6 +150,14 @@ async function start(): Promise<void> {
   app.listen(config.port, () => {
     console.log(`🚀 Ownly backend running on http://localhost:${config.port}`);
     console.log(`   Environment: ${config.nodeEnv}`);
+
+    // Load the photo-AI model in the background so the first photo upload is not slow.
+    // Failure is fine — photo AI degrades gracefully and manual entry never depends on it.
+    if (EmbeddingService.isEnabled()) {
+      void EmbeddingService.warmUp().then((ok) => {
+        console.log(ok ? '🧠 Photo AI model ready' : '⚠️  Photo AI model unavailable (manual entry still works)');
+      });
+    }
   });
 }
 

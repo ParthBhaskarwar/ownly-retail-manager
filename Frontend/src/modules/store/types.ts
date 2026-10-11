@@ -69,6 +69,7 @@ export interface UpdateStoreInput {
   name?: string;
   address?: string;
   phone?: string;
+  retailType?: string;
   gstNumber?: string;
   currency?: string;
   taxSettings?: TaxSettings;

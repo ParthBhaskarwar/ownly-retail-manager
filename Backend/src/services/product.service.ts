@@ -22,6 +22,8 @@ import { AppError } from '@/shared/AppError';
 import { AuditService } from './audit.service';
 import { AttributeService, toDefinition, type AttributeDefinitionRow } from './attribute.service';
 import { InventoryService } from './inventory.service';
+import { EmbeddingService } from './embedding.service';
+import { ProductEmbeddingRepository } from './product-embedding.repository';
 import type {
   CreateProductInput,
   CreateVariantInput,
@@ -36,13 +38,24 @@ import type {
   VariantWithStock,
 } from '@/types/domain';
 
+/**
+ * Photo AI is optional and slow relative to a save, so embeddings are synced
+ * after the product is committed and never block or fail the request.
+ */
+function syncEmbeddingsInBackground(storeId: string, productId: string, images: string[]): void {
+  if (!EmbeddingService.isEnabled()) return;
+  ProductEmbeddingRepository.syncProductEmbeddings(storeId, productId, images).catch((err) => {
+    console.error('[embedding] background sync failed for product', productId, err);
+  });
+}
+
 export const ProductService = {
   /**
    * Creates a product, its attribute values, its variants, and each variant's
    * opening stock (with unique barcodes) as a single atomic unit.
    */
   async createProduct(input: CreateProductInput): Promise<Product> {
-    return db.transaction(async (trx) => {
+    const created = await db.transaction(async (trx) => {
       const clash = await trx('products')
         .where({ store_id: input.storeId, base_sku: input.baseSku })
         .first();
@@ -51,6 +64,8 @@ export const ProductService = {
       }
 
       const productId = randomUUID();
+
+      const imageUrls = input.imageUrls || [];
 
       await trx('products').insert({
         id: productId,
@@ -65,12 +80,12 @@ export const ProductService = {
         base_selling_price: input.baseSellingPrice,
         base_cost_price: input.baseCostPrice,
         status: input.status ?? 'ACTIVE',
-        image_urls: JSON.stringify([]),
+        image_urls: JSON.stringify(imageUrls),
         created_by: input.createdBy,
         updated_by: input.createdBy,
       });
 
-      await AttributeService.setProductAttributeValues(productId, input.attributeValues, trx);
+      await AttributeService.replaceProductAttributeValues(productId, input.categoryId, input.attributeValues, trx);
 
       for (const [index, variant] of input.variants.entries()) {
         await createVariantInTrx(trx, {
@@ -92,48 +107,86 @@ export const ProductService = {
 
       return (await trx('products').where({ id: productId }).first()) as Product;
     });
+
+    if (input.imageUrls && input.imageUrls.length > 0) {
+      syncEmbeddingsInBackground(input.storeId, created.id, input.imageUrls);
+    }
+    return created;
   },
 
   async updateProduct(storeId: string, id: string, updates: UpdateProductInput): Promise<Product> {
-    const before = (await db('products').where({ id, store_id: storeId }).first()) as Product | undefined;
-    if (!before) throw AppError.notFound(`Product ${id} not found`);
+    const updated = await db.transaction(async (trx) => {
+      const before = (await trx('products').where({ id, store_id: storeId }).first()) as Product | undefined;
+      if (!before) throw AppError.notFound(`Product ${id} not found`);
 
-    const patch: Record<string, unknown> = { updated_by: updates.updatedBy, updated_at: new Date() };
-    if (updates.name !== undefined) patch.name = updates.name;
-    if (updates.description !== undefined) patch.description = updates.description;
-    if (updates.categoryId !== undefined) patch.category_id = updates.categoryId;
-    if (updates.subcategoryId !== undefined) patch.subcategory_id = updates.subcategoryId;
-    if (updates.supplierId !== undefined) patch.supplier_id = updates.supplierId;
-    if (updates.baseSellingPrice !== undefined) patch.base_selling_price = updates.baseSellingPrice;
-    if (updates.baseCostPrice !== undefined) patch.base_cost_price = updates.baseCostPrice;
-    if (updates.status !== undefined) patch.status = updates.status;
+      const patch: Record<string, unknown> = { updated_by: updates.updatedBy, updated_at: new Date() };
+      if (updates.name !== undefined) patch.name = updates.name;
+      if (updates.description !== undefined) patch.description = updates.description;
+      if (updates.categoryId !== undefined) patch.category_id = updates.categoryId;
+      if (updates.subcategoryId !== undefined) patch.subcategory_id = updates.subcategoryId;
+      if (updates.supplierId !== undefined) patch.supplier_id = updates.supplierId;
+      if (updates.baseSellingPrice !== undefined) patch.base_selling_price = updates.baseSellingPrice;
+      if (updates.baseCostPrice !== undefined) patch.base_cost_price = updates.baseCostPrice;
+      if (updates.status !== undefined) patch.status = updates.status;
 
-    const [after] = (await db('products').where({ id }).update(patch).returning('*')) as Product[];
+      if (updates.imageUrls !== undefined) {
+        patch.image_urls = JSON.stringify(updates.imageUrls);
+      }
 
-    // Price changes are sensitive — audit them with before/after values.
-    if (updates.baseSellingPrice !== undefined || updates.baseCostPrice !== undefined) {
-      await AuditService.log({
-        action: 'product.price_change', userId: updates.updatedBy, storeId,
-        entityType: 'product', entityId: id,
-        meta: {
-          old: { baseSellingPrice: before.baseSellingPrice, baseCostPrice: before.baseCostPrice },
-          new: { baseSellingPrice: after.baseSellingPrice, baseCostPrice: after.baseCostPrice },
-        },
-      });
-    } else {
-      await AuditService.log({
-        action: 'product.update', userId: updates.updatedBy, storeId,
-        entityType: 'product', entityId: id, meta: { ...updates },
-      });
+      await trx('products').where({ id }).update(patch);
+
+      if (updates.attributeValues !== undefined) {
+        const catId = (updates.categoryId ?? before.categoryId) as string;
+        await AttributeService.replaceProductAttributeValues(id, catId, updates.attributeValues, trx);
+      }
+
+      const after = (await trx('products').where({ id }).first()) as Product;
+
+      if (updates.baseSellingPrice !== undefined || updates.baseCostPrice !== undefined) {
+        await AuditService.log(
+          {
+            action: 'product.price_change', userId: updates.updatedBy, storeId,
+            entityType: 'product', entityId: id,
+            meta: {
+              old: { baseSellingPrice: before.baseSellingPrice, baseCostPrice: before.baseCostPrice },
+              new: { baseSellingPrice: after.baseSellingPrice, baseCostPrice: after.baseCostPrice },
+            },
+          },
+          trx
+        );
+      } else {
+        await AuditService.log(
+          {
+            action: 'product.update', userId: updates.updatedBy, storeId,
+            entityType: 'product', entityId: id, meta: { ...updates },
+          },
+          trx
+        );
+      }
+
+      return after;
+    });
+
+    if (updates.imageUrls !== undefined) {
+      syncEmbeddingsInBackground(storeId, id, updates.imageUrls);
     }
-
-    return after;
+    return updated;
   },
 
   /** Product + resolved attributes + variants with stock, in a fixed number of queries. */
   async getProductDetail(storeId: string, id: string): Promise<ProductDetail | null> {
     const product = (await db('products').where({ id, store_id: storeId }).first()) as Product | undefined;
     if (!product) return null;
+
+    const [category, subcategory, supplier] = await Promise.all([
+      db('categories').where({ id: product.categoryId }).first('name') as Promise<{ name: string } | undefined>,
+      product.subcategoryId
+        ? (db('subcategories').where({ id: product.subcategoryId }).first('name') as Promise<{ name: string } | undefined>)
+        : Promise.resolve(undefined),
+      product.supplierId
+        ? (db('suppliers').where({ id: product.supplierId, store_id: storeId }).first('name') as Promise<{ name: string } | undefined>)
+        : Promise.resolve(undefined),
+    ]);
 
     const [defRows, productValues, variants] = await Promise.all([
       db('attribute_definitions').where({ retail_template_id: product.retailTemplateId }),
@@ -179,6 +232,9 @@ export const ProductService = {
 
     return {
       ...product,
+      categoryName: category?.name,
+      subcategoryName: subcategory?.name,
+      supplierName: supplier?.name,
       attributes: resolve(productValues as Array<{ attributeDefinitionId: string; value: string }>),
       variants: variantsWithStock,
     };

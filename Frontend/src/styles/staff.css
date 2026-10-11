@@ -1,0 +1,27 @@
+/* ── Staff page ──────────────────────────────────────────────── */
+.staff-page { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-5); }
+.staff-page__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.staff-page__title { margin: 0; padding: 0; max-width: none; font-size: var(--text-2xl); font-weight: var(--font-bold); letter-spacing: -0.01em; }
+.staff-page__subtitle { margin: 2px 0 0; font-size: var(--text-sm); color: var(--color-ink-secondary); }
+.staff-page__head .btn { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+
+.staff-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: var(--space-4); }
+.staff-stat { display: flex; flex-direction: column; gap: 6px; padding: var(--space-4) var(--space-5); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+.staff-stat__label { font-size: 11px; font-weight: var(--font-semibold); letter-spacing: .05em; text-transform: uppercase; color: var(--color-ink-secondary); }
+.staff-stat__value { font-size: 28px; font-weight: var(--font-bold); line-height: 1; color: var(--color-ink); }
+.staff-stat__value--ok { color: var(--color-accent); }
+
+.staff-toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; padding: var(--space-3); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+.staff-search { flex: 1 1 260px; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; background: var(--color-paper); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.staff-search:focus-within { border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-tint); }
+.staff-search .material-symbols-outlined { font-size: 20px; color: var(--color-ink-muted); }
+.staff-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: var(--text-sm); color: var(--color-ink); }
+.staff-tabs { display: inline-flex; padding: 3px; gap: 2px; background: var(--color-muted); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.staff-tab { height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: transparent; color: var(--color-ink-secondary); font: 500 13px var(--font-body); cursor: pointer; }
+.staff-tab:hover { color: var(--color-ink); }
+.staff-tab--active { background: var(--color-surface); color: var(--color-accent); box-shadow: 0 1px 2px rgba(28,25,23,.08); font-weight: 600; }
+.staff-modal__text { margin: 0; font-size: var(--text-sm); line-height: 1.6; color: var(--color-ink-secondary); }
+.staff-modal__text strong { color: var(--color-ink); }
+
+/* Table container reads as a card, like the other list screens. */
+.staff-table-wrapper { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto; }

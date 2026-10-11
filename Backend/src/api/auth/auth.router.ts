@@ -8,9 +8,14 @@ import { AuthService } from '@/services/auth.service';
 import { StoreService } from '@/services/store.service';
 import { authenticate } from '@/middleware/auth.middleware';
 import { AppError } from '@/shared/AppError';
+import { rateLimit } from '@/middleware/rateLimit';
 import type { DeviceInfo } from '@/types/domain';
 
 export const authRouter = Router();
+
+const signupLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 30 });
+const codeLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20 });
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20 });
 
 const signupSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters.'),
@@ -32,7 +37,7 @@ const loginSchema = z.object({
     .nullish(),
 });
 
-authRouter.post('/signup', async (req, res, next) => {
+authRouter.post('/signup', signupLimiter, async (req, res, next) => {
   try {
     const input = signupSchema.parse(req.body);
     res.status(201).json(await AuthService.signUp(input));
@@ -41,7 +46,7 @@ authRouter.post('/signup', async (req, res, next) => {
   }
 });
 
-authRouter.post('/verify', async (req, res, next) => {
+authRouter.post('/verify', codeLimiter, async (req, res, next) => {
   try {
     const { userId, code } = verifySchema.parse(req.body);
     await AuthService.verify(userId, code);
@@ -51,7 +56,16 @@ authRouter.post('/verify', async (req, res, next) => {
   }
 });
 
-authRouter.post('/login', async (req, res, next) => {
+authRouter.post('/resend-code', codeLimiter, async (req, res, next) => {
+  try {
+    const { userId } = z.object({ userId: z.string().uuid() }).parse(req.body);
+    res.json(await AuthService.resendCode(userId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+authRouter.post('/login', loginLimiter, async (req, res, next) => {
   try {
     const { email, password, deviceInfo } = loginSchema.parse(req.body);
     res.json(await AuthService.login({ email, password }, (deviceInfo as DeviceInfo) ?? null));

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Required for use as a project reference target
+    "composite": true,
+    // Remove the rootDir restriction so test files outside src/ are allowed
+    "rootDir": ".",
+    // Explicitly pull in Jest global types (describe, it, expect, etc.)
+    "types": ["jest", "node"]
+  },
+  "include": ["src/**/*", "tests/**/*"]
+}

@@ -118,9 +118,41 @@ inventoryRouter.get('/item/:itemId', requirePermission('inventory:view'), async 
 inventoryRouter.get('/barcode/:barcode', requirePermission('inventory:view'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
-    const item = await InventoryService.findByBarcode(storeId, param(req.params, 'barcode'));
-    if (!item) throw AppError.notFound('No item found with that barcode.');
-    res.json({ item });
+    const barcode = param(req.params, 'barcode');
+
+    // Join inventory → variant → product to get all fields the POS needs in one query.
+    const row = await db('inventory_items as ii')
+      .join('product_variants as v', 'v.id', 'ii.variant_id')
+      .join('products as p', 'p.id', 'v.product_id')
+      .where({ 'ii.store_id': storeId, 'ii.barcode': barcode })
+      .whereIn('ii.status', ['IN_STOCK', 'RETURNED_TO_STOCK'])
+      .select(
+        'ii.id as inventory_item_id',
+        'ii.barcode',
+        'ii.status',
+        'p.id as product_id',
+        'p.name as product_name',
+        'v.id as variant_id',
+        'v.display_name as variant_name',
+        'v.sku',
+        // Effective selling price: variant override takes priority over product base price.
+        db.raw('COALESCE(v.selling_price_override, p.base_selling_price) as unit_price')
+      )
+      .first();
+
+    if (!row) throw AppError.notFound('No in-stock item found with that barcode.');
+
+    res.json({
+      inventoryItemId: row.inventoryItemId,
+      barcode: row.barcode,
+      status: row.status,
+      productId: row.productId,
+      productName: row.productName,
+      variantId: row.variantId,
+      variantName: row.variantName,
+      sku: row.sku,
+      unitPrice: Number(row.unitPrice),
+    });
   } catch (err) {
     next(err);
   }
@@ -161,8 +193,15 @@ inventoryRouter.get('/:itemId/movements', requirePermission('inventory:view'), a
 
 inventoryRouter.get('/variants/:variantId/stock', requirePermission('inventory:view'), async (req, res, next) => {
   try {
-    requireStoreId(req);
-    res.json({ stock: await InventoryService.getStockSummary(param(req.params, 'variantId')) });
+    const storeId = requireStoreId(req);
+    const variantId = param(req.params, 'variantId');
+    // Tenant check: the variant must belong to a product in the caller's store.
+    const owned = await db('product_variants as v')
+      .join('products as p', 'p.id', 'v.product_id')
+      .where({ 'v.id': variantId, 'p.store_id': storeId })
+      .first('v.id');
+    if (!owned) throw AppError.notFound('Variant not found in this store.');
+    res.json({ stock: await InventoryService.getStockSummary(variantId) });
   } catch (err) {
     next(err);
   }

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getAuthHeaders } from '@/shared/utils/auth';
-import { db } from '@/db/db';
+import { apiClient } from '@/lib/apiClient';
 
 interface CustomerSelectModalProps {
   isOpen: boolean;
@@ -34,29 +33,9 @@ export function CustomerSelectModal({
     setIsSearching(true);
     setError(null);
     try {
-      const res = await fetch(`/api/customers?query=${encodeURIComponent(searchQuery.trim())}`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSearchResults(data);
-      } else {
-        const q = searchQuery.trim().toLowerCase();
-        const results = await db.customers.filter(
-          (c) => c.name.toLowerCase().includes(q) || c.phone.includes(q)
-        ).toArray();
-        setSearchResults(results);
-      }
-    } catch {
-      try {
-        const q = searchQuery.trim().toLowerCase();
-        const results = await db.customers.filter(
-          (c) => c.name.toLowerCase().includes(q) || c.phone.includes(q)
-        ).toArray();
-        setSearchResults(results);
-      } catch {
-        setError('Search failed. Check your connection.');
-      }
+      setSearchResults(await apiClient.get<any[]>('/api/customers', { query: { query: searchQuery.trim() } }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Customer search failed.');
     } finally {
       setIsSearching(false);
     }
@@ -71,30 +50,14 @@ export function CustomerSelectModal({
     setIsCreating(true);
     setError(null);
     try {
-      const res = await fetch('/api/customers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify({ name: newName.trim(), phone: newPhone.trim(), email: newEmail.trim() || undefined }),
-      });
-      if (res.ok) {
-        const customer = await res.json();
-        onSelectCustomer({ id: customer.id, name: customer.name, phone: customer.phone, email: customer.email });
-      } else {
-        const { v4: uuidv4 } = await import('uuid');
-        const customer = {
-          id: uuidv4(),
-          name: newName.trim(),
-          phone: newPhone.trim(),
-          email: newEmail.trim() || undefined,
-          totalPurchases: 0,
-          createdAt: new Date().toISOString(),
-        };
-        await db.customers.add(customer);
-        onSelectCustomer({ id: customer.id, name: customer.name, phone: customer.phone, email: customer.email });
-      }
+      const customer = await apiClient.post<{ id: string; name: string; phone: string; email?: string }>(
+        '/api/customers',
+        { name: newName.trim(), phone: newPhone.trim(), email: newEmail.trim() || undefined }
+      );
+      onSelectCustomer({ id: customer.id, name: customer.name, phone: customer.phone, email: customer.email });
       onClose();
-    } catch {
-      setError('Failed to create customer record.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create customer record.');
     } finally {
       setIsCreating(false);
     }

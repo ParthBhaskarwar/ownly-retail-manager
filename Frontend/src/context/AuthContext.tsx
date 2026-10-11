@@ -26,6 +26,7 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   signUp: (input: SignUpInput) => Promise<PendingVerification>;
   verify: (userId: string, code: string) => Promise<void>;
+  resendCode: (userId: string) => Promise<{ devCode?: string }>;
   login: (input: LoginInput) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -51,18 +52,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
       return;
     }
-    try {
-      const result = await AuthService.resolveSession(token);
-      if (result) {
-        setState({ user: result.user, session: result.session, isLoading: false, isAuthenticated: true });
-      } else {
-        clearStoredSession();
-        setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
+    // Retry transient failures (server restarting, dropped connection) before giving up.
+    // A definitive "not logged in" answer clears the token inside resolveSession; a
+    // transient failure leaves the token in place so a reload can recover.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const result = await AuthService.resolveSession(token);
+        if (result) {
+          setState({ user: result.user, session: result.session, isLoading: false, isAuthenticated: true });
+        } else {
+          setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
+        }
+        return;
+      } catch {
+        if (attempt < 2) await new Promise((r) => setTimeout(r, 700 * (attempt + 1)));
       }
-    } catch {
-      clearStoredSession();
-      setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
     }
+    setState({ user: null, session: null, isLoading: false, isAuthenticated: false });
   }, []);
 
   useEffect(() => {
@@ -75,6 +81,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verify = useCallback(async (userId: string, code: string): Promise<void> => {
     await AuthService.verify(userId, code);
+  }, []);
+
+  const resendCode = useCallback(async (userId: string): Promise<{ devCode?: string }> => {
+    return AuthService.resendCode(userId);
   }, []);
 
   const login = useCallback(async (input: LoginInput): Promise<void> => {
@@ -97,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [state.session, state.user]);
 
   return (
-    <AuthContext.Provider value={{ ...state, signUp, verify, login, logout, refreshSession }}>
+    <AuthContext.Provider value={{ ...state, signUp, verify, resendCode, login, logout, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

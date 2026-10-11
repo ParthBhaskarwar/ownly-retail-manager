@@ -40,7 +40,7 @@ staffRouter.get('/', requirePermission('staff:view'), async (req, res, next) => 
 staffRouter.post('/', requirePermission('staff:create'), async (req, res, next) => {
   try {
     const input = createSchema.parse(req.body);
-    const staff = await StaffService.create(requireStoreId(req), req.user!.userId, input as never);
+    const staff = await StaffService.create(requireStoreId(req), req.user!.userId, input as never, req.user!.role);
     res.status(201).json({ staff });
   } catch (err) {
     next(err);
@@ -59,7 +59,7 @@ staffRouter.put('/:id', requirePermission('staff:edit'), async (req, res, next) 
   try {
     const updates = updateSchema.parse(req.body);
     const staff = await StaffService.update(
-      requireStoreId(req), req.user!.userId, param(req.params, 'id'), updates as never
+      requireStoreId(req), req.user!.userId, param(req.params, 'id'), updates as never, req.user!.role
     );
     res.json({ staff });
   } catch (err) {
@@ -69,7 +69,7 @@ staffRouter.put('/:id', requirePermission('staff:edit'), async (req, res, next) 
 
 staffRouter.post('/:id/deactivate', requirePermission('staff:deactivate'), async (req, res, next) => {
   try {
-    const staff = await StaffService.deactivate(requireStoreId(req), req.user!.userId, param(req.params, 'id'));
+    const staff = await StaffService.deactivate(requireStoreId(req), req.user!.userId, param(req.params, 'id'), req.user!.role);
     res.json({ staff });
   } catch (err) {
     next(err);

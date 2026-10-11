@@ -1,10 +1,10 @@
 'use client';
 
+import { PermissionGuard } from '@/shared/components/PermissionGuard';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ThermalInvoiceView } from '@/modules/billing/components/ThermalInvoiceView';
 import { A4InvoiceView } from '@/modules/billing/components/A4InvoiceView';
-import { db } from '@/db/db';
-import { getAuthHeaders } from '@/shared/utils/auth';
+import { apiClient } from '@/lib/apiClient';
 
 const STATUS_BADGES: Record<string, string> = {
   COMPLETED: 'badge--success',
@@ -14,97 +14,43 @@ const STATUS_BADGES: Record<string, string> = {
   CANCELLED: 'badge--error',
 };
 
-export default function InvoicesPage() {
+function InvoicesPageContent() {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [printFormat, setPrintFormat] = useState<'THERMAL' | 'A4'>('THERMAL');
   const [statusFilter, setStatusFilter] = useState('');
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const fetchInvoices = useCallback(async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
-      const params = new URLSearchParams();
-      if (searchQuery) params.set('query', searchQuery);
-      if (statusFilter) params.set('status', statusFilter);
-
-      const res = await fetch(`/api/billing/invoices?${params.toString()}`, {
-        headers: getAuthHeaders(),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setInvoices(data);
-        setIsOfflineMode(false);
-      } else {
-        throw new Error('API error');
-      }
-    } catch {
-      // Fallback to Dexie IndexedDB
-      try {
-        let results = await db.invoices.toArray();
-        if (searchQuery) {
-          const q = searchQuery.toLowerCase();
-          results = results.filter(
-            (inv) =>
-              inv.invoiceNumber?.toLowerCase().includes(q) ||
-              inv.customerName?.toLowerCase().includes(q) ||
-              inv.customerPhone?.includes(q)
-          );
-        }
-        if (statusFilter) {
-          results = results.filter((inv) => inv.status === statusFilter);
-        }
-        results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        setInvoices(results.map((inv) => ({
-          ...inv,
-          invoice_number: inv.invoiceNumber,
-          created_at: inv.createdAt,
-          customer_name: inv.customerName,
-          customer_phone: inv.customerPhone,
-          grand_total: inv.grandTotal,
-        })));
-        setIsOfflineMode(true);
-      } catch (dbErr) {
-        console.error('[INVOICES_DEXIE_FALLBACK_ERROR]', dbErr);
-      }
+      setInvoices(
+        await apiClient.get<any[]>('/api/billing/invoices', {
+          query: { query: searchQuery, status: statusFilter },
+        })
+      );
+    } catch (err) {
+      setInvoices([]);
+      setLoadError(err instanceof Error ? err.message : 'Could not load invoices.');
     } finally {
       setIsLoading(false);
     }
   }, [searchQuery, statusFilter]);
 
   useEffect(() => {
-    fetchInvoices();
-  }, []);
+    void fetchInvoices();
+    // Re-run when the status filter changes; text search runs on submit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter]);
 
   const handleSelectInvoice = async (invoiceId: string) => {
     try {
-      const res = await fetch(`/api/billing/invoices/${invoiceId}`, {
-        headers: getAuthHeaders(),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSelectedInvoice(data);
-        return;
-      }
-    } catch {}
-
-    // Offline fallback
-    const inv = await db.invoices.get(invoiceId);
-    if (inv) {
-      const items = await db.invoiceItems.where('invoiceId').equals(invoiceId).toArray();
-      const payments = await db.payments.where('invoiceId').equals(invoiceId).toArray();
-      setSelectedInvoice({
-        ...inv,
-        invoice_number: inv.invoiceNumber,
-        grand_total: inv.grandTotal,
-        created_at: inv.createdAt,
-        customer_name: inv.customerName,
-        items,
-        payments,
-      });
+      setSelectedInvoice(await apiClient.get<any>(`/api/billing/invoices/${invoiceId}`));
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Could not open that invoice.');
     }
   };
 
@@ -116,7 +62,6 @@ export default function InvoicesPage() {
           <h1 className="pos-header__title">Invoices &amp; Receipts</h1>
           <span className="pos-header__subtitle">
             Search, view line-items, and reprint past sales invoices
-            {isOfflineMode && ' • (Offline Dexie Mode Active)'}
           </span>
         </div>
 
@@ -156,6 +101,12 @@ export default function InvoicesPage() {
           </form>
         </div>
       </div>
+
+      {loadError && (
+        <div className="form-server-error" role="alert" style={{ marginBottom: 'var(--space-4)' }}>
+          {loadError}
+        </div>
+      )}
 
       {/* Invoice List Panel */}
       <div className="cart-panel">
@@ -301,5 +252,13 @@ export default function InvoicesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function InvoicesPage() {
+  return (
+    <PermissionGuard permissionKey="billing:view">
+      <InvoicesPageContent />
+    </PermissionGuard>
   );
 }

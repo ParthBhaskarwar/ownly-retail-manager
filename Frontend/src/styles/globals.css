@@ -2,12 +2,21 @@
    OWNLY — Global Styles
    ============================================================ */
 
-/* DM Sans (body) + Lora (headings) from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Lora:wght@600;700&display=swap');
+/* DM Sans (body and headings) from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 @import './tokens.css';
 @import './animations.css';
 @import './components.css';
+@import './forms.css';
+@import './settings.css';
+@import './staff.css';
 @import './pos.css';
+@import './billing.css';
+@import './products.css';
+@import './ai.css';
+@import './shell.css';
+@import './dashboard.css';
+@import './restock.css';
 
 /* ── Reset ──────────────────────────────────────────────────── */
 
@@ -102,10 +111,10 @@ ul, ol { list-style: none; }
 /* ── Images ─────────────────────────────────────────────────── */
 img, video { max-width: 100%; height: auto; display: block; }
 
-/* ── HR — dashed stitching motif ────────────────────────────── */
+/* ── HR — structural motif ────────────────────────────── */
 hr {
   border: none;
-  border-top: 1.5px dashed var(--color-border-subtle);
+  border-top: 1px solid var(--color-border-subtle);
   margin: var(--space-6) 0;
 }
 
@@ -141,7 +150,9 @@ hr {
 
 .app-sidebar {
   width: var(--sidebar-width);
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh; /* fixed to the viewport so the nav list can scroll inside it */
+  overflow: hidden;
   background: var(--color-sidebar-bg);
   border-right: 1px solid var(--color-sidebar-border);
   display: flex;
@@ -154,6 +165,9 @@ hr {
 
 .app-main {
   flex: 1;
+  /* A flex child defaults to min-width:auto, so one wide table would stretch the whole page
+     (header included) past the screen on phones. */
+  min-width: 0;
   margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;

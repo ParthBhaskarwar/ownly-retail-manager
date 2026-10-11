@@ -63,6 +63,9 @@ export interface ProductSummary extends Product {
 
 /** Full product detail: product + attributes + variants + stock counts per variant. */
 export interface ProductDetail extends Product {
+  categoryName?: string;
+  subcategoryName?: string;
+  supplierName?: string;
   attributes: ResolvedAttribute[];
   variants: VariantWithStock[];
 }
@@ -88,6 +91,7 @@ export interface CreateProductInput {
   baseSellingPrice: number;
   baseCostPrice: number;
   status?: ProductStatus;
+  imageUrls?: string[];
   /** Product-level attribute values (isVariantLevel = false) */
   attributeValues: Array<{ attributeDefinitionId: string; value: string }>;
   /** Initial variants to create alongside the product */
@@ -120,6 +124,8 @@ export interface UpdateProductInput {
   baseSellingPrice?: number;
   baseCostPrice?: number;
   status?: ProductStatus;
+  imageUrls?: string[];
+  attributeValues?: Array<{ attributeDefinitionId: string; value: string }>;
   updatedBy: string;
 }
 
@@ -143,3 +149,58 @@ export interface ProductSearchFilters {
   page?: number;            // 1-indexed, default 1
   pageSize?: number;        // default 20
 }
+
+// ─── Week 6 — Photo Intelligence ─────────────────────────────────────────────
+
+export interface PhotoQualityResult {
+  score: number;
+  issues: string[];
+}
+
+export interface AttributeSuggestions {
+  colours: string[];
+  /** One of the product form's pattern options (Solid, Striped, Checked, ...). */
+  pattern: string;
+  patternConfidence: number;
+}
+
+/** Response of POST /api/products/analyze-photo. */
+export interface PhotoAnalysisResult {
+  /** false when the offline model is off/unavailable (quality is still returned). */
+  aiAvailable: boolean;
+  qualityScore: number;
+  qualityIssues: string[];
+  attributeSuggestions: AttributeSuggestions | null;
+  similar: SimilarProduct[];
+  duplicateThreshold: number;
+  message?: string;
+}
+
+export interface SimilarProduct {
+  productId: string;
+  name: string;
+  baseSku: string;
+  similarity: number;
+  isPossibleDuplicate: boolean;
+  imageUrls: string[];
+}
+
+// ─── Week 6 — Product Performance ────────────────────────────────────────────
+
+export interface SizeDemandEntry {
+  size: string;
+  sold: number;
+  inStock: number;
+  sellThroughRate: number;
+}
+
+export interface ProductPerformanceMetrics {
+  productId: string;
+  timeToFirstSaleDays: number | null;
+  salesVelocity30d: number | null;
+  sellThroughRate: number | null;
+  avgStockAgeDays: number | null;
+  sizeDemand: SizeDemandEntry[];
+  computedAt: string;
+}
+

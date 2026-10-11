@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface":"#fff8f5","secondary-container":"#eae1da","surface-container-high":"#eee7e3","surface-container-lowest":"#ffffff","error":"#ba1a1a","on-background":"#1e1b19","on-primary-fixed":"#00201d","on-error":"#ffffff","tertiary-container":"#9c573a","surface-container-highest":"#e9e1dd","on-tertiary":"#ffffff","on-primary-container":"#a3faef","outline-variant":"#bdc9c6","on-tertiary-fixed":"#370e00","on-primary-fixed-variant":"#00504a","on-surface-variant":"#3e4947","on-secondary-fixed-variant":"#4b4641","inverse-surface":"#33302d","tertiary-fixed-dim":"#ffb598","tertiary":"#7f4025","on-secondary-fixed":"#1f1b17","surface-tint":"#006a63","on-error-container":"#93000a","on-secondary":"#ffffff","secondary-fixed":"#eae1da","inverse-primary":"#80d5cb","on-tertiary-fixed-variant":"#72361b","primary-fixed-dim":"#80d5cb","secondary-fixed-dim":"#cec5bf","on-primary":"#ffffff","surface-container":"#f4ece8","error-container":"#ffdad6","background":"#fff8f5","primary":"#005c55","surface-dim":"#e0d8d5","secondary":"#645d58","outline":"#6e7977","surface-container-low":"#faf2ee","tertiary-fixed":"#ffdbce","inverse-on-surface":"#f7efeb","on-surface":"#1e1b19","surface-bright":"#fff8f5","on-tertiary-container":"#ffe5db","surface-variant":"#e9e1dd","on-secondary-container":"#6a635e","primary-container":"#0f766e","primary-fixed":"#9cf2e8"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-lg":"1.5rem","space-xl":"2rem","gutter":"1rem","margin-desktop":"2rem","margin":"1.5rem","space-md":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter-desktop":"1.5rem"},"fontFamily":{"headline-lg":["Inter"],"label-sm":["Inter"],"headline-sm":["Inter"],"body-lg":["Inter"],"table-header":["Inter"],"body-sm":["Inter"],"body-md":["Inter"],"label-md":["Inter"],"display-lg":["Inter"],"headline-md":["Inter"]},"fontSize":{"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"table-header":["11px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"display-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}}</script></head><body><aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-[#E7E5E4] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-4 flex items-center gap-2 border-b border-[#E7E5E4]"><img alt="Ownly Retail Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Ug834MoQjE9U6zQ0nlJsRvydhtLJTWwAaN94FC7dO4m-amUCn0aK4jS0Q5-uHbnoZgCThXGRi8reNFTplJxXe_oWiFdkQbhLPXe0Rpy0n5RQTbrdX919y9tUA0Zw9V_8Ig0zqVGPAkBrsa-UBCjFzUBHYsieOKLXmFv7f66sItKh1x3QiZXLiYQsIOWJsAiaTcneXn95JslNm9CPsnWI4oC2_bYJS0YwMDu269lzJoGRaEOT_KUPKF"/><div class="flex flex-col"><span class="text-xl tracking-tight text-[#1C1917] leading-tight font-semibold">Ownly</span><span class="text-xs uppercase tracking-wider text-[#78716C] font-medium">Retail Manager</span></div></div><nav class="px-2 py-3 space-y-3 flex-1" data-active-classes="bg-[#F0FDFA] text-[#0F766E] font-medium"><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Main</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="dashboard" href="#"><span class="material-symbols-outlined text-xl">dashboard</span><span>Dashboard</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Store</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="pos-billing" href="#"><span class="material-symbols-outlined text-xl">point_of_sale</span><span>POS Billing</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#F0FDFA] text-[#0F766E] font-medium transition-colors text-sm" data-path="invoices-receipts" href="#"><span class="material-symbols-outlined text-xl text-[#0F766E]">receipt_long</span><span>Invoices &amp; Receipts</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="returns-refunds" href="#"><span class="material-symbols-outlined text-xl">assignment_return</span><span>Returns &amp; Refunds</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="product-exchanges" href="#"><span class="material-symbols-outlined text-xl">swap_horiz</span><span>Product Exchanges</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="products" href="#"><span class="material-symbols-outlined text-xl">checkroom</span><span>Products</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="restock" href="#"><span class="material-symbols-outlined text-xl">move_to_inbox</span><span>Restock</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="ai-restock" href="#"><span class="material-symbols-outlined text-xl">auto_awesome</span><span>AI Restock</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="inventory-ledger" href="#"><span class="material-symbols-outlined text-xl">table_chart</span><span>Inventory Ledger</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="barcodes" href="#"><span class="material-symbols-outlined text-xl">qr_code_scanner</span><span>Barcodes</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">People</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="staff" href="#"><span class="material-symbols-outlined text-xl">badge</span><span>Staff</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Insights</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="reports" href="#"><span class="material-symbols-outlined text-xl">bar_chart</span><span>Reports</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="ai-insights" href="#"><span class="material-symbols-outlined text-xl">psychology</span><span>AI Insights</span></a></div><div class="space-y-1 pb-4"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">System</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="backup-safety" href="#"><span class="material-symbols-outlined text-xl">verified_user</span><span>Backup &amp; Safety</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="settings" href="#"><span class="material-symbols-outlined text-xl">settings</span><span>Settings</span></a></div></nav></div><div class="p-3 border-t border-[#E7E5E4] bg-white"><div class="flex items-center justify-between text-[#78716C] text-xs font-medium"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#16A34A] inline-block"></span>Online Sync</span><span class="text-[#78716C]">v2.4.1</span></div></div></aside><div class="pl-64 flex flex-col min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-white border-b border-[#E7E5E4] z-40 px-6 flex items-center justify-between"><div class="flex items-center gap-3"><div class="flex items-center gap-2 px-3 py-1.5 border border-[#E7E5E4] rounded-lg bg-[#FAFAF9] hover:bg-[#F5F5F4] transition-colors cursor-pointer"><span class="w-2 h-2 rounded-full bg-[#16A34A]"></span><span class="text-sm font-semibold text-[#1C1917]">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-base text-[#78716C]">expand_more</span></div><div class="hidden lg:flex items-center gap-1.5 px-3 py-1 border border-[#E7E5E4] rounded-lg bg-[#FAFAF9]"><span class="material-symbols-outlined text-sm text-[#78716C]">schedule</span><span class="text-xs text-[#78716C] font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-3"><div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#FAFAF9] border border-[#E7E5E4] rounded-lg text-[#1C1917] text-sm w-60"><span class="material-symbols-outlined text-lg text-[#78716C]">search</span><span class="flex-1 text-[#78716C] text-xs">Search orders, items...</span><kbd class="px-1.5 py-0.5 text-xs bg-white border border-[#E7E5E4] rounded text-[#78716C] shadow-none">⌘K</kbd></div><button class="relative p-1.5 text-[#78716C] hover:text-[#1C1917] rounded-lg hover:bg-[#F5F5F4] transition-colors"><span class="material-symbols-outlined text-2xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#DC2626] ring-2 ring-white"></span></button><div class="h-6 w-px bg-[#E7E5E4]"></div><div class="flex items-center gap-2 pl-1"><img alt="Profile" class="w-8 h-8 rounded-full object-cover border border-[#E7E5E4]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1o0_oZkkT7iGft61T28I2M3ZTToAKlaC-mTUOv1nitSlhfdGV2DULpmpfQXaUYUuluCjRbyiUfNvUOAenOTbKZKjnrqUZyHE194LprR-2SlnWeBD8zoUD1KjlRENs-KSCQDaLMPw4FCYgCtDifjaBgOJB4hc0aE2km_0vRx0J_K-CyIczuF6s_4Kn2H177lDsPlMjccRu2l8yk0Jf_J7JODJzkZ5kiJxWccBLtekP8A97uYyFg9Q"/><div class="hidden xl:flex flex-col text-left"><span class="text-sm leading-none text-[#1C1917] font-semibold">Rajesh Verma</span><span class="text-xs text-[#78716C] leading-tight mt-0.5">Store Owner &amp; Manager</span></div></div></div></header><main class="flex-1 pt-16 w-full bg-[#FAFAF9] px-6 py-6"><div class="flex flex-col w-full space-y-6">
+<!-- PAGE HEADER & KEY METRIC SUMMARY -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Invoices &amp; Receipts</h1>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#F0FDFA] text-[#0F766E] border border-[#CCFBF1]">
+          Live Register
+        </span>
+</div>
+<p class="font-body-md text-body-md text-secondary mt-1">Browse, search, audit and reprint past point-of-sale transactions</p>
+</div>
+<!-- Quick Stats -->
+<div class="flex items-center gap-3">
+<div class="bg-white border border-[#E7E5E4] rounded-lg px-3.5 py-2 flex items-center gap-3 shadow-sm">
+<div class="p-1.5 rounded-md bg-[#F5F5F4] text-[#0F766E]">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-[#78716C]">Total Invoices</span>
+<span class="text-sm font-semibold text-[#1C1917] leading-tight">284 bills</span>
+</div>
+</div>
+<div class="bg-white border border-[#E7E5E4] rounded-lg px-3.5 py-2 flex items-center gap-3 shadow-sm">
+<div class="p-1.5 rounded-md bg-[#F0FDF4] text-[#16A34A]">
+<span class="material-symbols-outlined text-lg">currency_rupee</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-[#78716C]">Today's Revenue</span>
+<span class="text-sm font-semibold text-[#16A34A] leading-tight">₹48,920.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- TOOLBAR CARD (SEARCH, FILTER, DATE RANGE, ACTIONS) -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg p-4 shadow-sm">
+<div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+<!-- Search Input -->
+<div class="relative flex-1 min-w-[280px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-lg text-[#78716C]">search</span>
+<input class="w-full pl-9 pr-8 py-2 text-sm bg-white border border-[#E7E5E4] rounded-md text-[#1C1917] placeholder-[#A8A29E] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all" id="invoiceSearchInput" placeholder="Search by invoice number or customer name..." type="text"/>
+<button class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-[#78716C] hover:text-[#1C1917]" id="clearSearchBtn">
+<span class="material-symbols-outlined text-base">close</span>
+</button>
+</div>
+<!-- Controls & Dropdowns -->
+<div class="flex flex-wrap items-center gap-2.5">
+<!-- Status Dropdown -->
+<div class="relative">
+<div class="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E7E5E4] rounded-md cursor-pointer hover:bg-[#FAFAF9] text-sm text-[#1C1917] select-none" id="statusFilterBtn">
+<span class="material-symbols-outlined text-base text-[#78716C]">tune</span>
+<span class="font-medium text-xs uppercase tracking-wider text-[#78716C] mr-0.5">Status:</span>
+<span class="font-medium" id="currentStatusLabel">All Statuses</span>
+<span class="material-symbols-outlined text-base text-[#78716C] ml-1">expand_more</span>
+</div>
+<div class="hidden absolute right-0 mt-1 w-44 bg-white border border-[#E7E5E4] rounded-md shadow-lg py-1 z-30" id="statusDropdownMenu">
+<button class="w-full text-left px-3 py-1.5 text-xs text-[#1C1917] hover:bg-[#F5F5F4] flex items-center justify-between font-medium" data-status="All">
+<span>All Statuses</span>
+<span class="material-symbols-outlined text-sm text-[#0F766E]">check</span>
+</button>
+<button class="w-full text-left px-3 py-1.5 text-xs text-[#1C1917] hover:bg-[#F5F5F4] flex items-center justify-between" data-status="Completed">
+<span>Completed</span>
+</button>
+<button class="w-full text-left px-3 py-1.5 text-xs text-[#1C1917] hover:bg-[#F5F5F4] flex items-center justify-between" data-status="Partially Returned">
+<span>Partially Returned</span>
+</button>
+<button class="w-full text-left px-3 py-1.5 text-xs text-[#1C1917] hover:bg-[#F5F5F4] flex items-center justify-between" data-status="Fully Returned">
+<span>Fully Returned</span>
+</button>
+<button class="w-full text-left px-3 py-1.5 text-xs text-[#1C1917] hover:bg-[#F5F5F4] flex items-center justify-between" data-status="Exchanged">
+<span>Exchanged</span>
+</button>
+</div>
+</div>
+<!-- Date Range Picker -->
+<div class="flex items-center gap-2 px-3 py-2 bg-white border border-[#E7E5E4] rounded-md text-sm text-[#1C1917] hover:bg-[#FAFAF9] cursor-pointer">
+<span class="material-symbols-outlined text-base text-[#78716C]">calendar_today</span>
+<span class="font-medium text-xs tracking-tight text-[#1C1917]">01 Oct 2026 - 03 Oct 2026</span>
+<span class="material-symbols-outlined text-sm text-[#78716C]">arrow_drop_down</span>
+</div>
+<!-- Refresh Button -->
+<button class="p-2 text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded-md hover:bg-[#FAFAF9] transition-colors flex items-center justify-center" id="refreshBtn" title="Refresh Table">
+<span class="material-symbols-outlined text-lg" id="refreshIcon">refresh</span>
+</button>
+<!-- Divider -->
+<div class="h-6 w-px bg-[#E7E5E4] mx-0.5 hidden sm:block"></div>
+<!-- Export CSV Button -->
+<button class="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#E7E5E4] text-[#1C1917] hover:bg-[#FAFAF9] text-xs font-semibold rounded-md transition-colors shadow-sm">
+<span class="material-symbols-outlined text-base text-[#78716C]">download</span>
+<span>Export CSV</span>
+</button>
+<!-- Print Summary Action -->
+<button class="flex items-center gap-1.5 px-3 py-2 bg-[#0F766E] text-white hover:bg-[#115E59] text-xs font-semibold rounded-md transition-colors shadow-sm">
+<span class="material-symbols-outlined text-base">print</span>
+<span>Print Summary</span>
+</button>
+</div>
+</div>
+</div>
+<!-- MAIN DATA TABLE CARD -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg shadow-sm overflow-hidden flex flex-col">
+<!-- Table Meta Sub-Header -->
+<div class="px-5 py-3.5 border-b border-[#E7E5E4] bg-[#FAFAF9] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h2 class="text-sm font-semibold text-[#1C1917]">Sales Invoices History</h2>
+<span class="text-xs text-[#78716C] font-normal">• Showing 8 of 284 invoices</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-[#78716C]">
+<span class="w-2 h-2 rounded-full bg-[#16A34A]"></span>
+<span>Auto-sync active</span>
+</div>
+</div>
+<!-- Responsive Table Container -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F5F5F4] border-b border-[#E7E5E4]">
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-[#78716C] tracking-wider w-[180px]">
+              Invoice Number
+            </th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-[#78716C] tracking-wider w-[160px]">
+              Date &amp; Time
+            </th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-[#78716C] tracking-wider min-w-[200px]">
+              Customer
+            </th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-[#78716C] tracking-wider text-right w-[140px]">
+              Grand Total
+            </th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-[#78716C] tracking-wider w-[160px]">
+              Payment Method
+            </th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-[#78716C] tracking-wider w-[150px]">
+              Status
+            </th>
+<th class="py-2.5 px-4 font-table-header text-table-header uppercase text-[#78716C] tracking-wider text-right w-[130px]">
+              Action
+            </th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E7E5E4] text-sm">
+<!-- ROW 1: Completed, Priya Sharma -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261003-0089
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">03 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">14:32 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917] leading-tight">Priya Sharma</div>
+<div class="text-xs text-[#78716C] mt-0.5 font-mono">+91 98201 44321</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#1C1917]">₹4,999.00</span>
+<div class="text-[11px] text-[#78716C]">2 items</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#0F766E]">qr_code_2</span>
+                UPI QR
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+                Completed
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261003-0089', 'Priya Sharma', '₹4,999.00', 'Completed', 'UPI QR', '03 Oct 2026, 14:32')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+<!-- ROW 2: Completed, Walk-in -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261003-0088
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">03 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">12:15 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="italic text-[#78716C] text-xs">Walk-in Customer</div>
+<div class="text-[11px] text-[#A8A29E] mt-0.5">Direct Counter Sale</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#1C1917]">₹1,299.00</span>
+<div class="text-[11px] text-[#78716C]">1 item</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#78716C]">payments</span>
+                Cash
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+                Completed
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261003-0088', 'Walk-in Customer', '₹1,299.00', 'Completed', 'Cash', '03 Oct 2026, 12:15')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+<!-- ROW 3: Partially Returned, Ananya Deshmukh -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261002-0087
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">02 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">19:40 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917] leading-tight">Ananya Deshmukh</div>
+<div class="text-xs text-[#78716C] mt-0.5 font-mono">+91 94140 88291</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#1C1917]">₹8,196.00</span>
+<div class="text-[11px] text-[#D97706]">1 of 3 returned</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#0F766E]">credit_card</span>
+                Card / POS
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#FFFBEB] text-[#D97706] border border-[#FDE68A]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span>
+                Partially Returned
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261002-0087', 'Ananya Deshmukh', '₹8,196.00', 'Partially Returned', 'Card / POS', '02 Oct 2026, 19:40')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+<!-- ROW 4: Completed, Vikramaditya Rathore -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261002-0086
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">02 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">17:10 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917] leading-tight">Vikramaditya Rathore</div>
+<div class="text-xs text-[#78716C] mt-0.5 font-mono">+91 99280 11920</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#1C1917]">₹14,500.00</span>
+<div class="text-[11px] text-[#78716C]">Bridal Silk Set</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#0F766E]">call_split</span>
+                Split Tender
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+                Completed
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261002-0086', 'Vikramaditya Rathore', '₹14,500.00', 'Completed', 'Split Tender', '02 Oct 2026, 17:10')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+<!-- ROW 5: Fully Returned, Meera Iyer -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261002-0085
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">02 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">15:22 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917] leading-tight">Meera Iyer</div>
+<div class="text-xs text-[#78716C] mt-0.5 font-mono">+91 97112 55304</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#DC2626] line-through">₹3,499.00</span>
+<div class="text-[11px] text-[#DC2626]">Refunded via UPI</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#0F766E]">qr_code_2</span>
+                UPI QR
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span>
+                Fully Returned
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261002-0085', 'Meera Iyer', '₹3,499.00', 'Fully Returned', 'UPI QR', '02 Oct 2026, 15:22')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+<!-- ROW 6: Exchanged, Rohan Mehta -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261001-0084
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">01 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">20:05 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917] leading-tight">Rohan Mehta</div>
+<div class="text-xs text-[#78716C] mt-0.5 font-mono">+91 98450 77123</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#1C1917]">₹2,498.00</span>
+<div class="text-[11px] text-[#78716C]">Adjusted size XL</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#0F766E]">credit_card</span>
+                Card / POS
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#F5F5F4] text-[#78716C] border border-[#E7E5E4]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#78716C]"></span>
+                Exchanged
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261001-0084', 'Rohan Mehta', '₹2,498.00', 'Exchanged', 'Card / POS', '01 Oct 2026, 20:05')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+<!-- ROW 7: Completed, Walk-in -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261001-0083
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">01 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">18:14 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="italic text-[#78716C] text-xs">Walk-in Customer</div>
+<div class="text-[11px] text-[#A8A29E] mt-0.5">Counter Sales</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#1C1917]">₹750.00</span>
+<div class="text-[11px] text-[#78716C]">Dupatta accessory</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#78716C]">payments</span>
+                Cash
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+                Completed
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261001-0083', 'Walk-in Customer', '₹750.00', 'Completed', 'Cash', '01 Oct 2026, 18:14')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+<!-- ROW 8: Completed, Sangeeta Ghosh -->
+<tr class="hover:bg-[#FAFAF9] transition-colors group">
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono text-xs font-semibold px-2 py-1 rounded bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4] inline-block">
+                INV-20261001-0082
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap text-[#78716C] text-xs">
+<div class="font-medium text-[#1C1917]">01 Oct 2026</div>
+<div class="text-[11px] text-[#78716C]">14:50 PM</div>
+</td>
+<td class="py-3 px-4">
+<div class="font-medium text-[#1C1917] leading-tight">Sangeeta Ghosh</div>
+<div class="text-xs text-[#78716C] mt-0.5 font-mono">+91 93310 90412</div>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<span class="font-semibold text-[#1C1917]">₹6,850.00</span>
+<div class="text-[11px] text-[#78716C]">Kurti set + Stole</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-[#FAFAF9] border border-[#E7E5E4] text-[#1C1917]">
+<span class="material-symbols-outlined text-sm text-[#0F766E]">qr_code_2</span>
+                UPI QR
+              </span>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+                Completed
+              </span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#78716C] hover:text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#F5F5F4] transition-colors" onclick="previewInvoiceModal('INV-20261001-0082', 'Sangeeta Ghosh', '₹6,850.00', 'Completed', 'UPI QR', '01 Oct 2026, 14:50')">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Reprint</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- PAGINATION FOOTER -->
+<div class="px-5 py-3 border-t border-[#E7E5E4] bg-[#FAFAF9] flex flex-col sm:flex-row items-center justify-between gap-3">
+<div class="text-xs text-[#78716C]">
+        Showing <span class="font-medium text-[#1C1917]">1</span> to <span class="font-medium text-[#1C1917]">8</span> of <span class="font-medium text-[#1C1917]">284</span> invoices • <span class="text-[#78716C]">25 rows per page</span>
+</div>
+<div class="flex items-center gap-1">
+<!-- Prev button -->
+<button class="px-2.5 py-1 rounded border border-[#E7E5E4] bg-white text-[#78716C] hover:text-[#1C1917] text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 transition-colors" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+<span>Previous</span>
+</button>
+<!-- Page numbers -->
+<button class="w-7 h-7 flex items-center justify-center rounded text-xs font-semibold bg-[#0F766E] text-white">1</button>
+<button class="w-7 h-7 flex items-center justify-center rounded text-xs font-medium text-[#78716C] hover:text-[#1C1917] hover:bg-white transition-colors">2</button>
+<button class="w-7 h-7 flex items-center justify-center rounded text-xs font-medium text-[#78716C] hover:text-[#1C1917] hover:bg-white transition-colors">3</button>
+<span class="text-xs text-[#78716C] px-1">...</span>
+<button class="w-7 h-7 flex items-center justify-center rounded text-xs font-medium text-[#78716C] hover:text-[#1C1917] hover:bg-white transition-colors">12</button>
+<!-- Next button -->
+<button class="px-2.5 py-1 rounded border border-[#E7E5E4] bg-white text-[#78716C] hover:text-[#1C1917] hover:bg-[#FAFAF9] text-xs font-medium flex items-center gap-1 transition-colors">
+<span>Next</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- LEDGER DISPLAY STATES PREVIEWS (EMPTY, LOADING, ERROR PREVIEW MODULE) -->
+<div class="pt-4 space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-[#78716C]">view_carousel</span>
+<span class="font-table-header text-table-header uppercase text-[#78716C] tracking-wider">System State Previews (Inventory Ledger Parity)</span>
+</div>
+<span class="text-xs text-[#78716C]">Component audit &amp; fallback reference</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- STATE A: EMPTY STATE -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg p-5 flex flex-col items-center text-center justify-between min-h-[220px]">
+<div class="w-10 h-10 rounded-full bg-[#FAFAF9] border border-[#E7E5E4] flex items-center justify-center text-[#78716C] mb-2">
+<span class="material-symbols-outlined text-xl">receipt_long</span>
+</div>
+<div class="space-y-1 my-auto">
+<h4 class="text-sm font-semibold text-[#1C1917]">No invoices found</h4>
+<p class="text-xs text-[#78716C] max-w-[240px] leading-relaxed">
+            Try adjusting search query, clearing status filters, or expanding the calendar range.
+          </p>
+</div>
+<button class="mt-3 px-3 py-1.5 text-xs font-medium text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#FAFAF9] transition-colors" onclick="resetFiltersUI()">
+          Reset All Filters
+        </button>
+</div>
+<!-- STATE B: LOADING SKELETON STATE -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg p-5 flex flex-col justify-between min-h-[220px]">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-[#0F766E] animate-ping"></span>
+<span class="text-xs font-medium text-[#0F766E]">Fetching transactions...</span>
+</div>
+<span class="text-[11px] text-[#A8A29E] font-mono">SQLite Local DB</span>
+</div>
+<!-- Pulse rows -->
+<div class="space-y-2.5 my-auto animate-pulse">
+<div class="h-3.5 bg-[#F5F5F4] rounded w-3/4"></div>
+<div class="h-3 bg-[#F5F5F4] rounded w-full"></div>
+<div class="h-3 bg-[#F5F5F4] rounded w-5/6"></div>
+<div class="h-3 bg-[#F5F5F4] rounded w-2/3"></div>
+</div>
+<div class="text-[11px] text-[#78716C] pt-2 border-t border-[#E7E5E4] flex items-center justify-between">
+<span>Syncing store journal</span>
+<span class="text-[10px] text-[#A8A29E]">42ms</span>
+</div>
+</div>
+<!-- STATE C: ERROR STATE -->
+<div class="bg-white border border-[#E7E5E4] rounded-lg p-5 flex flex-col items-center text-center justify-between min-h-[220px]">
+<div class="w-10 h-10 rounded-full bg-[#FEF2F2] border border-[#FECACA] flex items-center justify-center text-[#DC2626] mb-2">
+<span class="material-symbols-outlined text-xl">cloud_off</span>
+</div>
+<div class="space-y-1 my-auto">
+<h4 class="text-sm font-semibold text-[#1C1917]">Failed to load invoices</h4>
+<p class="text-xs text-[#78716C] max-w-[240px] leading-relaxed">
+            Connection to local counter database timed out. Offline receipt cache preserved.
+          </p>
+</div>
+<button class="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#0F766E] hover:bg-[#115E59] rounded transition-colors shadow-sm" onclick="triggerReloadNotice()">
+<span class="material-symbols-outlined text-sm">replay</span>
+<span>Retry Connection</span>
+</button>
+</div>
+</div>
+</div>
+<!-- REPRINT / AUDIT MODAL (SLIDE-OVER / POPUP) -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" id="reprintModal">
+<div class="bg-white border border-[#E7E5E4] rounded-lg max-w-md w-full shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+<!-- Modal Header -->
+<div class="px-5 py-4 border-b border-[#E7E5E4] flex items-center justify-between bg-[#FAFAF9]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-[#0F766E]">receipt</span>
+<span class="text-sm font-semibold text-[#1C1917]">Thermal Receipt Reprint</span>
+</div>
+<button class="text-[#78716C] hover:text-[#1C1917] p-1 rounded hover:bg-[#E7E5E4]" onclick="closeInvoiceModal()">
+<span class="material-symbols-outlined text-lg">close</span>
+</button>
+</div>
+<!-- Thermal Bill Simulation Container -->
+<div class="p-6 bg-[#FAFAF9] flex justify-center">
+<div class="w-full bg-white border border-[#E7E5E4] p-5 shadow-sm font-mono text-xs text-[#1C1917] space-y-3">
+<div class="text-center pb-2 border-b border-dashed border-[#E7E5E4]">
+<div class="font-bold text-sm tracking-wide">TULSI COLLECTION</div>
+<div class="text-[11px] text-[#78716C]">Main Market, MG Road, Jaipur</div>
+<div class="text-[11px] text-[#78716C]">GSTIN: 08AAACT1234F1Z8</div>
+</div>
+<div class="space-y-1 text-[11px] pb-2 border-b border-dashed border-[#E7E5E4]">
+<div class="flex justify-between">
+<span class="text-[#78716C]">Invoice:</span>
+<span class="font-bold" id="modalInvNum">INV-20261003-0089</span>
+</div>
+<div class="flex justify-between">
+<span class="text-[#78716C]">Date:</span>
+<span id="modalInvDate">03 Oct 2026, 14:32</span>
+</div>
+<div class="flex justify-between">
+<span class="text-[#78716C]">Customer:</span>
+<span class="font-bold" id="modalCustomerName">Priya Sharma</span>
+</div>
+<div class="flex justify-between">
+<span class="text-[#78716C]">Payment:</span>
+<span id="modalPayMethod">UPI QR</span>
+</div>
+</div>
+<!-- Items Mock -->
+<div class="space-y-1.5 text-[11px] pb-2 border-b border-dashed border-[#E7E5E4]">
+<div class="flex justify-between">
+<span>Chanderi Silk Saree (L)</span>
+<span>₹3,499.00</span>
+</div>
+<div class="flex justify-between">
+<span>Matching Petticoat</span>
+<span>₹1,500.00</span>
+</div>
+</div>
+<!-- Totals -->
+<div class="space-y-1 text-[11px]">
+<div class="flex justify-between text-[#78716C]">
+<span>Subtotal (CGST/SGST incl.)</span>
+<span id="modalSubtotal">₹4,999.00</span>
+</div>
+<div class="flex justify-between text-xs font-bold pt-1 border-t border-[#E7E5E4]">
+<span>NET TOTAL</span>
+<span class="text-sm" id="modalTotal">₹4,999.00</span>
+</div>
+</div>
+<div class="text-center pt-2 text-[10px] text-[#78716C]">
+            *** Thank you for shopping with us! ***
+          </div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-5 py-3 border-t border-[#E7E5E4] bg-white flex items-center justify-end gap-2">
+<button class="px-3 py-1.5 text-xs font-medium text-[#1C1917] bg-white border border-[#E7E5E4] rounded hover:bg-[#FAFAF9]" onclick="closeInvoiceModal()">
+          Cancel
+        </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#0F766E] hover:bg-[#115E59] rounded shadow-sm" onclick="executeReprint()">
+<span class="material-symbols-outlined text-sm">print</span>
+<span>Send to 80mm ESC/POS</span>
+</button>
+</div>
+</div>
+</div>
+<!-- INTERACTIVITY SCRIPT -->
+<script>
+    // Search input toggle clear button
+    const searchInput = document.getElementById('invoiceSearchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (searchInput && clearBtn) {
+      searchInput.addEventListener('input', (e) => {
+        if (e.target.value.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      });
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.classList.add('hidden');
+        searchInput.focus();
+      });
+    }
+
+    // Status filter dropdown interactive toggle
+    const statusBtn = document.getElementById('statusFilterBtn');
+    const statusMenu = document.getElementById('statusDropdownMenu');
+    const currentStatusLabel = document.getElementById('currentStatusLabel');
+
+    if (statusBtn && statusMenu) {
+      statusBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        statusMenu.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', () => {
+        statusMenu.classList.add('hidden');
+      });
+
+      statusMenu.querySelectorAll('button[data-status]').forEach((btn) => {
+        btn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const selected = btn.getAttribute('data-status');
+          currentStatusLabel.innerText = selected === 'All' ? 'All Statuses' : selected;
+          statusMenu.classList.add('hidden');
+        });
+      });
+    }
+
+    // Refresh button spinner micro-interaction
+    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshIcon = document.getElementById('refreshIcon');
+    if (refreshBtn && refreshIcon) {
+      refreshBtn.addEventListener('click', () => {
+        refreshIcon.classList.add('animate-spin');
+        setTimeout(() => {
+          refreshIcon.classList.remove('animate-spin');
+        }, 650);
+      });
+    }
+
+    // Modal state functions
+    function previewInvoiceModal(invNum, customer, total, status, payMethod, datetime) {
+      document.getElementById('modalInvNum').innerText = invNum;
+      document.getElementById('modalCustomerName').innerText = customer;
+      document.getElementById('modalTotal').innerText = total;
+      document.getElementById('modalSubtotal').innerText = total;
+      document.getElementById('modalPayMethod').innerText = payMethod;
+      document.getElementById('modalInvDate').innerText = datetime;
+      document.getElementById('reprintModal').classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('reprintModal').classList.add('hidden');
+    }
+
+    function executeReprint() {
+      const modal = document.getElementById('reprintModal');
+      const originalText = modal.querySelector('button.bg-\\[\\#0F766E\\] span:last-child').innerText;
+      modal.querySelector('button.bg-\\[\\#0F766E\\] span:last-child').innerText = 'Sending to printer...';
+      setTimeout(() => {
+        modal.querySelector('button.bg-\\[\\#0F766E\\] span:last-child').innerText = originalText;
+        closeInvoiceModal();
+      }, 700);
+    }
+
+    function resetFiltersUI() {
+      if (searchInput) searchInput.value = '';
+      if (clearBtn) clearBtn.classList.add('hidden');
+      if (currentStatusLabel) currentStatusLabel.innerText = 'All Statuses';
+    }
+
+    function triggerReloadNotice() {
+      const btn = event.currentTarget;
+      btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">refresh</span><span>Connecting...</span>';
+      setTimeout(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">done</span><span>Reconnected</span>';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined text-sm">replay</span><span>Retry Connection</span>';
+        }, 1500);
+      }, 900);
+    }
+  </script>
+</div></main></div></body></html>

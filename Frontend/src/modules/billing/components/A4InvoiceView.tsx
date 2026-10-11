@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useStoreContext } from '@/context/StoreContext';
 
 interface A4InvoiceProps {
   invoice: any;
@@ -8,168 +9,152 @@ interface A4InvoiceProps {
   onClose?: () => void;
 }
 
-export function A4InvoiceView({ invoice, onPrint, onClose }: A4InvoiceProps) {
+export function A4InvoiceView({ invoice }: A4InvoiceProps) {
+  const { store } = useStoreContext();
   if (!invoice) return null;
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
-    <div className="a4-invoice-wrapper">
-      {/* Screen action bar */}
-      <div className="print:hidden flex justify-between items-center max-w-4xl mx-auto mb-4 bg-surface p-4 rounded-xl border border-border">
-        <span className="font-bold text-base text-foreground">Tax Invoice (A4 Standard Format)</span>
-        <div className="flex gap-2">
-          <button
-            onClick={handlePrint}
-            className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-hover flex items-center gap-2"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 6 2 18 2 18 9" />
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-              <rect x="6" y="14" width="12" height="8" />
-            </svg>
-            <span>Print A4 Invoice</span>
-          </button>
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-foreground text-sm font-semibold rounded-lg"
-            >
-              Close
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Printable A4 Container */}
-      <div className="a4-container bg-white text-black p-8 max-w-4xl mx-auto border border-gray-300 shadow-xl print:shadow-none print:border-none print:p-0">
+    <>
+      <style>{`
+        @media print {
+          @page { size: A4; margin: 12mm; }
+          .a4-receipt-container {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            page-break-after: auto;
+          }
+        }
+      `}</style>
+      <div className="a4-receipt-container" style={{ width: '100%', maxWidth: '800px', margin: '0 auto', padding: '32px', backgroundColor: 'white', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-modal)', color: '#000', fontFamily: 'var(--font-sans)', fontSize: '14px', lineHeight: '1.5' }}>
+        
         {/* Invoice Header */}
-        <div className="flex justify-between items-start border-b-2 border-primary pb-6 mb-6">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '24px', marginBottom: '24px' }}>
           <div>
-            <h1 className="text-2xl font-extrabold uppercase text-primary tracking-wide">TAX INVOICE</h1>
-            <p className="text-sm font-bold text-gray-800 mt-1">OWNLY RETAIL STORE</p>
-            <p className="text-xs text-gray-600">123 Retail Boulevard, Tech Hub, Suite 400</p>
-            <p className="text-xs text-gray-600">Phone: +91 98765 43210 | Email: billing@ownlyretail.com</p>
-            <p className="text-xs text-gray-600 font-mono mt-1">GSTIN: 27AABCO1234F1Z0</p>
+            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px' }}>TAX INVOICE</h1>
+            <div style={{ marginTop: '8px', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase' }}>{store?.name ?? 'Store'}</div>
+            {store?.address && <div style={{ fontSize: '12px' }}>{store.address}</div>}
+            {store?.phone && <div style={{ fontSize: '12px' }}>Phone: {store.phone}</div>}
+            {store?.gstNumber && <div style={{ fontSize: '12px', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>GSTIN: {store.gstNumber}</div>}
           </div>
 
-          <div className="text-right text-xs space-y-1">
-            <div className="text-base font-bold text-gray-900">{invoice.invoice_number || invoice.invoiceNumber}</div>
-            <div className="text-gray-600">Date: <span className="font-semibold text-gray-900">{new Date(invoice.created_at || invoice.createdAt || Date.now()).toLocaleString()}</span></div>
-            <div className="text-gray-600">Status: <span className="font-bold text-green-700">{invoice.status || 'COMPLETED'}</span></div>
+          <div style={{ textAlign: 'right', fontSize: '12px' }}>
+            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{invoice.invoice_number || invoice.invoiceNumber}</div>
+            <div style={{ marginTop: '4px' }}>Date: <span style={{ fontWeight: 'bold' }}>{new Date(invoice.created_at || invoice.createdAt || Date.now()).toLocaleString()}</span></div>
+            <div>Status: <span style={{ fontWeight: 'bold' }}>{invoice.status || 'COMPLETED'}</span></div>
           </div>
         </div>
 
         {/* Bill To & Cashier Info */}
-        <div className="grid grid-cols-2 gap-6 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200 text-xs">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px', padding: '16px', border: '1px solid #000', borderRadius: '4px' }}>
           <div>
-            <h3 className="font-bold uppercase text-gray-500 text-[10px] tracking-wider mb-1">Customer Information</h3>
-            <p className="text-sm font-bold text-gray-900">{invoice.customer_name || invoice.customerName || 'Walk-in Customer'}</p>
-            {invoice.customer_phone || invoice.customerPhone ? (
-              <p className="text-gray-600 mt-0.5">Phone: {invoice.customer_phone || invoice.customerPhone}</p>
-            ) : null}
+            <h3 style={{ margin: 0, fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Customer Information</h3>
+            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{invoice.customer_name || invoice.customerName || 'Walk-in Customer'}</div>
+            {(invoice.customer_phone || invoice.customerPhone) && (
+              <div style={{ marginTop: '2px' }}>Phone: {invoice.customer_phone || invoice.customerPhone}</div>
+            )}
           </div>
 
-          <div className="text-right">
-            <h3 className="font-bold uppercase text-gray-500 text-[10px] tracking-wider mb-1">Store Details</h3>
-            <p className="text-sm font-semibold text-gray-900">Billed by: {invoice.cashier_name || 'Authorized Cashier'}</p>
-            <p className="text-gray-600 mt-0.5">Currency: INR (₹)</p>
+          <div style={{ textAlign: 'right' }}>
+            <h3 style={{ margin: 0, fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Store Details</h3>
+            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>Billed by: {invoice.cashier_name || 'Authorized Cashier'}</div>
+            <div style={{ marginTop: '2px' }}>Currency: INR (₹)</div>
           </div>
         </div>
 
         {/* Item Table */}
-        <table className="w-full text-left text-xs mb-6 border-collapse">
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', fontSize: '12px' }}>
           <thead>
-            <tr className="bg-gray-100 border-y border-gray-300 text-gray-700 font-bold">
-              <th className="py-3 px-3">#</th>
-              <th className="py-3 px-3">Product Name & Variant</th>
-              <th className="py-3 px-3">Barcode</th>
-              <th className="py-3 px-3 text-center">Qty</th>
-              <th className="py-3 px-3 text-right">Unit Price</th>
-              <th className="py-3 px-3 text-right">Discount</th>
-              <th className="py-3 px-3 text-right">Amount</th>
+            <tr style={{ borderTop: '1px solid #000', borderBottom: '1px solid #000' }}>
+              <th style={{ padding: '12px 8px', textAlign: 'left' }}>#</th>
+              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Product Name & Variant</th>
+              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Barcode</th>
+              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Qty</th>
+              <th style={{ padding: '12px 8px', textAlign: 'right' }}>Unit Price</th>
+              <th style={{ padding: '12px 8px', textAlign: 'right' }}>Discount</th>
+              <th style={{ padding: '12px 8px', textAlign: 'right' }}>Amount</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody>
             {(invoice.items || []).map((item: any, idx: number) => (
-              <tr key={idx}>
-                <td className="py-3 px-3 text-gray-500">{idx + 1}</td>
-                <td className="py-3 px-3">
-                  <div className="font-bold text-gray-900">{item.product_name || item.productName}</div>
-                  <div className="text-[11px] text-gray-500">{item.variant_name || item.variantName}</div>
+              <tr key={idx} style={{ borderBottom: '1px solid #ddd' }}>
+                <td style={{ padding: '12px 8px' }}>{idx + 1}</td>
+                <td style={{ padding: '12px 8px' }}>
+                  <div style={{ fontWeight: 'bold' }}>{item.product_name || item.productName}</div>
+                  <div style={{ fontSize: '11px', marginTop: '2px' }}>{item.variant_name || item.variantName}</div>
                 </td>
-                <td className="py-3 px-3 font-mono text-gray-600">{item.barcode}</td>
-                <td className="py-3 px-3 text-center font-bold">{item.quantity}</td>
-                <td className="py-3 px-3 text-right">₹{parseFloat(item.unit_price || item.unitPrice).toFixed(2)}</td>
-                <td className="py-3 px-3 text-right text-gray-600">₹{parseFloat(item.discount_amount || item.discountAmount || 0).toFixed(2)}</td>
-                <td className="py-3 px-3 text-right font-bold text-gray-900">₹{parseFloat(item.final_price || item.finalPrice).toFixed(2)}</td>
+                <td style={{ padding: '12px 8px', fontFamily: 'var(--font-mono)' }}>{item.barcode}</td>
+                <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: 'bold' }}>{item.quantity}</td>
+                <td style={{ padding: '12px 8px', textAlign: 'right' }}>{parseFloat(item.unit_price || item.unitPrice).toFixed(2)}</td>
+                <td style={{ padding: '12px 8px', textAlign: 'right' }}>{parseFloat(item.discount_amount || item.discountAmount || 0).toFixed(2)}</td>
+                <td style={{ padding: '12px 8px', textAlign: 'right', fontWeight: 'bold' }}>{parseFloat(item.final_price || item.finalPrice).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
         {/* Totals & Payments Section */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
           {/* Payment Method Breakdown */}
-          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-xs">
-            <h4 className="font-bold text-gray-700 uppercase tracking-wider mb-2">Payment Details</h4>
-            <div className="space-y-1.5">
+          <div style={{ border: '1px solid #000', borderRadius: '4px', padding: '16px', fontSize: '12px' }}>
+            <h4 style={{ margin: 0, fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Payment Details</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {(invoice.payments || []).map((p: any, idx: number) => (
-                <div key={idx} className="flex justify-between border-b border-gray-200 pb-1">
-                  <span className="font-semibold">{p.payment_method || p.paymentMethod}:</span>
-                  <span>₹{parseFloat(p.amount).toFixed(2)} {p.transaction_reference ? `(${p.transaction_reference})` : ''}</span>
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
+                  <span style={{ fontWeight: 'bold' }}>{p.payment_method || p.paymentMethod}:</span>
+                  <span>{parseFloat(p.amount).toFixed(2)} {p.transaction_reference ? `(${p.transaction_reference})` : ''}</span>
                 </div>
               ))}
               {parseFloat(invoice.change_given || invoice.changeGiven || 0) > 0 && (
-                <div className="flex justify-between text-green-700 font-bold pt-1">
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', paddingTop: '4px' }}>
                   <span>Change Given:</span>
-                  <span>₹{parseFloat(invoice.change_given || invoice.changeGiven).toFixed(2)}</span>
+                  <span>{parseFloat(invoice.change_given || invoice.changeGiven).toFixed(2)}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Totals */}
-          <div className="text-xs space-y-2">
-            <div className="flex justify-between text-gray-600">
+          <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Subtotal:</span>
-              <span className="font-semibold text-gray-900">₹{parseFloat(invoice.subtotal).toFixed(2)}</span>
+              <span style={{ fontWeight: 'bold' }}>{parseFloat(invoice.subtotal).toFixed(2)}</span>
             </div>
             {parseFloat(invoice.discount_amount || invoice.discountAmount || 0) > 0 && (
-              <div className="flex justify-between text-gray-600">
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Bill Discount:</span>
-                <span className="font-semibold text-red-600">-₹{parseFloat(invoice.discount_amount || invoice.discountAmount).toFixed(2)}</span>
+                <span style={{ fontWeight: 'bold' }}>-{parseFloat(invoice.discount_amount || invoice.discountAmount).toFixed(2)}</span>
               </div>
             )}
             {parseFloat(invoice.tax_amount || invoice.taxAmount || 0) > 0 && (
-              <div className="flex justify-between text-gray-600">
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Tax Amount:</span>
-                <span className="font-semibold text-gray-900">₹{parseFloat(invoice.tax_amount || invoice.taxAmount).toFixed(2)}</span>
+                <span style={{ fontWeight: 'bold' }}>{parseFloat(invoice.tax_amount || invoice.taxAmount).toFixed(2)}</span>
               </div>
             )}
-            <div className="flex justify-between text-base font-extrabold text-gray-900 border-t-2 border-gray-900 pt-2">
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: '900', borderTop: '2px solid #000', paddingTop: '8px', marginTop: '4px' }}>
               <span>GRAND TOTAL:</span>
-              <span>₹{parseFloat(invoice.grand_total || invoice.grandTotal).toFixed(2)}</span>
+              <span>{parseFloat(invoice.grand_total || invoice.grandTotal).toFixed(2)}</span>
             </div>
           </div>
         </div>
 
         {/* Terms & Footer */}
-        <div className="border-t border-gray-300 pt-4 text-[11px] text-gray-500 flex justify-between items-end">
+        <div style={{ borderTop: '1px solid #000', paddingTop: '16px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
-            <p className="font-bold text-gray-700">Terms & Conditions:</p>
-            <p>1. Returns & Exchanges accepted within 14 days with original receipt.</p>
-            <p>2. Damaged or altered items are not eligible for standard return to stock.</p>
+            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Terms & Conditions:</div>
+            <div>1. Returns & Exchanges accepted within 14 days with original receipt.</div>
+            <div>2. Damaged or altered items are not eligible for standard return to stock.</div>
           </div>
-          <div className="text-right">
-            <p className="font-bold text-gray-700">Authorized Signatory</p>
-            <div className="h-8"></div>
-            <p className="text-[10px]">Thank you for your business!</p>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '32px' }}>Authorized Signatory</div>
+            <div style={{ fontSize: '10px' }}>Thank you for your business!</div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

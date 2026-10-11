@@ -30,6 +30,9 @@ import {
   type InventoryMovement,
   type InventorySearchFilters,
   type LowStockVariant,
+  type RestockBatchLine,
+  type RestockBatchResult,
+  type RestockInput,
   type StockAlerts,
   type StockSummary,
   type StockValuation,
@@ -492,5 +495,94 @@ export const InventoryService = {
     return db('inventory_movements')
       .where({ store_id: storeId, inventory_item_id: inventoryItemId })
       .orderBy('performed_at', 'asc');
+  },
+
+  /**
+   * Manual restock — accepts multiple variant lines in one operation.
+   *
+   * Each line creates `quantity` physical inventory_items (each with a new unique
+   * barcode using the store-scoped sequence) and one RESTOCK movement per item.
+   * All lines run in a single transaction so the batch is atomic.
+   *
+   * A restock_batch row is written to provide a human-readable history of "who
+   * restocked what on which date" independently of the movement log.
+   */
+  async restockVariants(input: RestockInput): Promise<RestockBatchResult> {
+    const { storeId, performedBy, lines, notes } = input;
+
+    if (!lines.length) throw AppError.badRequest('Restock must include at least one variant line.');
+
+    return db.transaction(async (trx) => {
+      // Verify all variants exist in this store up-front before writing anything.
+      const variantIds = lines.map((l) => l.variantId);
+      const variants = (await trx('product_variants as v')
+        .join('products as p', 'p.id', 'v.product_id')
+        .whereIn('v.id', variantIds)
+        .andWhere('p.store_id', storeId)
+        .select('v.id', 'v.sku')) as Array<{ id: string; sku: string }>;
+
+      const variantSkuMap = new Map(variants.map((v) => [v.id, v.sku]));
+
+      const missing = variantIds.filter((id) => !variantSkuMap.has(id));
+      if (missing.length) {
+        throw AppError.notFound(`Variants not found in this store: ${missing.join(', ')}`);
+      }
+
+      const batchId = randomUUID();
+      const resultLines: RestockBatchLine[] = [];
+      let totalUnits = 0;
+
+      for (const line of lines) {
+        const sku = variantSkuMap.get(line.variantId)!;
+        const items = await this.addStock(
+          {
+            storeId,
+            variantId: line.variantId,
+            quantity: line.quantity,
+            purchaseCostPrice: line.purchaseCostPrice,
+            purchaseDate: line.purchaseDate,
+            performedBy,
+            notes: notes ?? undefined,
+          },
+          sku,
+          trx
+        );
+
+        // Overwrite the PURCHASE movement type written by addStock with RESTOCK,
+        // since this is a restocking event, not an initial product creation.
+        await trx('inventory_movements')
+          .whereIn('inventory_item_id', items.map((i) => i.id))
+          .andWhere('reference_type', 'PURCHASE_ENTRY')
+          .andWhere('store_id', storeId)
+          .update({ movement_type: 'RESTOCK', reference_type: 'RESTOCK_BATCH', reference_id: batchId });
+
+        resultLines.push({ variantId: line.variantId, itemsCreated: items });
+        totalUnits += items.length;
+      }
+
+      // Write the restock_batch summary row.
+      await trx('restock_batches').insert({
+        id: batchId,
+        store_id: storeId,
+        performed_by: performedBy,
+        notes: notes ?? null,
+        total_units: totalUnits,
+        variant_count: lines.length,
+      });
+
+      await AuditService.log(
+        {
+          action: 'inventory.restock',
+          userId: performedBy,
+          storeId,
+          entityType: 'restock_batch',
+          entityId: batchId,
+          meta: { totalUnits, variantCount: lines.length },
+        },
+        trx
+      );
+
+      return { batchId, totalUnits, lines: resultLines };
+    });
   },
 };

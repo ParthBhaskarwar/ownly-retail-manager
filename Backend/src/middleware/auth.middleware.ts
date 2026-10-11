@@ -1,10 +1,16 @@
 /**
  * Auth middleware — verifies the JWT and enforces the permission matrix.
+ *
+ * The token only proves *who* the caller is. Role, store and active status are
+ * re-read from the database on every request, so deactivating a staff member,
+ * changing their role, or creating the owner's store takes effect immediately
+ * instead of when the old token happens to expire.
  */
 
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '@/config/env';
+import { db } from '@/db/client';
 import { evaluatePermission, type PermissionKey } from '@/config/permissions';
 import { AppError } from '@/shared/AppError';
 import type { Role } from '@/types/domain';
@@ -24,32 +30,38 @@ declare global {
   }
 }
 
-export function authenticate(req: Request, _res: Response, next: NextFunction): void {
-  const authHeader = req.headers['authorization'];
-  if (!authHeader?.startsWith('Bearer ')) {
-    // In development, allow unauthenticated requests with a default owner identity
-    // so the billing POS can be demoed locally without a live token.
-    if (config.isDev) {
-      req.user = { userId: 'local-user', storeId: null, role: 'OWNER' };
-      next();
-      return;
-    }
-    next(AppError.unauthorized('Missing or malformed Authorization header'));
-    return;
-  }
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-  const token = authHeader.slice(7);
+export async function authenticate(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    req.user = jwt.verify(token, config.jwtSecret) as JwtPayload;
-    next();
-  } catch {
-    // In development, fall back to a default identity if token verification fails.
-    if (config.isDev) {
-      req.user = { userId: 'local-user', storeId: null, role: 'OWNER' };
-      next();
-      return;
+    const authHeader = req.headers['authorization'];
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw AppError.unauthorized('Missing or malformed Authorization header');
     }
-    next(AppError.unauthorized('Invalid or expired token'));
+
+    let payload: JwtPayload;
+    try {
+      payload = jwt.verify(authHeader.slice(7), config.jwtSecret) as JwtPayload;
+    } catch {
+      throw AppError.unauthorized('Invalid or expired token');
+    }
+    if (typeof payload.userId !== 'string' || !UUID_RE.test(payload.userId)) {
+      throw AppError.unauthorized('Invalid or expired token');
+    }
+
+    const row = (await db('users')
+      .where({ id: payload.userId })
+      .first('id', 'store_id', 'role', 'is_active')) as
+      | { id: string; storeId: string | null; role: Role; isActive: boolean }
+      | undefined;
+
+    if (!row) throw AppError.unauthorized('Account no longer exists.');
+    if (!row.isActive) throw AppError.forbidden('This account has been deactivated.');
+
+    req.user = { userId: row.id, storeId: row.storeId, role: row.role };
+    next();
+  } catch (err) {
+    next(err);
   }
 }
 
@@ -62,6 +74,21 @@ export function requirePermission(key: PermissionKey) {
     }
     if (!evaluatePermission(req.user.role, key)) {
       next(AppError.forbidden(`Your role (${req.user.role}) cannot perform this action.`));
+      return;
+    }
+    next();
+  };
+}
+
+/** Restricts a route to specific roles, regardless of the permission matrix. */
+export function requireRole(...roles: Role[]) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      next(AppError.unauthorized());
+      return;
+    }
+    if (!roles.includes(req.user.role)) {
+      next(AppError.forbidden(`Only ${roles.join(' / ')} can perform this action.`));
       return;
     }
     next();

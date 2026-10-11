@@ -20,10 +20,16 @@ export default function OnboardingCompletePage() {
 
   useEffect(() => {
     if (!user) return;
-    StoreService.getByOwnerId(user.id).then((s) => {
+    StoreService.getByOwnerId(user.id).then(async (s) => {
       setStore(s);
-      const onboardingSteps = StoreService.getOnboardingSteps(user.id, s, user);
-      setSteps(onboardingSteps);
+      try {
+        const onboarding = await StoreService.fetchOnboardingState();
+        const onboardingSteps = StoreService.getOnboardingSteps(user.id, s, user, onboarding.staffAdded);
+        setSteps(onboardingSteps);
+      } catch {
+        const onboardingSteps = StoreService.getOnboardingSteps(user.id, s, user);
+        setSteps(onboardingSteps);
+      }
     });
   }, [user]);
 

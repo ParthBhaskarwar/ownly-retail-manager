@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-primary": "#80d5cb", "tertiary-fixed-dim": "#ffb598", "on-tertiary-fixed-variant": "#72361b", "surface-dim": "#e0d8d5", "on-error": "#ffffff", "primary": "#005c55", "secondary": "#645d58", "secondary-fixed-dim": "#cec5bf", "on-surface": "#1e1b19", "on-error-container": "#93000a", "surface-container-low": "#faf2ee", "background": "#fff8f5", "secondary-fixed": "#eae1da", "on-background": "#1e1b19", "surface-container-highest": "#e9e1dd", "on-primary": "#ffffff", "surface-container-lowest": "#ffffff", "surface-tint": "#006a63", "tertiary-fixed": "#ffdbce", "surface-container-high": "#eee7e3", "on-secondary": "#ffffff", "on-secondary-fixed": "#1f1b17", "error": "#ba1a1a", "primary-fixed-dim": "#80d5cb", "tertiary": "#7f4025", "on-primary-fixed": "#00201d", "surface": "#fff8f5", "on-tertiary-container": "#ffe5db", "inverse-surface": "#33302d", "error-container": "#ffdad6", "on-secondary-fixed-variant": "#4b4641", "on-tertiary": "#ffffff", "secondary-container": "#eae1da", "on-primary-container": "#a3faef", "outline": "#6e7977", "on-surface-variant": "#3e4947", "tertiary-container": "#9c573a", "on-primary-fixed-variant": "#00504a", "primary-fixed": "#9cf2e8", "inverse-on-surface": "#f7efeb", "surface-variant": "#e9e1dd", "primary-container": "#0f766e", "surface-container": "#f4ece8", "surface-bright": "#fff8f5", "on-secondary-container": "#6a635e", "outline-variant": "#bdc9c6", "on-tertiary-fixed": "#370e00" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-sm": "0.5rem", "margin": "1.5rem", "space-xl": "2rem", "gutter-desktop": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "space-lg": "1.5rem", "margin-desktop": "2rem", "gutter": "1rem" }, "fontFamily": { "headline-sm": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "display-lg": ["Inter"], "table-header": ["Inter"] }, "fontSize": { "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "display-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "table-header": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md antialiased min-h-screen"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col h-full"><div class="h-16 px-space-md flex items-center justify-between gap-space-sm bg-surface-container-lowest"><div class="flex items-center gap-space-sm overflow-hidden"><img alt="Brand logo. - Primary color: #2b4c7e
+- Font: newsreader
+- Mode: light
+- Roundness: rounded-sm
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X0--XUhwiTWxURVHjkFrsBc5D1fTgJEdp_1kUlMEBrWzqOSIXRp_CeLm4G3tAvj-_5yKvKmSfTkW8GB30PbeNrsJp4chwGOoULxp-vu1Q9qwDQaFX0e4Kug3imJBoG_oT7PkeyGujYQwPS1hm0ZC_wXnwq5kLPgLyRiHmG-FpKz5t0CTKU8gUFf7vmAzKRViJV2WiKVAMcNjYDH4QWdNNYjD6K6Hb69pjyBCUnzNQcNc2SP8TuOpMDIA"/><div class="flex flex-col truncate"><span class="font-headline-sm text-headline-sm text-primary tracking-tight leading-none">Ownly</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none mt-1">Retail Manager</span></div></div><span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface text-[18px]">unfold_more</span></div><div class="flex-1 overflow-y-auto px-space-sm py-space-sm space-y-space-md"><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Main</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[18px]">grid_view</span><span>Dashboard</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Store</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="pos-billing" href="#"><span class="material-symbols-outlined text-[18px]">point_of_sale</span><span>POS Billing</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="invoices-and-receipts" href="#"><span class="material-symbols-outlined text-[18px]">receipt_long</span><span>Invoices & Receipts</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="returns-and-refunds" href="#"><span class="material-symbols-outlined text-[18px]">assignment_return</span><span>Returns & Refunds</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="product-exchanges" href="#"><span class="material-symbols-outlined text-[18px]">sync_alt</span><span>Product Exchanges</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="products" href="#"><span class="material-symbols-outlined text-[18px]">inventory_2</span><span>Products</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="restock" href="#"><span class="material-symbols-outlined text-[18px]">pallet</span><span>Restock</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-restock" href="#"><span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>AI Restock</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="inventory-ledger" href="#"><span class="material-symbols-outlined text-[18px]">fact_check</span><span>Inventory Ledger</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="barcodes" href="#"><span class="material-symbols-outlined text-[18px]">barcode_scanner</span><span>Barcodes</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">People</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="staff" href="#"><span class="material-symbols-outlined text-[18px]">badge</span><span>Staff</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">Insights</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="reports" href="#"><span class="material-symbols-outlined text-[18px]">analytics</span><span>Reports</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="ai-insights" href="#"><span class="material-symbols-outlined text-[18px]">psychology</span><span>AI Insights</span></a></nav><nav class="space-y-space-xs" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><div class="px-space-sm py-1 font-table-header text-table-header uppercase tracking-wider text-secondary">System</div><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="backup-and-safety" href="#"><span class="material-symbols-outlined text-[18px]">security</span><span>Backup & Safety</span></a><a class="flex items-center gap-3 px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[18px]">settings</span><span>Settings</span></a></nav></div><div class="p-space-sm bg-surface-container-low flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-primary-container inline-block"></span><span class="font-label-sm text-label-sm text-on-surface">Online Sync</span></div><span class="text-secondary font-label-sm text-label-sm">v2.4.1</span></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 bg-surface-container-lowest px-3 py-1.5 rounded-lg shadow-[0_1px_4px_rgba(0,0,0,0.02)] cursor-pointer hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-label-md text-label-md text-on-surface font-medium">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-[16px] text-outline">expand_more</span></div><div class="flex items-center gap-2 bg-surface-container-low px-2.5 py-1 rounded-full"><span class="h-1.5 w-1.5 rounded-full bg-primary-container animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm bg-surface-container-lowest px-3 py-1.5 rounded-lg w-72 text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors shadow-[0_1px_4px_rgba(0,0,0,0.02)]"><span class="material-symbols-outlined text-[18px] text-outline">search</span><span class="font-body-sm text-body-sm text-outline flex-1">Search records, SKUs...</span><kbd class="bg-surface-container-high px-1.5 py-0.5 rounded text-[11px] font-medium text-on-surface-variant">⌘K</kbd></div><button class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-error"></span></button><div class="flex items-center gap-space-sm pl-space-sm bg-transparent cursor-pointer"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VVX_RDY5lLDezUZOsHJz5s0Jgd0SrVhxOtKPwZRpJYx4Ciky8jTO_KKBzX_pDjokGWAlm9_HohTtyWtwmlPzKa5N_1ECJ7Sjrco-7cwx1SHyzxOVZZeCjwGno8JqSamq7qtS9bHIg4L_SURk3FT6rnMkzhMFZ_2WjQ96l9L4nZ4QRKehyRaekbQ6hNGxgCW0kiLS3M9h_aIr8-8PsYZQ7STrVrv0SFa_rhgBTLTAKNXf573-Gtc4tsCA"/><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium leading-tight">Rajesh Verma</span><span class="font-label-sm text-label-sm text-secondary leading-tight">Store Owner & Manager</span></div></div></div></header><main class="relative pt-16 w-full min-h-screen bg-surface"><div class="flex flex-col w-full">
+<!-- Content Canvas Area -->
+<div class="px-space-md md:px-margin-desktop py-space-lg space-y-space-xl max-w-7xl mx-auto w-full">
+<!-- Header & Breadcrumbs -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-space-sm pb-space-sm">
+<div class="space-y-1">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-secondary">
+<span>Store</span>
+<span class="text-outline-variant">/</span>
+<span>Returns & Refunds</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-medium">New Return</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">Returns & Refunds</h1>
+<p class="font-body-md text-body-md text-secondary">Initiate item return, verify condition, and execute immediate disbursement.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+          Manager POS Terminal #04
+        </span>
+</div>
+</div>
+<!-- Stepper Navigation -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md relative">
+<!-- Step 1 -->
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Step 1</p>
+<p class="font-headline-sm text-headline-sm text-on-surface truncate">Find Invoice</p>
+</div>
+<div class="hidden md:block flex-1 h-0.5 bg-primary/20 ml-2"></div>
+</div>
+<!-- Step 2 -->
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-md text-label-md shrink-0 ring-4 ring-primary-container/20">
+            2
+          </div>
+<div class="min-w-0">
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Step 2</p>
+<p class="font-headline-sm text-headline-sm text-on-surface truncate">Select Items & State</p>
+</div>
+<div class="hidden md:block flex-1 h-0.5 bg-surface-container-highest ml-2"></div>
+</div>
+<!-- Step 3 -->
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-secondary flex items-center justify-center font-label-md text-label-md shrink-0">
+            3
+          </div>
+<div class="min-w-0">
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold">Step 3</p>
+<p class="font-headline-sm text-headline-sm text-secondary truncate">Disburse Refund</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Two-Column Workflow -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left Column: Sequential Actions -->
+<div class="lg:col-span-8 space-y-space-lg">
+<!-- Card 1: Step 1 - Lookup & Loaded Invoice Record -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">1. Original Invoice Record</h2>
+</div>
+<span class="px-2.5 py-0.5 bg-surface-container-low text-secondary font-label-sm text-label-sm rounded">POS Audit Logged</span>
+</div>
+<!-- Search Bar -->
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-space-sm">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">barcode_scanner</span>
+<input class="w-full bg-surface-container-lowest pl-10 pr-4 py-2 font-mono text-body-md text-on-surface rounded-lg focus:outline-none focus:bg-surface-container-lowest shadow-sm" placeholder="Scan thermal barcode or type INV-..." type="text" value="INV-20261003-0089"/>
+</div>
+<button class="bg-primary-container hover:bg-primary text-on-primary px-space-lg py-2 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-colors shrink-0">
+<span class="material-symbols-outlined text-[18px]">search</span>
+              Look Up
+            </button>
+</div>
+<!-- Found Invoice Snapshot Sub-card -->
+<div class="bg-surface-container-low rounded-lg p-space-md space-y-space-sm">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-3">
+<span class="font-mono font-headline-sm text-headline-sm text-on-surface">INV-20261003-0089</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-[#F0FDF4] text-[#16A34A]">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                  Completed • Paid
+                </span>
+</div>
+<button class="text-primary hover:text-on-surface font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+                Change Invoice
+              </button>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm pt-space-xs font-label-sm text-label-sm">
+<div>
+<p class="text-secondary">Date & Time</p>
+<p class="text-on-surface font-medium mt-0.5">03 Oct 2026, 14:32</p>
+</div>
+<div>
+<p class="text-secondary">Customer</p>
+<p class="text-on-surface font-medium mt-0.5 truncate">Priya Sharma</p>
+<p class="text-outline text-xs">+91 98201 44321</p>
+</div>
+<div>
+<p class="text-secondary">Method</p>
+<p class="text-on-surface font-medium mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">qr_code_2</span>
+                  UPI QR (ICICI)
+                </p>
+</div>
+<div>
+<p class="text-secondary">Grand Total</p>
+<p class="text-on-surface font-semibold mt-0.5">₹4,999.00 <span class="font-normal text-secondary">(2 items)</span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Step 2 - Select Items to Return -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">2. Select Items for Return</h2>
+</div>
+<span class="text-secondary font-label-sm text-label-sm">Pick products, quantities, and inward stock triage</span>
+</div>
+<!-- Items Table -->
+<div class="overflow-x-auto rounded-lg">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead class="bg-surface-container-high text-secondary uppercase font-table-header text-table-header tracking-wider">
+<tr>
+<th class="py-3 px-3 w-10 text-center">
+<input checked="" class="accent-primary rounded cursor-pointer" type="checkbox"/>
+</th>
+<th class="py-3 px-3">Item Details</th>
+<th class="py-3 px-3 text-center">Qty Sold</th>
+<th class="py-3 px-3 text-right">Unit Price</th>
+<th class="py-3 px-3 text-center">Return Qty</th>
+<th class="py-3 px-3">Condition Triage</th>
+<th class="py-3 px-3">Reason</th>
+</tr>
+</thead>
+<tbody class="bg-surface-container-lowest">
+<!-- Row 1: Selected Item -->
+<tr class="bg-primary/5 transition-colors">
+<td class="py-3.5 px-3 text-center align-top pt-4">
+<input checked="" class="accent-primary rounded cursor-pointer h-4 w-4" id="check-item-1" type="checkbox"/>
+</td>
+<td class="py-3.5 px-3 align-top">
+<div class="font-headline-sm text-label-md text-on-surface">Chanderi Silk Anarkali Suit</div>
+<div class="font-mono text-xs text-secondary mt-0.5">SKU: CHN-SLK-042 • Size: XL • Emerald</div>
+</td>
+<td class="py-3.5 px-3 text-center font-medium text-on-surface align-top pt-4">1</td>
+<td class="py-3.5 px-3 text-right font-medium text-on-surface align-top pt-4">₹3,499.00</td>
+<td class="py-3.5 px-3 align-top">
+<div class="inline-flex items-center bg-surface-container-high rounded px-1.5 py-0.5 gap-2">
+<button class="text-secondary hover:text-on-surface text-sm font-bold w-4 text-center disabled:opacity-40" disabled="">-</button>
+<span class="font-mono font-medium text-on-surface">1</span>
+<button class="text-secondary hover:text-on-surface text-sm font-bold w-4 text-center disabled:opacity-40" disabled="">+</button>
+</div>
+</td>
+<td class="py-3.5 px-3 align-top">
+<div class="inline-flex bg-surface-container-high p-0.5 rounded text-xs">
+<button class="px-2.5 py-1 bg-surface-container-lowest text-primary font-medium rounded shadow-sm">Saleable</button>
+<button class="px-2.5 py-1 text-secondary hover:text-on-surface">Damaged</button>
+</div>
+</td>
+<td class="py-3.5 px-3 align-top">
+<select class="bg-surface-container-low text-on-surface text-xs rounded px-2 py-1.5 focus:outline-none cursor-pointer">
+<option selected="">Size / Fit Issue</option>
+<option>Defective / Fabric Flaw</option>
+<option>Customer Changed Mind</option>
+<option>Wrong Color Delivered</option>
+</select>
+</td>
+</tr>
+<!-- Row 2: Unselected Item -->
+<tr class="opacity-60 bg-surface-container-lowest transition-colors">
+<td class="py-3.5 px-3 text-center align-top pt-4">
+<input class="accent-primary rounded cursor-pointer h-4 w-4" id="check-item-2" type="checkbox"/>
+</td>
+<td class="py-3.5 px-3 align-top">
+<div class="font-headline-sm text-label-md text-on-surface">Kashmiri Thread Stole</div>
+<div class="font-mono text-xs text-secondary mt-0.5">SKU: KSH-STL-STD • Free Size • Walnut White</div>
+</td>
+<td class="py-3.5 px-3 text-center font-medium text-on-surface align-top pt-4">1</td>
+<td class="py-3.5 px-3 text-right font-medium text-on-surface align-top pt-4">₹1,500.00</td>
+<td class="py-3.5 px-3 align-top">
+<div class="inline-flex items-center bg-surface-container rounded px-1.5 py-0.5 gap-2 opacity-50">
+<span class="text-secondary text-sm font-bold w-4 text-center">-</span>
+<span class="font-mono font-medium text-secondary">0</span>
+<span class="text-secondary text-sm font-bold w-4 text-center">+</span>
+</div>
+</td>
+<td class="py-3.5 px-3 align-top">
+<div class="inline-flex bg-surface-container p-0.5 rounded text-xs opacity-50 pointer-events-none">
+<span class="px-2 py-1 text-secondary">Saleable</span>
+<span class="px-2 py-1 text-secondary">Damaged</span>
+</div>
+</td>
+<td class="py-3.5 px-3 align-top">
+<select class="bg-surface-container text-secondary text-xs rounded px-2 py-1.5 opacity-50 cursor-not-allowed" disabled="">
+<option>-- Select reason --</option>
+</select>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Inward Rule Helper Banner -->
+<div class="flex items-start gap-2.5 p-space-sm bg-surface-container-low rounded-lg text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0 mt-0.5">inventory</span>
+<span>
+<strong>Inventory Automation:</strong> Items marked as <span class="text-primary font-medium">Saleable</span> automatically replenish warehouse and POS balance. Items marked <span class="text-tertiary font-medium">Damaged</span> are quarantined into the damaged stock ledger for supplier claims.
+            </span>
+</div>
+</div>
+<!-- Card 3: Step 3 - Refund Method Selection -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">3. Refund Disbursement Channel</h2>
+</div>
+<!-- Selection Radio Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Option 1: Original Method -->
+<label class="cursor-pointer flex flex-col justify-between p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow transition-all relative">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-start gap-3">
+<input checked="" class="mt-1 accent-primary h-4 w-4" name="refund_channel" type="radio"/>
+<div>
+<span class="font-label-md text-label-md font-semibold text-on-surface block">Refund to Original Payment</span>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Disburse ₹3,499.00 straight to customer's linked UPI account.</p>
+</div>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between text-xs">
+<span class="font-mono text-outline-variant">priyasharma@icici</span>
+<span class="px-2 py-0.5 rounded font-semibold bg-[#F0FDF4] text-[#16A34A]">Instant QR Push</span>
+</div>
+</label>
+<!-- Option 2: Store Credit -->
+<label class="cursor-pointer flex flex-col justify-between p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow transition-all opacity-80 hover:opacity-100">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-start gap-3">
+<input class="mt-1 accent-primary h-4 w-4" name="refund_channel" type="radio"/>
+<div>
+<span class="font-label-md text-label-md font-semibold text-on-surface block">Issue Store Credit Voucher</span>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Generates digital credit note code with 1-year validity across Tulsi outlets.</p>
+</div>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between text-xs">
+<span class="text-secondary">Delivered via SMS</span>
+<span class="px-2 py-0.5 rounded font-semibold bg-surface-container-high text-on-surface-variant">Credit Note</span>
+</div>
+</label>
+</div>
+<!-- Memo Input -->
+<div class="space-y-1 pt-space-xs">
+<label class="font-label-sm text-label-sm text-secondary">Manager Memo / Reason Note (Optional)</label>
+<input class="w-full bg-surface-container-lowest px-3 py-2 text-body-sm text-on-surface rounded-lg shadow-sm focus:outline-none focus:bg-surface-container-lowest" placeholder="e.g., Customer opted for exchange in trial room but requested refund due to size unavailability." type="text"/>
+</div>
+</div>
+</div>
+<!-- Right Column: Sticky Summary & Execution Panel -->
+<div class="lg:col-span-4 sticky top-20 space-y-space-md">
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Refund Summary</h3>
+<span class="px-2 py-0.5 rounded font-medium text-xs bg-primary/10 text-primary">1 Item Selected</span>
+</div>
+<!-- Targeted Invoice Meta -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex items-center justify-between font-label-sm text-label-sm">
+<div>
+<span class="text-secondary block text-xs">Origin Invoice</span>
+<span class="font-mono font-medium text-on-surface">INV-20261003-0089</span>
+</div>
+<div class="text-right">
+<span class="text-secondary block text-xs">Customer</span>
+<span class="font-medium text-on-surface">P. Sharma</span>
+</div>
+</div>
+<!-- Line Breakdown -->
+<div class="space-y-space-sm text-label-md text-label-md">
+<div class="flex justify-between items-start text-secondary">
+<div>
+<span>Return Item (x1)</span>
+<p class="text-xs text-outline-variant font-mono">Chanderi Anarkali (XL)</p>
+</div>
+<span class="text-on-surface font-medium">₹3,499.00</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>GST Refundable (12% incl.)</span>
+<span class="text-on-surface font-medium">₹374.89</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>Restocking Fee</span>
+<span class="text-primary font-medium">₹0.00</span>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-px bg-surface-container-highest"></div>
+<!-- Total Due -->
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="font-table-header text-table-header uppercase tracking-wider text-secondary">Total Refund Due</span>
+<span class="font-display-lg text-display-lg font-bold text-on-surface">₹3,499.00</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-primary font-medium">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+<span>Direct Settlement via Original UPI Gateway</span>
+</div>
+</div>
+<!-- Inward Status Recap -->
+<div class="p-3 bg-surface-container-low rounded-lg text-xs space-y-1 text-secondary">
+<div class="flex items-center gap-1.5 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-primary">warehouse</span>
+<span>Stock Inward Preview:</span>
+</div>
+<p>1x SKU: CHN-SLK-042 will automatically re-enter Main Store Inventory balance upon confirmation.</p>
+</div>
+<!-- Actions -->
+<div class="space-y-space-sm pt-space-xs">
+<button class="w-full bg-primary-container hover:bg-primary text-on-primary py-3 px-4 rounded-lg font-headline-sm text-headline-sm shadow flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[20px]">currency_rupee</span>
+              Confirm Refund (₹3,499.00)
+            </button>
+<button class="w-full bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant py-2.5 px-4 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+              Cancel & Return to Invoices
+            </button>
+</div>
+</div>
+<!-- Quick Help Note -->
+<div class="p-space-sm text-center font-body-sm text-body-sm text-secondary">
+<span>Need supervisor override? <a class="text-primary underline font-medium" href="#">Request Manager PIN</a></span>
+</div>
+</div>
+</div>
+<!-- Workflow State Previews (Design System Completeness) -->
+<div class="pt-space-xl space-y-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Workflow State Previews</h2>
+<p class="font-body-sm text-body-sm text-secondary">Operational fallbacks and terminal confirmation screens for this sub-workflow.</p>
+</div>
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-secondary font-mono text-xs">UX State Validation</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<!-- State 1: Error / Not Found State -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-label-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-[18px]">error</span>
+              State: Invoice Not Found
+            </span>
+<span class="font-label-sm text-xs px-2 py-0.5 rounded bg-error/10 text-error font-medium">Lookup Error</span>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg space-y-2">
+<div class="flex items-center gap-2 text-xs font-mono text-error">
+<span class="material-symbols-outlined text-[16px]">search_off</span>
+              Query: "INV-20269999-0000" returned 0 rows
+            </div>
+<p class="font-body-sm text-body-sm text-secondary">
+              Invoice not found. Please verify the receipt date or scan the physical barcode directly from the customer’s thermal slip.
+            </p>
+</div>
+<div class="flex flex-wrap gap-2 text-xs">
+<button class="px-3 py-1.5 bg-surface-container-high text-on-surface rounded font-medium hover:bg-surface-container-highest transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">phone_iphone</span>
+              Find via Mobile No.
+            </button>
+<button class="px-3 py-1.5 bg-surface-container-high text-on-surface rounded font-medium hover:bg-surface-container-highest transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+              Filter Past 30 Days
+            </button>
+</div>
+</div>
+<!-- State 2: Success / Confirmation State -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-label-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[#16A34A] text-[18px]">check_circle</span>
+              State: Return Successfully Processed
+            </span>
+<span class="font-label-sm text-xs px-2 py-0.5 rounded bg-[#F0FDF4] text-[#16A34A] font-medium">Settled</span>
+</div>
+<div class="p-3 bg-[#F0FDF4] rounded-lg space-y-1">
+<div class="flex items-center justify-between">
+<span class="font-mono text-xs font-semibold text-[#16A34A]">CREDIT NOTE #CRN-20261003-0014</span>
+<span class="font-bold text-sm text-[#16A34A]">₹3,499.00</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Disbursed to UPI (ICICI RRN: 6291048821). 1 SKU restored to Tulsi Main Store live stock.
+            </p>
+</div>
+<div class="flex items-center gap-2 text-xs pt-1">
+<button class="px-3 py-1.5 bg-primary-container text-on-primary rounded font-medium hover:bg-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">print</span>
+              Print Thermal Slip
+            </button>
+<button class="px-3 py-1.5 bg-surface-container-high text-on-surface rounded font-medium hover:bg-surface-container-highest transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">add</span>
+              Process Next Return
+            </button>
+<a class="text-primary hover:underline ml-auto font-medium" href="#">View in Ledger →</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

@@ -20,10 +20,19 @@ export const db = knex({
   connection: {
     connectionString: config.databaseUrl,
     ssl: sslConfig,
+    // Send TCP keep-alives so a hosted database (Neon) does not silently drop
+    // connections that sit idle in the pool.
+    keepAlive: true,
   },
   pool: {
-    min: 2,
+    // min 0 + a short idle timeout: connections are retired by us before the server
+    // kills them. With min 2, an idle pooled connection could be dead by the next
+    // request, which failed with "Connection terminated unexpectedly" (a 500).
+    min: 0,
     max: 10,
+    idleTimeoutMillis: 10_000,
+    reapIntervalMillis: 2_000,
+    acquireTimeoutMillis: 30_000,
   },
   postProcessResponse,
   wrapIdentifier,

@@ -6,7 +6,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { StoreService } from '@/services/store.service';
 import { AuthService } from '@/services/auth.service';
-import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
+import { authenticate, requirePermission, requireRole, requireStoreId } from '@/middleware/auth.middleware';
 
 export const storeRouter = Router();
 storeRouter.use(authenticate);
@@ -52,7 +52,7 @@ storeRouter.get('/onboarding', async (req, res, next) => {
  * Creating the store changes the caller's storeId, so a fresh token is
  * returned with the response — see POST /api/auth/refresh for the rationale.
  */
-storeRouter.post('/', async (req, res, next) => {
+storeRouter.post('/', requireRole('OWNER'), async (req, res, next) => {
   try {
     const input = createSchema.parse(req.body);
     const store = await StoreService.create(req.user!.userId, input);
@@ -63,7 +63,7 @@ storeRouter.post('/', async (req, res, next) => {
   }
 });
 
-storeRouter.put('/', requirePermission('store:edit'), async (req, res, next) => {
+storeRouter.put('/', requirePermission('settings:edit'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
     const updates = createSchema.partial().extend({ logoUrl: z.string().optional() }).parse(req.body);
@@ -73,7 +73,7 @@ storeRouter.put('/', requirePermission('store:edit'), async (req, res, next) => 
   }
 });
 
-storeRouter.post('/complete-setup', async (req, res, next) => {
+storeRouter.post('/complete-setup', requireRole('OWNER'), async (req, res, next) => {
   try {
     const storeId = requireStoreId(req);
     res.json({ store: await StoreService.markSetupComplete(storeId, req.user!.userId) });

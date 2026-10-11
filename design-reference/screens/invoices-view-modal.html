@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface":"#fff8f5","secondary-container":"#eae1da","surface-container-high":"#eee7e3","surface-container-lowest":"#ffffff","error":"#ba1a1a","on-background":"#1e1b19","on-primary-fixed":"#00201d","on-error":"#ffffff","tertiary-container":"#9c573a","surface-container-highest":"#e9e1dd","on-tertiary":"#ffffff","on-primary-container":"#a3faef","outline-variant":"#bdc9c6","on-tertiary-fixed":"#370e00","on-primary-fixed-variant":"#00504a","on-surface-variant":"#3e4947","on-secondary-fixed-variant":"#4b4641","inverse-surface":"#33302d","tertiary-fixed-dim":"#ffb598","tertiary":"#7f4025","on-secondary-fixed":"#1f1b17","surface-tint":"#006a63","on-error-container":"#93000a","on-secondary":"#ffffff","secondary-fixed":"#eae1da","inverse-primary":"#80d5cb","on-tertiary-fixed-variant":"#72361b","primary-fixed-dim":"#80d5cb","secondary-fixed-dim":"#cec5bf","on-primary":"#ffffff","surface-container":"#f4ece8","error-container":"#ffdad6","background":"#fff8f5","primary":"#005c55","surface-dim":"#e0d8d5","secondary":"#645d58","outline":"#6e7977","surface-container-low":"#faf2ee","tertiary-fixed":"#ffdbce","inverse-on-surface":"#f7efeb","on-surface":"#1e1b19","surface-bright":"#fff8f5","on-tertiary-container":"#ffe5db","surface-variant":"#e9e1dd","on-secondary-container":"#6a635e","primary-container":"#0f766e","primary-fixed":"#9cf2e8"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-lg":"1.5rem","space-xl":"2rem","gutter":"1rem","margin-desktop":"2rem","margin":"1.5rem","space-md":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter-desktop":"1.5rem"},"fontFamily":{"headline-lg":["Inter"],"label-sm":["Inter"],"headline-sm":["Inter"],"body-lg":["Inter"],"table-header":["Inter"],"body-sm":["Inter"],"body-md":["Inter"],"label-md":["Inter"],"display-lg":["Inter"],"headline-md":["Inter"]},"fontSize":{"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"table-header":["11px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"display-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}}</script></head><body><aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-[#E7E5E4] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-4 flex items-center gap-2 border-b border-[#E7E5E4]"><img alt="Ownly Retail Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Ug834MoQjE9U6zQ0nlJsRvydhtLJTWwAaN94FC7dO4m-amUCn0aK4jS0Q5-uHbnoZgCThXGRi8reNFTplJxXe_oWiFdkQbhLPXe0Rpy0n5RQTbrdX919y9tUA0Zw9V_8Ig0zqVGPAkBrsa-UBCjFzUBHYsieOKLXmFv7f66sItKh1x3QiZXLiYQsIOWJsAiaTcneXn95JslNm9CPsnWI4oC2_bYJS0YwMDu269lzJoGRaEOT_KUPKF"/><div class="flex flex-col"><span class="text-xl tracking-tight text-[#1C1917] leading-tight font-semibold">Ownly</span><span class="text-xs uppercase tracking-wider text-[#78716C] font-medium">Retail Manager</span></div></div><nav class="px-2 py-3 space-y-3 flex-1" data-active-classes="bg-[#F0FDFA] text-[#0F766E] font-medium"><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Main</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="dashboard" href="#"><span class="material-symbols-outlined text-xl">dashboard</span><span>Dashboard</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Store</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="pos-billing" href="#"><span class="material-symbols-outlined text-xl">point_of_sale</span><span>POS Billing</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#F0FDFA] text-[#0F766E] font-medium transition-colors text-sm" data-path="invoices-receipts" href="#"><span class="material-symbols-outlined text-xl text-[#0F766E]">receipt_long</span><span>Invoices &amp; Receipts</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="returns-refunds" href="#"><span class="material-symbols-outlined text-xl">assignment_return</span><span>Returns &amp; Refunds</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="product-exchanges" href="#"><span class="material-symbols-outlined text-xl">swap_horiz</span><span>Product Exchanges</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="products" href="#"><span class="material-symbols-outlined text-xl">checkroom</span><span>Products</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="restock" href="#"><span class="material-symbols-outlined text-xl">move_to_inbox</span><span>Restock</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="ai-restock" href="#"><span class="material-symbols-outlined text-xl">auto_awesome</span><span>AI Restock</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="inventory-ledger" href="#"><span class="material-symbols-outlined text-xl">table_chart</span><span>Inventory Ledger</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="barcodes" href="#"><span class="material-symbols-outlined text-xl">qr_code_scanner</span><span>Barcodes</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">People</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="staff" href="#"><span class="material-symbols-outlined text-xl">badge</span><span>Staff</span></a></div><div class="space-y-1"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">Insights</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="reports" href="#"><span class="material-symbols-outlined text-xl">bar_chart</span><span>Reports</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="ai-insights" href="#"><span class="material-symbols-outlined text-xl">psychology</span><span>AI Insights</span></a></div><div class="space-y-1 pb-4"><div class="px-2 py-1 text-xs uppercase tracking-wider text-[#78716C] font-semibold">System</div><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="backup-safety" href="#"><span class="material-symbols-outlined text-xl">verified_user</span><span>Backup &amp; Safety</span></a><a class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[#78716C] hover:bg-[#F5F5F4] hover:text-[#1C1917] transition-colors text-sm font-normal" data-path="settings" href="#"><span class="material-symbols-outlined text-xl">settings</span><span>Settings</span></a></div></nav></div><div class="p-3 border-t border-[#E7E5E4] bg-white"><div class="flex items-center justify-between text-[#78716C] text-xs font-medium"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#16A34A] inline-block"></span>Online Sync</span><span class="text-[#78716C]">v2.4.1</span></div></div></aside><div class="pl-64 flex flex-col min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-white border-b border-[#E7E5E4] z-40 px-6 flex items-center justify-between"><div class="flex items-center gap-3"><div class="flex items-center gap-2 px-3 py-1.5 border border-[#E7E5E4] rounded-lg bg-[#FAFAF9] hover:bg-[#F5F5F4] transition-colors cursor-pointer"><span class="w-2 h-2 rounded-full bg-[#16A34A]"></span><span class="text-sm font-semibold text-[#1C1917]">Tulsi Collection • Main Store</span><span class="material-symbols-outlined text-base text-[#78716C]">expand_more</span></div><div class="hidden lg:flex items-center gap-1.5 px-3 py-1 border border-[#E7E5E4] rounded-lg bg-[#FAFAF9]"><span class="material-symbols-outlined text-sm text-[#78716C]">schedule</span><span class="text-xs text-[#78716C] font-medium">Shift #1 • Open</span></div></div><div class="flex items-center gap-3"><div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#FAFAF9] border border-[#E7E5E4] rounded-lg text-[#1C1917] text-sm w-60"><span class="material-symbols-outlined text-lg text-[#78716C]">search</span><span class="flex-1 text-[#78716C] text-xs">Search orders, items...</span><kbd class="px-1.5 py-0.5 text-xs bg-white border border-[#E7E5E4] rounded text-[#78716C] shadow-none">⌘K</kbd></div><button class="relative p-1.5 text-[#78716C] hover:text-[#1C1917] rounded-lg hover:bg-[#F5F5F4] transition-colors"><span class="material-symbols-outlined text-2xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#DC2626] ring-2 ring-white"></span></button><div class="h-6 w-px bg-[#E7E5E4]"></div><div class="flex items-center gap-2 pl-1"><img alt="Profile" class="w-8 h-8 rounded-full object-cover border border-[#E7E5E4]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1o0_oZkkT7iGft61T28I2M3ZTToAKlaC-mTUOv1nitSlhfdGV2DULpmpfQXaUYUuluCjRbyiUfNvUOAenOTbKZKjnrqUZyHE194LprR-2SlnWeBD8zoUD1KjlRENs-KSCQDaLMPw4FCYgCtDifjaBgOJB4hc0aE2km_0vRx0J_K-CyIczuF6s_4Kn2H177lDsPlMjccRu2l8yk0Jf_J7JODJzkZ5kiJxWccBLtekP8A97uYyFg9Q"/><div class="hidden xl:flex flex-col text-left"><span class="text-sm leading-none text-[#1C1917] font-semibold">Rajesh Verma</span><span class="text-xs text-[#78716C] leading-tight mt-0.5">Store Owner &amp; Manager</span></div></div></div></header><main class="flex-1 pt-16 w-full bg-[#FAFAF9] px-6 py-6"><div class="flex flex-col w-full relative">
+<!-- Underlay App Screen (Invoices & Receipts view behind modal) -->
+<div aria-hidden="true" class="w-full filter blur-[2px] opacity-40 select-none pointer-events-none transition-all duration-300">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-xl bg-surface-container text-primary">
+<span class="material-symbols-outlined text-2xl">receipt_long</span>
+</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Invoices &amp; Receipts</h1>
+<p class="font-body-sm text-body-sm text-secondary">Manage customer orders, invoices, reprints, and fiscal settlements</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+<span>Today (03 Oct 2026)</span>
+</div>
+<button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-lg">add</span>
+<span>New Sale</span>
+</button>
+</div>
+</div>
+<!-- Quick Metrics Strip -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-1">
+<span class="font-table-header text-table-header text-secondary uppercase">Today's Invoices</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">89</span>
+<span class="font-body-sm text-body-sm text-[#16A34A] flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> +14% vs yesterday
+          </span>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-1">
+<span class="font-table-header text-table-header text-secondary uppercase">Total Gross Value</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">₹2,84,310.00</span>
+<span class="font-body-sm text-body-sm text-secondary">Average ₹3,194 per ticket</span>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-1">
+<span class="font-table-header text-table-header text-secondary uppercase">GST Collected (Est.)</span>
+<span class="font-headline-lg text-headline-lg text-on-surface">₹34,117.20</span>
+<span class="font-body-sm text-body-sm text-secondary">CGST + SGST pooled</span>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-1">
+<span class="font-table-header text-table-header text-secondary uppercase">Active Terminal</span>
+<span class="font-headline-lg text-headline-lg text-primary">TSC-TE200-01</span>
+<span class="font-body-sm text-body-sm text-[#16A34A] flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span> Ready • USB Port 2
+          </span>
+</div>
+</div>
+<!-- Mock Table -->
+<div class="rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden">
+<div class="px-5 py-3.5 bg-surface-container-low flex items-center justify-between">
+<div class="font-headline-sm text-headline-sm text-on-surface">All Transactions</div>
+<div class="font-label-sm text-label-sm text-secondary">Showing 1-10 of 89 invoices</div>
+</div>
+<div class="p-4 space-y-3">
+<div class="h-10 rounded bg-surface-container-high w-full"></div>
+<div class="h-10 rounded bg-surface-container-high w-full"></div>
+<div class="h-10 rounded bg-surface-container-high w-full"></div>
+<div class="h-10 rounded bg-surface-container-high w-full"></div>
+<div class="h-10 rounded bg-surface-container-high w-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Backdrop Overlay -->
+<div class="fixed inset-0 z-50 bg-[#1C1917]/50 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 transition-opacity duration-200" id="invoiceModalBackdrop">
+<!-- Modal Container -->
+<div aria-labelledby="modalInvoiceTitle" aria-modal="true" class="w-full max-w-4xl max-h-[942px] flex flex-col bg-surface-container-lowest rounded-xl shadow-2xl overflow-hidden transform transition-all duration-200" id="invoiceModalCard" role="dialog">
+<!-- Modal Header -->
+<header class="px-5 py-3.5 bg-surface-container-lowest flex items-center justify-between gap-4 z-10 shrink-0">
+<div class="flex items-center gap-3.5 min-w-0">
+<!-- View Format Toggle Pills -->
+<div aria-label="Receipt format view" class="bg-surface-container-high p-0.5 rounded-lg flex items-center gap-1 shrink-0" role="tablist">
+<button aria-selected="true" class="format-pill-active px-3 py-1.5 rounded-md font-label-md text-label-md flex items-center gap-1.5 transition-all bg-surface-container-lowest text-primary shadow-sm" id="formatThermalBtn" onclick="switchFormat('thermal')" role="tab" type="button">
+<span class="material-symbols-outlined text-base">receipt</span>
+<span>Thermal (80mm)</span>
+</button>
+<button aria-selected="false" class="format-pill-inactive px-3 py-1.5 rounded-md font-label-md text-label-md flex items-center gap-1.5 transition-all text-secondary hover:text-on-surface" id="formatA4Btn" onclick="switchFormat('a4')" role="tab" type="button">
+<span class="material-symbols-outlined text-base">description</span>
+<span>A4 Invoice</span>
+</button>
+</div>
+<!-- Metadata Badges -->
+<div class="hidden sm:flex items-center gap-2 min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-mono tracking-tight truncate" id="modalInvoiceTitle">INV-20261003-0089</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-label-sm font-semibold bg-[#F0FDF4] text-[#16A34A]">Completed</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-label-sm bg-surface-container text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-xs text-primary">cloud_done</span> Synced
+            </span>
+</div>
+</div>
+<!-- Quick Utilities / Actions -->
+<div class="flex items-center gap-2 shrink-0">
+<button class="px-3 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors flex items-center gap-1.5 font-label-md text-label-md" onclick="triggerDownload()" title="Download digital PDF file" type="button">
+<span class="material-symbols-outlined text-lg">download</span>
+<span class="hidden md:inline">Download PDF</span>
+</button>
+<button class="px-4 py-2 rounded-lg bg-primary hover:bg-[#115E59] text-on-primary transition-all flex items-center gap-1.5 font-label-md text-label-md shadow-sm active:scale-95" id="printActionBtn" onclick="triggerPrint()" title="Send to default thermal roll printer" type="button">
+<span class="material-symbols-outlined text-lg">print</span>
+<span>Print Receipt</span>
+</button>
+<div class="h-6 w-px bg-surface-container-high mx-1 hidden sm:block"></div>
+<button class="group flex items-center gap-1.5 p-1.5 px-2 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container transition-colors" onclick="closeInvoiceModal()" title="Close Preview (Esc)" type="button">
+<span class="material-symbols-outlined text-xl">close</span>
+<kbd class="hidden md:inline-block px-1.5 py-0.5 rounded text-[10px] font-label-sm bg-surface-container-high text-on-surface-variant uppercase tracking-wider">Esc</kbd>
+</button>
+</div>
+</header>
+<!-- Modal Body Canvas -->
+<div class="flex-1 overflow-y-auto bg-surface-container-high/60 p-4 md:p-8 flex justify-center items-start">
+<!-- ================= THERMAL RECEIPT CANVAS (DEFAULT) ================= -->
+<div class="w-full max-w-[390px] bg-surface-container-lowest rounded-sm shadow-xl p-5 md:p-6 text-on-surface text-xs leading-relaxed select-text transition-all duration-200 relative" id="thermalReceiptView">
+<!-- Subtle Paper Top Edge Cut indicator -->
+<div class="absolute -top-1 left-0 right-0 h-1 bg-surface-container-high/40 [mask-image:radial-gradient(circle_at_bottom,black_1px,transparent_1px)] [mask-size:6px_4px]"></div>
+<!-- Store Brand Header -->
+<div class="text-center space-y-1">
+<h2 class="font-headline-md text-headline-md tracking-wider text-on-surface uppercase font-bold">Tulsi Collection</h2>
+<p class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-medium">Ethnic &amp; Festive Retail Store</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-[280px] mx-auto text-[11px] leading-tight pt-1">
+              Shop 14-16, Heritage Textile Market, M.G. Road, Jaipur, Rajasthan - 302001
+            </p>
+<p class="font-body-sm text-body-sm text-secondary text-[11px]">
+              Tel: +91 141 256 8900 • contact@tulsicollection.in
+            </p>
+<div class="inline-block px-2 py-0.5 rounded bg-surface-container text-on-surface font-mono text-[11px] font-semibold mt-1">
+              GSTIN: 08AAACT1234F1Z5
+            </div>
+<p class="font-label-sm text-label-sm text-secondary text-[10px] pt-0.5">
+              Counter #01 • Shift #1 • Staff: Rajesh Verma
+            </p>
+</div>
+<!-- Divider -->
+<div class="w-full my-3 border-b-2 border-dotted border-secondary/30"></div>
+<!-- Invoice Metadata -->
+<div class="space-y-1 font-body-sm text-body-sm">
+<div class="flex justify-between items-center">
+<span class="text-secondary text-[11px]">Invoice No:</span>
+<span class="font-mono font-bold text-on-surface text-[13px]">INV-20261003-0089</span>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span class="text-secondary">Date &amp; Time:</span>
+<span class="font-mono text-on-surface">03 Oct 2026, 14:32 PM</span>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span class="text-secondary">Customer:</span>
+<span class="font-medium text-on-surface">Priya Sharma</span>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span class="text-secondary">Contact:</span>
+<span class="font-mono text-on-surface">+91 98201 44321</span>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span class="text-secondary">Place of Supply:</span>
+<span class="font-mono text-on-surface">Rajasthan (08) - Intrastate</span>
+</div>
+</div>
+<!-- Divider -->
+<div class="w-full my-3 border-b-2 border-dotted border-secondary/30"></div>
+<!-- Itemised List Table -->
+<div class="space-y-2">
+<div class="grid grid-cols-12 text-[10px] font-table-header text-table-header uppercase text-secondary pb-1 border-b border-surface-container-high">
+<span class="col-span-6">Description / SKU</span>
+<span class="col-span-2 text-center">Sz/Qty</span>
+<span class="col-span-2 text-right">Rate</span>
+<span class="col-span-2 text-right">Amount</span>
+</div>
+<!-- Item 1 -->
+<div class="py-1 space-y-0.5">
+<div class="grid grid-cols-12 items-baseline">
+<div class="col-span-6 font-semibold text-on-surface text-[12px] leading-snug">
+                  Chanderi Silk Anarkali Suit
+                </div>
+<div class="col-span-2 text-center font-mono text-[11px]">XL × 1</div>
+<div class="col-span-2 text-right font-mono text-[11px] text-secondary">3,499.00</div>
+<div class="col-span-2 text-right font-mono font-semibold text-[11px] text-on-surface">3,499.00</div>
+</div>
+<div class="flex items-center justify-between text-[10px] text-secondary font-mono">
+<span>SKU: CHN-SLK-042 • HSN: 6204</span>
+<span>Disc: ₹0.00</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="py-1 space-y-0.5">
+<div class="grid grid-cols-12 items-baseline">
+<div class="col-span-6 font-semibold text-on-surface text-[12px] leading-snug">
+                  Kashmiri Thread Stole
+                </div>
+<div class="col-span-2 text-center font-mono text-[11px]">Free × 1</div>
+<div class="col-span-2 text-right font-mono text-[11px] text-secondary">1,500.00</div>
+<div class="col-span-2 text-right font-mono font-semibold text-[11px] text-on-surface">1,500.00</div>
+</div>
+<div class="flex items-center justify-between text-[10px] text-secondary font-mono">
+<span>SKU: KSH-STL-STD • HSN: 6214</span>
+<span>Disc: ₹0.00</span>
+</div>
+</div>
+</div>
+<!-- Divider -->
+<div class="w-full my-3 border-b-2 border-dotted border-secondary/30"></div>
+<!-- Financial Breakdown -->
+<div class="space-y-1 text-[11px]">
+<div class="flex justify-between items-center">
+<span class="text-secondary">Subtotal (2 items):</span>
+<span class="font-mono text-on-surface">₹4,999.00</span>
+</div>
+<div class="flex justify-between items-center text-secondary">
+<span>Item Discount / Coupon:</span>
+<span class="font-mono">₹0.00</span>
+</div>
+<div class="flex justify-between items-center text-secondary">
+<span>Taxable Value:</span>
+<span class="font-mono">₹4,463.39</span>
+</div>
+<div class="flex justify-between items-center text-secondary">
+<span>CGST @ 6.0%:</span>
+<span class="font-mono">₹267.80</span>
+</div>
+<div class="flex justify-between items-center text-secondary">
+<span>SGST @ 6.0%:</span>
+<span class="font-mono">₹267.80</span>
+</div>
+<div class="flex justify-between items-center text-secondary">
+<span>Total GST (12%):</span>
+<span class="font-mono font-medium text-on-surface">₹535.60</span>
+</div>
+<div class="flex justify-between items-center text-secondary">
+<span>Round Off:</span>
+<span class="font-mono">+₹0.00</span>
+</div>
+<!-- Grand Total Block -->
+<div class="pt-2 pb-1 border-t-2 border-dashed border-secondary/40 flex justify-between items-baseline mt-2">
+<span class="font-headline-sm text-headline-sm uppercase font-bold text-on-surface">Grand Total:</span>
+<span class="font-headline-lg text-headline-lg font-mono font-extrabold text-on-surface tracking-tight">₹4,999.00</span>
+</div>
+<div class="text-[10px] text-secondary font-mono italic text-right">
+              Amount in words: Four Thousand Nine Hundred Ninety-Nine Rupees Only
+            </div>
+</div>
+<!-- Divider -->
+<div class="w-full my-3 border-b-2 border-dotted border-secondary/30"></div>
+<!-- Payment Details -->
+<div class="space-y-1 text-[11px] bg-surface-container-low/70 p-2.5 rounded">
+<div class="flex justify-between items-center font-medium">
+<span class="text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#16A34A]">verified</span>
+                Payment Mode: UPI QR
+              </span>
+<span class="font-mono font-bold text-on-surface">₹4,999.00</span>
+</div>
+<div class="flex justify-between items-center text-[10px] text-secondary pt-0.5">
+<span>Provider: Razorpay POS • PhonePe</span>
+<span class="font-mono text-[#16A34A] font-semibold">PAID</span>
+</div>
+<div class="text-[10px] font-mono text-secondary break-all pt-0.5">
+              UTR: UPI/427618990142/SUCCESS
+            </div>
+<div class="flex justify-between items-center text-[10px] text-secondary pt-0.5">
+<span>Balance Due:</span>
+<span class="font-mono font-bold text-on-surface">₹0.00</span>
+</div>
+</div>
+<!-- Barcode Graphic -->
+<div class="my-4 text-center space-y-1">
+<div class="flex justify-center items-center px-4">
+<!-- Crisp SVG Code 128 Style Barcode representation -->
+<svg class="h-11 w-56 text-on-surface" fill="currentColor" viewbox="0 0 220 44" xmlns="http://www.w3.org/2000/svg">
+<!-- Barcode sequence -->
+<rect height="44" width="3" x="0" y="0"></rect>
+<rect height="44" width="2" x="5" y="0"></rect>
+<rect height="44" width="4" x="10" y="0"></rect>
+<rect height="44" width="1" x="16" y="0"></rect>
+<rect height="44" width="3" x="20" y="0"></rect>
+<rect height="44" width="5" x="25" y="0"></rect>
+<rect height="44" width="2" x="33" y="0"></rect>
+<rect height="44" width="3" x="38" y="0"></rect>
+<rect height="44" width="1" x="44" y="0"></rect>
+<rect height="44" width="4" x="47" y="0"></rect>
+<rect height="44" width="3" x="54" y="0"></rect>
+<rect height="44" width="2" x="60" y="0"></rect>
+<rect height="44" width="5" x="65" y="0"></rect>
+<rect height="44" width="2" x="73" y="0"></rect>
+<rect height="44" width="1" x="78" y="0"></rect>
+<rect height="44" width="4" x="82" y="0"></rect>
+<rect height="44" width="3" x="88" y="0"></rect>
+<rect height="44" width="2" x="94" y="0"></rect>
+<rect height="44" width="5" x="98" y="0"></rect>
+<rect height="44" width="1" x="106" y="0"></rect>
+<rect height="44" width="3" x="110" y="0"></rect>
+<rect height="44" width="4" x="115" y="0"></rect>
+<rect height="44" width="2" x="122" y="0"></rect>
+<rect height="44" width="3" x="126" y="0"></rect>
+<rect height="44" width="5" x="132" y="0"></rect>
+<rect height="44" width="2" x="140" y="0"></rect>
+<rect height="44" width="1" x="145" y="0"></rect>
+<rect height="44" width="4" x="149" y="0"></rect>
+<rect height="44" width="3" x="155" y="0"></rect>
+<rect height="44" width="2" x="160" y="0"></rect>
+<rect height="44" width="4" x="165" y="0"></rect>
+<rect height="44" width="3" x="172" y="0"></rect>
+<rect height="44" width="2" x="178" y="0"></rect>
+<rect height="44" width="5" x="183" y="0"></rect>
+<rect height="44" width="2" x="191" y="0"></rect>
+<rect height="44" width="4" x="195" y="0"></rect>
+<rect height="44" width="2" x="202" y="0"></rect>
+<rect height="44" width="4" x="206" y="0"></rect>
+<rect height="44" width="2" x="213" y="0"></rect>
+<rect height="44" width="3" x="217" y="0"></rect>
+</svg>
+</div>
+<p class="font-mono text-[11px] text-secondary tracking-widest font-semibold">*INV202610030089*</p>
+</div>
+<!-- Footer Policy -->
+<div class="text-center space-y-1 pt-2 border-t border-secondary/20">
+<p class="font-label-md text-label-md font-semibold text-on-surface">Thank you for shopping at Tulsi Collection!</p>
+<p class="font-body-sm text-body-sm text-secondary text-[10px] leading-tight">
+              Exchange Policy: Garments in original condition with intact price tags can be exchanged within 7 days against valid receipt. Strictly no cash refunds.
+            </p>
+<div class="pt-2 flex items-center justify-center gap-1.5 text-[9px] text-secondary font-mono">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+<span>Generated by Ownly Retail Manager • Cloud Synced</span>
+</div>
+</div>
+</div>
+<!-- ================= A4 INVOICE CANVAS (HIDDEN BY DEFAULT) ================= -->
+<div class="hidden w-full max-w-2xl bg-surface-container-lowest rounded-sm shadow-xl p-8 md:p-10 text-on-surface text-sm transition-all duration-200" id="a4InvoiceView">
+<!-- A4 Formal Tax Invoice Header -->
+<div class="flex justify-between items-start pb-6 border-b border-surface-container-high">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-primary text-on-primary font-bold text-xs uppercase tracking-wider">TAX INVOICE</span>
+<span class="font-mono text-xs text-secondary">Original for Recipient</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold pt-1">TULSI COLLECTION</h2>
+<p class="font-body-sm text-body-sm text-secondary">Premium Ethnic, Bridal &amp; Festive Apparel</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-sm pt-1">
+                Shop 14-16, Heritage Textile Market, M.G. Road, Jaipur, Rajasthan - 302001<br/>
+                GSTIN: <span class="font-mono font-semibold">08AAACT1234F1Z5</span> • State Code: 08
+              </p>
+</div>
+<div class="text-right space-y-1 font-body-sm text-body-sm">
+<div class="font-headline-sm text-headline-sm font-mono text-primary font-bold">INV-20261003-0089</div>
+<div class="text-secondary font-mono">Date: 03 Oct 2026</div>
+<div class="text-secondary font-mono">Time: 14:32 IST</div>
+<div class="text-secondary">POS Terminal: #01 (Main)</div>
+<div class="inline-block mt-2 px-2.5 py-1 rounded bg-[#F0FDF4] text-[#16A34A] font-semibold text-xs">
+                STATUS: PAID
+              </div>
+</div>
+</div>
+<!-- Billed To & Shipment Grid -->
+<div class="grid grid-cols-2 gap-6 py-5 border-b border-surface-container-high text-xs">
+<div class="space-y-1">
+<span class="font-table-header text-table-header uppercase text-secondary font-semibold">Billed To (Customer):</span>
+<p class="font-headline-sm text-headline-sm text-on-surface">Priya Sharma</p>
+<p class="text-secondary font-mono">+91 98201 44321 • priya.sharma92@gmail.com</p>
+<p class="text-secondary">C-42, Adarsh Nagar, Jaipur, Rajasthan - 302004</p>
+<p class="text-secondary">Place of Supply: Rajasthan (08)</p>
+</div>
+<div class="space-y-1 text-right sm:text-left">
+<span class="font-table-header text-table-header uppercase text-secondary font-semibold">Payment &amp; Dispatch:</span>
+<p class="font-medium text-on-surface">UPI Digital Settlement (Instant)</p>
+<p class="font-mono text-secondary">Ref UTR: UPI/427618990142/SUCCESS</p>
+<p class="text-secondary">Cashier: Rajesh Verma (Staff ID: #STF-04)</p>
+<p class="text-secondary">Fulfillment: Over-the-counter Carry Bag</p>
+</div>
+</div>
+<!-- A4 Items Table -->
+<div class="py-4">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="bg-surface-container-low text-secondary font-table-header text-table-header uppercase border-b border-surface-container-high">
+<th class="py-2.5 px-3">#</th>
+<th class="py-2.5 px-3">Item &amp; Description</th>
+<th class="py-2.5 px-3">HSN Code</th>
+<th class="py-2.5 px-3 text-center">Size</th>
+<th class="py-2.5 px-3 text-center">Qty</th>
+<th class="py-2.5 px-3 text-right">Unit Price</th>
+<th class="py-2.5 px-3 text-right">GST %</th>
+<th class="py-2.5 px-3 text-right">Total (INR)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high font-body-sm text-body-sm">
+<tr>
+<td class="py-3 px-3 font-mono text-secondary">01</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Chanderi Silk Anarkali Suit</div>
+<div class="text-[11px] text-secondary font-mono">SKU: CHN-SLK-042 • Color: Emerald Gold</div>
+</td>
+<td class="py-3 px-3 font-mono text-secondary">6204</td>
+<td class="py-3 px-3 text-center font-mono">XL</td>
+<td class="py-3 px-3 text-center font-mono font-medium">1</td>
+<td class="py-3 px-3 text-right font-mono">₹3,124.11</td>
+<td class="py-3 px-3 text-right font-mono text-secondary">12%</td>
+<td class="py-3 px-3 text-right font-mono font-semibold">₹3,499.00</td>
+</tr>
+<tr>
+<td class="py-3 px-3 font-mono text-secondary">02</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Kashmiri Thread Stole</div>
+<div class="text-[11px] text-secondary font-mono">SKU: KSH-STL-STD • Hand-embroidered</div>
+</td>
+<td class="py-3 px-3 font-mono text-secondary">6214</td>
+<td class="py-3 px-3 text-center font-mono">Free</td>
+<td class="py-3 px-3 text-center font-mono font-medium">1</td>
+<td class="py-3 px-3 text-right font-mono">₹1,339.28</td>
+<td class="py-3 px-3 text-right font-mono text-secondary">12%</td>
+<td class="py-3 px-3 text-right font-mono font-semibold">₹1,500.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- A4 Totals & Tax Summary -->
+<div class="grid grid-cols-12 gap-6 pt-4 border-t border-surface-container-high">
+<div class="col-span-7 space-y-3">
+<div class="p-3 rounded bg-surface-container-low text-xs space-y-1">
+<span class="font-semibold text-on-surface">GST Tax Breakdown (Intrastate 12%):</span>
+<div class="grid grid-cols-3 gap-2 font-mono text-[11px] pt-1">
+<div>Taxable: <span class="font-medium text-on-surface">₹4,463.39</span></div>
+<div>CGST 6%: <span class="font-medium text-on-surface">₹267.80</span></div>
+<div>SGST 6%: <span class="font-medium text-on-surface">₹267.80</span></div>
+</div>
+</div>
+<div class="text-[11px] text-secondary space-y-0.5">
+<p class="font-semibold text-on-surface">Declaration &amp; Terms:</p>
+<p>1. We declare that this invoice shows the actual price of goods described and that all particulars are true and correct.</p>
+<p>2. Subject to Jaipur jurisdiction only. Goods once sold can only be exchanged within 7 days with intact barcode tags.</p>
+</div>
+</div>
+<div class="col-span-5 space-y-1.5 text-xs text-right">
+<div class="flex justify-between text-secondary">
+<span>Subtotal (Excl. Tax):</span>
+<span class="font-mono">₹4,463.39</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>Total Tax (GST 12%):</span>
+<span class="font-mono">₹535.61</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>Discount / Coupon:</span>
+<span class="font-mono">₹0.00</span>
+</div>
+<div class="flex justify-between text-secondary">
+<span>Round off adjustment:</span>
+<span class="font-mono">₹0.00</span>
+</div>
+<div class="flex justify-between items-baseline pt-3 border-t-2 border-surface-container-high text-on-surface">
+<span class="font-headline-sm text-headline-sm font-bold uppercase">Grand Total:</span>
+<span class="font-headline-lg text-headline-lg font-mono font-bold text-primary">₹4,999.00</span>
+</div>
+<div class="pt-6 text-center text-xs text-secondary">
+<p class="font-semibold text-on-surface">For Tulsi Collection</p>
+<div class="h-9 flex items-center justify-center italic text-secondary text-[11px]">
+                  [ Digitally Signed &amp; Authorized ]
+                </div>
+<p class="text-[10px]">Authorised Signatory</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer Status & Dismiss Bar -->
+<footer class="px-5 py-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+<div class="flex items-center gap-2 text-xs text-secondary">
+<span class="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse"></span>
+<span class="font-medium text-on-surface">TSC TE200 Thermal</span>
+<span class="text-secondary">• USB Direct • 80mm Continuous Paper Roll</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[11px] text-secondary hidden lg:inline">Press <kbd class="px-1 py-0.5 rounded bg-surface-container-high text-on-surface font-mono text-[10px]">Esc</kbd> or click outside to dismiss</span>
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors" onclick="closeInvoiceModal()" type="button">
+            Close Preview
+          </button>
+</div>
+</footer>
+</div>
+</div>
+<!-- Print Toast Notification (Interactive Feedback) -->
+<div class="fixed bottom-6 right-6 z-[60] bg-on-surface text-surface-container-lowest px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none" id="printNotificationToast">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-surface-container-lowest">Spooling to Printer...</span>
+<span class="text-[11px] text-secondary-fixed">Sent ticket INV-20261003-0089 to TSC TE200</span>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+    // Tab format switcher: Thermal (80mm) vs A4 Full Invoice
+    function switchFormat(format) {
+      const thermalBtn = document.getElementById('formatThermalBtn');
+      const a4Btn = document.getElementById('formatA4Btn');
+      const thermalView = document.getElementById('thermalReceiptView');
+      const a4View = document.getElementById('a4InvoiceView');
+
+      if (format === 'thermal') {
+        thermalBtn.className = "px-3 py-1.5 rounded-md font-label-md text-label-md flex items-center gap-1.5 transition-all bg-surface-container-lowest text-primary shadow-sm";
+        thermalBtn.setAttribute('aria-selected', 'true');
+        a4Btn.className = "px-3 py-1.5 rounded-md font-label-md text-label-md flex items-center gap-1.5 transition-all text-secondary hover:text-on-surface";
+        a4Btn.setAttribute('aria-selected', 'false');
+
+        thermalView.classList.remove('hidden');
+        a4View.classList.add('hidden');
+      } else {
+        a4Btn.className = "px-3 py-1.5 rounded-md font-label-md text-label-md flex items-center gap-1.5 transition-all bg-surface-container-lowest text-primary shadow-sm";
+        a4Btn.setAttribute('aria-selected', 'true');
+        thermalBtn.className = "px-3 py-1.5 rounded-md font-label-md text-label-md flex items-center gap-1.5 transition-all text-secondary hover:text-on-surface";
+        thermalBtn.setAttribute('aria-selected', 'false');
+
+        a4View.classList.remove('hidden');
+        thermalView.classList.add('hidden');
+      }
+    }
+
+    // Modal Close Handler
+    function closeInvoiceModal() {
+      const backdrop = document.getElementById('invoiceModalBackdrop');
+      const card = document.getElementById('invoiceModalCard');
+      
+      card.classList.add('scale-95', 'opacity-0');
+      backdrop.classList.add('opacity-0');
+      
+      setTimeout(() => {
+        backdrop.style.display = 'none';
+      }, 200);
+    }
+
+    // Backdrop click detection
+    document.getElementById('invoiceModalBackdrop').addEventListener('click', function(event) {
+      if (event.target === this) {
+        closeInvoiceModal();
+      }
+    });
+
+    // Keyboard 'Esc' key listener
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        const backdrop = document.getElementById('invoiceModalBackdrop');
+        if (backdrop && backdrop.style.display !== 'none') {
+          closeInvoiceModal();
+        }
+      }
+    });
+
+    // Print micro-interaction
+    function triggerPrint() {
+      showToast("Print Spool Initiated", "Ticket INV-20261003-0089 sent to TSC TE200 Thermal Roll.");
+      // Optional actual browser dialog:
+      // setTimeout(() => { window.print(); }, 500);
+    }
+
+    // PDF Download micro-interaction
+    function triggerDownload() {
+      showToast("Generating PDF File", "Receipt INV-20261003-0089.pdf ready for download.");
+    }
+
+    // Toast helper
+    function showToast(title, msg) {
+      const toast = document.getElementById('printNotificationToast');
+      if (!toast) return;
+      toast.querySelector('.font-semibold').textContent = title;
+      toast.querySelector('.text-secondary-fixed').textContent = msg;
+      
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 3200);
+    }
+  </script>
+</div></main></div></body></html>

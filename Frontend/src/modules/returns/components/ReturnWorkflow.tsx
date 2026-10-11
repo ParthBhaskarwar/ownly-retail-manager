@@ -1,15 +1,38 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getAuthHeaders } from '@/shared/utils/auth';
-import { db } from '@/db/db';
+import { apiClient } from '@/lib/apiClient';
+
+interface ReturnableItem {
+  id: string;
+  productName: string;
+  variantName: string;
+  barcode: string;
+  finalPrice: number | string;
+  refundableAmount: number;
+  status: string;
+  eligibleForReturn: boolean;
+  isAlreadyReturned: boolean;
+}
+
+interface ReturnInvoice {
+  invoice: { id: string; invoiceNumber: string; customerName?: string | null; grandTotal: number | string };
+  items: ReturnableItem[];
+}
+
+interface ReturnResult {
+  returnNumber: string;
+  totalRefundAmount: number;
+  refundMethod: string;
+  creditNote: { creditNoteNumber: string; originalAmount: number | string; expiryDate: string } | null;
+}
 
 export function ReturnWorkflow() {
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [invoiceData, setInvoiceData] = useState<any>(null);
+  const [invoiceData, setInvoiceData] = useState<ReturnInvoice | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [successResult, setSuccessResult] = useState<any>(null);
+  const [successResult, setSuccessResult] = useState<ReturnResult | null>(null);
 
   const [returnSelection, setReturnSelection] = useState<Record<string, { selected: boolean; condition: string; reason: string }>>({});
   const [refundMethod, setRefundMethod] = useState<'CASH' | 'UPI' | 'CARD' | 'CREDIT_NOTE'>('CASH');
@@ -23,99 +46,42 @@ export function ReturnWorkflow() {
     setInvoiceData(null);
     setSuccessResult(null);
 
-    const tryDexie = async () => {
-      const inv = await db.invoices.where('invoiceNumber').equals(invoiceNumber.trim()).first();
-      if (!inv) return null;
-      const items = await db.invoiceItems.where('invoiceId').equals(inv.id).toArray();
-      return {
-        invoice: {
-          ...inv,
-          invoice_number: inv.invoiceNumber,
-          grand_total: inv.grandTotal,
-          customer_name: inv.customerName,
-          created_at: inv.createdAt,
-        },
-        items: items.map((i: any) => ({
-          ...i,
-          product_name: i.productName,
-          variant_name: i.variantName,
-          final_price: i.finalPrice,
-          eligibleForReturn: i.status === 'ACTIVE',
-          isAlreadyReturned: i.status === 'RETURNED',
-        })),
-      };
-    };
-
     try {
-      const res = await fetch(`/api/returns/eligible/${encodeURIComponent(invoiceNumber.trim())}`, {
-        headers: getAuthHeaders(),
+      const data = await apiClient.get<ReturnInvoice>(
+        `/api/returns/eligible/${encodeURIComponent(invoiceNumber.trim())}`
+      );
+      setInvoiceData(data);
+      const initSel: Record<string, { selected: boolean; condition: string; reason: string }> = {};
+      data.items.forEach((item) => {
+        if (item.eligibleForReturn) {
+          initSel[item.id] = { selected: false, condition: 'RESELLABLE', reason: '' };
+        }
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        setInvoiceData(data);
-        const initSel: Record<string, { selected: boolean; condition: string; reason: string }> = {};
-        (data.items || []).forEach((item: any) => {
-          if (item.eligibleForReturn) {
-            initSel[item.id] = { selected: false, condition: 'RESELLABLE', reason: '' };
-          }
-        });
-        setReturnSelection(initSel);
-      } else {
-        const offlineData = await tryDexie();
-        if (offlineData) {
-          setInvoiceData(offlineData);
-          const initSel: Record<string, { selected: boolean; condition: string; reason: string }> = {};
-          offlineData.items.forEach((item: any) => {
-            if (item.eligibleForReturn) {
-              initSel[item.id] = { selected: false, condition: 'RESELLABLE', reason: '' };
-            }
-          });
-          setReturnSelection(initSel);
-        } else {
-          const errData = await res.json().catch(() => ({}));
-          setError((errData as any).error || 'Invoice not found.');
-        }
-      }
-    } catch {
-      try {
-        const offlineData = await tryDexie();
-        if (offlineData) {
-          setInvoiceData(offlineData);
-          const initSel: Record<string, { selected: boolean; condition: string; reason: string }> = {};
-          offlineData.items.forEach((item: any) => {
-            if (item.eligibleForReturn) {
-              initSel[item.id] = { selected: false, condition: 'RESELLABLE', reason: '' };
-            }
-          });
-          setReturnSelection(initSel);
-        } else {
-          setError('Invoice not found. Please verify the invoice number.');
-        }
-      } catch {
-        setError('Could not search invoice. Check your connection.');
-      }
+      setReturnSelection(initSel);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not search the invoice.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const selectedItemsList = Object.entries(returnSelection)
-    .filter(([_, val]) => val.selected)
+    .filter(([, val]) => val.selected)
     .map(([id, val]) => {
-      const item = invoiceData?.items?.find((i: any) => i.id === id);
+      const item = invoiceData?.items.find((i) => i.id === id);
       return {
         invoiceItemId: id,
         condition: val.condition,
         reason: val.reason,
-        refundAmount: parseFloat(item?.final_price ?? item?.finalPrice ?? 0),
+        // Shown to the cashier; the server recomputes and enforces the real amount.
+        refundAmount: Number(item?.refundableAmount ?? 0),
       };
     });
 
   const totalRefundAmount = selectedItemsList.reduce((sum, item) => sum + item.refundAmount, 0);
 
   const handleSubmitReturn = async () => {
-    if (selectedItemsList.length === 0) {
+    if (!invoiceData || selectedItemsList.length === 0) {
       setError('Please select at least one item to return.');
       return;
     }
@@ -124,28 +90,21 @@ export function ReturnWorkflow() {
     setError(null);
 
     try {
-      const res = await fetch('/api/returns', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify({
-          originalInvoiceId: invoiceData.invoice.id,
-          items: selectedItemsList,
-          refundMethod,
-          notes: 'Customer return processed via POS',
-        }),
+      const result = await apiClient.post<ReturnResult>('/api/returns', {
+        originalInvoiceId: invoiceData.invoice.id,
+        items: selectedItemsList.map(({ invoiceItemId, condition, reason }) => ({
+          invoiceItemId,
+          condition,
+          reason: reason || undefined,
+        })),
+        refundMethod,
+        notes: 'Customer return processed via POS',
       });
-
-      if (res.ok) {
-        const result = await res.json();
-        setSuccessResult(result);
-        setInvoiceData(null);
-        setReturnSelection({});
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        setError((errData as any).error || 'Failed to process return.');
-      }
-    } catch {
-      setError('Network error. Please check your connection and try again.');
+      setSuccessResult(result);
+      setInvoiceData(null);
+      setReturnSelection({});
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process return.');
     } finally {
       setIsLoading(false);
     }
@@ -222,9 +181,9 @@ export function ReturnWorkflow() {
           {successResult.creditNote && (
             <div style={{ background: '#FFFFFF', border: '1.5px solid var(--color-paid-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', textAlign: 'left', width: '100%', maxWidth: '380px' }}>
               <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-ink-muted)', fontWeight: 'var(--font-bold)' }}>Store Credit Note Voucher</div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-denim-dark)', margin: 'var(--space-1) 0' }}>{successResult.creditNote.credit_note_number}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-denim-dark)', margin: 'var(--space-1) 0' }}>{successResult.creditNote.creditNoteNumber}</div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)' }}>
-                Value: ₹{parseFloat(successResult.creditNote.original_amount).toFixed(2)} • Expires: {successResult.creditNote.expiry_date}
+                Value: ₹{Number(successResult.creditNote.originalAmount).toFixed(2)} • Expires: {successResult.creditNote.expiryDate}
               </div>
             </div>
           )}
@@ -247,16 +206,16 @@ export function ReturnWorkflow() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>Invoice:</span>
-                <code style={{ fontFamily: 'var(--font-mono)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>{invoiceData.invoice.invoice_number}</code>
+                <code style={{ fontFamily: 'var(--font-mono)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>{invoiceData.invoice.invoiceNumber}</code>
               </div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', marginTop: '2px' }}>
-                Customer: <strong>{invoiceData.invoice.customer_name || 'Walk-in Customer'}</strong>
+                Customer: <strong>{invoiceData.invoice.customerName || 'Walk-in Customer'}</strong>
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>Original Total</div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>
-                ₹{parseFloat(invoiceData.invoice.grand_total).toFixed(2)}
+                ₹{Number(invoiceData.invoice.grandTotal).toFixed(2)}
               </div>
             </div>
           </div>
@@ -268,10 +227,10 @@ export function ReturnWorkflow() {
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              {invoiceData.items.map((item: any) => {
+              {invoiceData.items.map((item) => {
                 const sel = returnSelection[item.id] || { selected: false, condition: 'RESELLABLE', reason: '' };
                 const eligible = item.eligibleForReturn;
-                const alreadyReturned = item.isAlreadyReturned || item.status === 'RETURNED';
+                const alreadyReturned = item.isAlreadyReturned;
 
                 return (
                   <div
@@ -301,9 +260,9 @@ export function ReturnWorkflow() {
                           />
                         )}
                         <div>
-                          <div style={{ fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>{item.product_name || item.productName}</div>
+                          <div style={{ fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>{item.productName}</div>
                           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', display: 'flex', gap: 'var(--space-2)', marginTop: '2px' }}>
-                            <span>Size: <strong>{item.variant_name || item.variantName}</strong></span>
+                            <span>Size: <strong>{item.variantName}</strong></span>
                             <span>• Barcode: <code>{item.barcode}</code></span>
                           </div>
                         </div>
@@ -311,7 +270,7 @@ export function ReturnWorkflow() {
 
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>
-                          ₹{parseFloat(item.final_price ?? item.finalPrice ?? 0).toFixed(2)}
+                          ₹{Number(item.refundableAmount ?? item.finalPrice ?? 0).toFixed(2)}
                         </div>
                         {alreadyReturned && (
                           <span className="badge badge--neutral badge--sm" style={{ marginTop: '4px' }}>Already Returned</span>

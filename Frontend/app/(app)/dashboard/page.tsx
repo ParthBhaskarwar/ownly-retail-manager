@@ -1,20 +1,51 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthContext } from '@/context/AuthContext';
 import { useStoreContext } from '@/context/StoreContext';
 import { StoreService } from '@/modules/store/services/StoreService';
 import { OnboardingChecklist } from '@/modules/store/components/OnboardingChecklist';
+import { RestockRemindersCard } from '@/modules/restock/components/RestockRemindersCard';
+import { AiOverviewCard } from '@/modules/ai/components/AiOverviewCard';
+import { evaluatePermission } from '@/config/permissions';
+import type { Role } from '@/modules/account/types';
+import { ReportService } from '@/modules/reports/services/ReportService';
+import { BackupService, getBackupStatus } from '@/modules/backup/services/BackupService';
+import { apiClient } from '@/lib/apiClient';
 import { PermissionGuard } from '@/shared/components/PermissionGuard';
-import { db } from '@/db/db';
 import type { OnboardingStep } from '@/modules/store/types';
+import type { SalesReportSummary, InventoryValuationSummary, StockAgeingSummary } from '@/modules/reports/types';
+import type { BackupStatus } from '@/modules/backup/types';
+
+function fmt(n: number): string {
+  return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const { store } = useStoreContext();
+  const storeId = user?.storeId || store?.id || '';
+
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
-  const showChecklist = !store?.setupCompleted;
+  const [salesReport, setSalesReport] = useState<SalesReportSummary | null>(null);
+  const [valuation, setValuation] = useState<InventoryValuationSummary | null>(null);
+  const [ageing, setAgeing] = useState<StockAgeingSummary | null>(null);
+  const [storageHealth, setStorageHealth] = useState<BackupStatus | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showBanner, setShowBanner] = useState(true);
+
+  const role = user?.role as Role | undefined;
+  const can = (key: Parameters<typeof evaluatePermission>[1]) => !!role && evaluatePermission(role, key);
+  const canReports = can('reports:view');
+  // Only while something required is still outstanding; a finished checklist is just noise.
+  const needsSetup = steps.some((st) => !st.completed && !st.optional && st.key !== 'setup_complete');
+  const showChecklist = role === 'OWNER' && !store?.setupCompleted && needsSetup;
+  const ageTotal = ageing
+    ? ageing.bins.age0To30Days.count + ageing.bins.age31To60Days.count + ageing.bins.age61To90Days.count + ageing.bins.ageOver90Days.count
+    : 0;
+  const pct = (n: number) => (ageTotal > 0 ? (n / ageTotal) * 100 : 0);
 
   const [stats, setStats] = useState({
     todaySales: 0,
@@ -27,44 +58,36 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    const s = StoreService.getOnboardingSteps(user.id, store, user);
-    setSteps(s);
 
-    // Calculate live dashboard stats from Dexie DB
+    const loadSteps = async () => {
+      try {
+        const onboarding = await StoreService.fetchOnboardingState();
+        const s = StoreService.getOnboardingSteps(user.id, store, user, onboarding.staffAdded);
+        setSteps(s);
+      } catch {
+        const s = StoreService.getOnboardingSteps(user.id, store, user);
+        setSteps(s);
+      }
+    };
+    loadSteps();
+
     const loadDashboardData = async () => {
       try {
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const allInvoices = await db.invoices.toArray().catch(() => []);
-        const todayInvoices = allInvoices.filter((inv) =>
-          inv.createdAt?.startsWith(todayStr)
-        );
-
-        const sales = todayInvoices.reduce(
-          (sum, inv) => sum + (Number(inv.grandTotal) || 0),
-          0
-        );
-
-        const prodsCount = await db.products.count().catch(() => 0);
-        const invItems = await db.inventoryItems
-          .where('status')
-          .equals('IN_STOCK')
-          .count()
-          .catch(() => 0);
-        const returns = await db.returns.count().catch(() => 0);
+        const data = await apiClient.get<{
+          salesKpi?: { todayRevenue?: number; todayOrders?: number };
+          stockKpi?: { totalProducts?: number; totalInStock?: number; returnsToday?: number };
+          recentInvoices?: any[];
+        }>('/api/dashboard/summary');
 
         setStats({
-          todaySales: sales,
-          ordersToday: todayInvoices.length,
-          totalProducts: prodsCount,
-          inStockItems: invItems,
-          returnsCount: returns,
+          todaySales: data.salesKpi?.todayRevenue ?? 0,
+          ordersToday: data.salesKpi?.todayOrders ?? 0,
+          totalProducts: data.stockKpi?.totalProducts ?? 0,
+          inStockItems: data.stockKpi?.totalInStock ?? 0,
+          returnsCount: data.stockKpi?.returnsToday ?? 0,
         });
 
-        // Top 5 recent invoices
-        const sorted = [...allInvoices].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ).slice(0, 5);
-        setRecentInvoices(sorted);
+        setRecentInvoices(data.recentInvoices ?? []);
       } catch (e) {
         console.error('[DASHBOARD_DATA_ERROR]', e);
       }
@@ -73,168 +96,276 @@ export default function DashboardPage() {
     loadDashboardData();
   }, [user, store]);
 
+  useEffect(() => {
+    if (!storeId) return;
+    let isMounted = true;
+    setIsLoading(true);
+
+    const role = user?.role as Role | undefined;
+    const canReports = !!role && evaluatePermission(role, 'reports:view');
+    const canBackup = !!role && evaluatePermission(role, 'settings:edit');
+
+    Promise.allSettled([
+      canReports ? ReportService.getSalesReport(storeId) : Promise.resolve(null),
+      canReports ? ReportService.getInventoryValuationReport(storeId) : Promise.resolve(null),
+      canReports ? ReportService.getStockAgeingReport(storeId) : Promise.resolve(null),
+      canBackup ? BackupService.getHealth() : Promise.resolve(null),
+    ])
+      .then(([s, v, a, h]) => {
+        if (!isMounted) return;
+        if (s.status === 'fulfilled') setSalesReport(s.value);
+        if (v.status === 'fulfilled') setValuation(v.value);
+        if (a.status === 'fulfilled') setAgeing(a.value);
+        if (h.status === 'fulfilled' && h.value) setStorageHealth(getBackupStatus(h.value.latestBackupAt));
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [storeId, user?.role]);
+
   return (
     <PermissionGuard permissionKey="dashboard:view">
-      <div className="dashboard">
-        {/* Welcome Header */}
-        <div className="page-header" style={{ alignItems: 'center' }}>
+      <div className="dash-container animate-fade-in-up">
+        
+        <div className="dash-header">
           <div>
-            <h1 className="page-title">
-              Welcome back, {user?.name?.split(' ')[0] || 'Retailer'} 👋
-            </h1>
-            <p className="page-subtitle">
-              {store?.name || 'Ownly Retail POS'} • Store Operational Dashboard
-            </p>
+            <h1 className="dash-title">Shop Overview &amp; Daily Register</h1>
+            <p className="dash-subtitle">Real-time sales, inventory alerts, and quick actions for {store?.name || 'Store'}.</p>
           </div>
-
-          <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
-            <Link href="/billing" className="btn btn-primary" style={{ height: '44px', gap: 'var(--space-2)' }}>
-              ⚡ Open POS Billing
-            </Link>
-            <Link href="/products/new" className="btn btn-secondary" style={{ height: '44px' }}>
-              + Add Product
-            </Link>
+          <div className="dash-actions">
+            {can('inventory:edit') && <Link href="/products/new" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>add</span>
+              Add Product
+            </Link>}
+            {can('inventory:edit') && <Link href="/restock" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>move_to_inbox</span>
+              Restock Inward
+            </Link>}
+            {can('inventory:view') && <Link href="/inventory" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>checklist</span>
+              Inventory Count
+            </Link>}
+            {canReports && <Link href="/reports" className="dash-btn dash-btn-outline">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-ink-secondary)'}}>bar_chart</span>
+              View Reports
+            </Link>}
+            {can('billing:create') && <Link href="/billing" className="dash-btn dash-btn-primary">
+              <span className="material-symbols-outlined">point_of_sale</span>
+              New Sale (POS)
+            </Link>}
           </div>
         </div>
 
-        {/* Onboarding checklist (shown until setup is complete) */}
+        {can('settings:edit') && storageHealth?.backupDue && showBanner && (
+          <div className="dash-banner">
+            <div className="dash-banner-left">
+              <span className="material-symbols-outlined" style={{color: 'var(--color-caution)'}}>shield</span>
+              <div className="dash-banner-text">
+                <strong>System Backup Due:</strong> Your store data has not been backed up recently. Weekly backups are recommended.
+              </div>
+            </div>
+            <div className="dash-banner-actions">
+              <Link href="/backup" className="dash-banner-btn">
+                <span className="material-symbols-outlined" style={{fontSize: '16px'}}>cloud_upload</span>
+                Create Backup Now
+              </Link>
+              <button className="dash-banner-close" onClick={() => setShowBanner(false)} aria-label="Dismiss Banner">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {showChecklist && steps.length > 0 && (
-          <div className="dashboard__onboarding">
+          <div style={{ marginBottom: 'var(--space-4)' }}>
             <OnboardingChecklist steps={steps} />
           </div>
         )}
 
-        {/* Live Statistics Cards */}
-        <div className="dashboard-stats">
-          <div className="card stat-card">
-            <div className="stat-card__icon" style={{ color: 'var(--color-paid)' }}>₹</div>
-            <div className="stat-card__value" style={{ color: 'var(--color-paid)' }}>
-              ₹{stats.todaySales.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        <div className="dash-kpi-grid">
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Today's Sales</span>
+              <span className="material-symbols-outlined">payments</span>
             </div>
-            <div className="stat-card__label">Today's Sales Revenue</div>
+            <div>
+              <div className="dash-kpi-value">{fmt(stats.todaySales || 0)}</div>
+            </div>
           </div>
 
-          <div className="card stat-card">
-            <div className="stat-card__icon" style={{ color: 'var(--color-denim)' }}>🧾</div>
-            <div className="stat-card__value">
-              {stats.ordersToday}
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Orders Today</span>
+              <span className="material-symbols-outlined">receipt</span>
             </div>
-            <div className="stat-card__label">Orders Completed Today</div>
+            <div>
+              <div className="dash-kpi-value">{stats.ordersToday || 0} <span>bills</span></div>
+            </div>
           </div>
 
-          <div className="card stat-card">
-            <div className="stat-card__icon" style={{ color: 'var(--color-caution)' }}>📦</div>
-            <div className="stat-card__value">
-              {stats.totalProducts}
+          {canReports && <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Gross Profit</span>
+              <span className="material-symbols-outlined">account_balance_wallet</span>
             </div>
-            <div className="stat-card__label">Catalog Products</div>
+            <div>
+              <div className="dash-kpi-value">{fmt(salesReport?.grossProfit || 0)}</div>
+              <div className="dash-kpi-trend positive">
+                {salesReport?.grossMarginPercent ? salesReport.grossMarginPercent.toFixed(1) : '0.0'}% realized margin
+              </div>
+            </div>
+          </div>}
+
+          <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">In-Stock Units</span>
+              <span className="material-symbols-outlined">inventory_2</span>
+            </div>
+            <div>
+              <div className="dash-kpi-value">{stats.inStockItems || 0} <span>pcs</span></div>
+              <div className="dash-kpi-desc">Across {stats.totalProducts || 0} SKUs</div>
+            </div>
           </div>
 
-          <div className="card stat-card">
-            <div className="stat-card__icon" style={{ color: 'var(--color-denim-dark)' }}>🏷️</div>
-            <div className="stat-card__value">
-              {stats.inStockItems}
+          {canReports && <div className="dash-kpi-card">
+            <div className="dash-kpi-header">
+              <span className="dash-kpi-title">Stock Value (Cost)</span>
+              <span className="material-symbols-outlined">savings</span>
             </div>
-            <div className="stat-card__label">In-Stock Retail Units</div>
+            <div>
+              <div className="dash-kpi-value">{fmt(valuation?.totalStockCostValue || 0)}</div>
+            </div>
+          </div>}
+        </div>
+
+        <div className="dash-layout-grid">
+          <div className="dash-col-7">
+            <RestockRemindersCard storeId={storeId} />
+          </div>
+
+          <div className="dash-col-5">
+            {canReports && <div className="dash-card">
+              <div className="dash-card-header">
+                <div>
+                  <h2 className="dash-card-title">Stock Ageing Analysis</h2>
+                </div>
+                <span className="dash-card-subtitle">Total: {ageTotal} pcs</span>
+              </div>
+              <div className="dash-card-body">
+                <div className="dash-ageing-bar">
+                  <div style={{width: pct(ageing?.bins.age0To30Days.count || 0) + '%', backgroundColor: 'var(--color-paid)'}}></div>
+                  <div style={{width: pct(ageing?.bins.age31To60Days.count || 0) + '%', backgroundColor: 'var(--color-denim)'}}></div>
+                  <div style={{width: pct(ageing?.bins.age61To90Days.count || 0) + '%', backgroundColor: 'var(--color-caution)'}}></div>
+                  <div style={{width: pct(ageing?.bins.ageOver90Days.count || 0) + '%', backgroundColor: 'var(--color-return)'}}></div>
+                </div>
+                
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-paid)'}}></span>
+                    <span style={{fontWeight: 500}}>0 - 30 Days</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600}}>{ageing?.bins.age0To30Days.count || 0} pcs</span> ({fmt(ageing?.bins.age0To30Days.value || 0)})
+                  </div>
+                </div>
+
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-denim)'}}></span>
+                    <span style={{fontWeight: 500}}>31 - 60 Days</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600}}>{ageing?.bins.age31To60Days.count || 0} pcs</span> ({fmt(ageing?.bins.age31To60Days.value || 0)})
+                  </div>
+                </div>
+
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-caution)'}}></span>
+                    <span style={{fontWeight: 500}}>61 - 90 Days</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600}}>{ageing?.bins.age61To90Days.count || 0} pcs</span> ({fmt(ageing?.bins.age61To90Days.value || 0)})
+                  </div>
+                </div>
+
+                <div className="dash-ageing-row">
+                  <div className="dash-ageing-label">
+                    <span className="dash-ageing-dot" style={{backgroundColor: 'var(--color-return)'}}></span>
+                    <span style={{fontWeight: 500}}>90+ Days (Dead Stock Risk)</span>
+                  </div>
+                  <div>
+                    <span style={{fontWeight: 600, color: 'var(--color-return)'}}>{ageing?.bins.ageOver90Days.count || 0} pcs</span> ({fmt(ageing?.bins.ageOver90Days.value || 0)})
+                  </div>
+                </div>
+
+                {ageing && ageing.slowMovingProducts.length > 0 && (
+                  <div className="dash-ageing-warning">
+                    <span className="material-symbols-outlined" style={{color: 'var(--color-caution)', fontSize: '18px'}}>hourglass_bottom</span>
+                    <div style={{fontSize: '12px', color: 'var(--color-ink-secondary)'}}>
+                      <span style={{fontWeight: 600, color: 'var(--color-ink)'}}>Oldest active SKU:</span> {ageing.slowMovingProducts[0].productName} — in inventory for <span style={{fontWeight: 600, color: 'var(--color-return)'}}>{ageing.slowMovingProducts[0].oldestItemAgeDays} days</span>.
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>}
+
+            {user && evaluatePermission(user.role as Role, 'reports:view') && <AiOverviewCard />}
+
           </div>
         </div>
 
-        {/* Core Workflows Navigation Grid */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          <div className="form-section__title">Retail Operations &amp; Workflows</div>
-          <div className="workflows-grid">
-            <Link href="/billing" className="workflow-card">
-              <div className="workflow-card__icon-wrap" style={{ color: 'var(--color-denim-dark)' }}>
-                ⊟
-              </div>
-              <h3 className="workflow-card__title">Point-of-Sale (POS)</h3>
-              <p className="workflow-card__desc">
-                High-speed barcode checkout, line discounts, customer selection, and split tender payments.
-              </p>
-            </Link>
-
-            <Link href="/invoices" className="workflow-card">
-              <div className="workflow-card__icon-wrap" style={{ color: 'var(--color-info)' }}>
-                📄
-              </div>
-              <h3 className="workflow-card__title">Invoices &amp; Receipts</h3>
-              <p className="workflow-card__desc">
-                Browse sales history, filter by status, and print 80mm thermal receipts or A4 tax invoices.
-              </p>
-            </Link>
-
-            <Link href="/returns" className="workflow-card">
-              <div className="workflow-card__icon-wrap" style={{ color: 'var(--color-return)' }}>
-                ↩
-              </div>
-              <h3 className="workflow-card__title">Returns &amp; Refunds</h3>
-              <p className="workflow-card__desc">
-                Search invoices, inspect condition tags, and issue instant refunds or store credit note vouchers.
-              </p>
-            </Link>
-
-            <Link href="/exchanges" className="workflow-card">
-              <div className="workflow-card__icon-wrap" style={{ color: 'var(--color-denim)' }}>
-                ⇄
-              </div>
-              <h3 className="workflow-card__title">Product Exchanges</h3>
-              <p className="workflow-card__desc">
-                Swap item sizes or models with automated price difference collection/refund calculations.
-              </p>
-            </Link>
-          </div>
-        </div>
-
-        {/* Recent Invoices Table */}
-        {recentInvoices.length > 0 && (
-          <div className="cart-panel">
-            <div className="cart-panel__header">
-              <span className="cart-panel__title">Recent Sales Transactions</span>
-              <Link href="/invoices" className="link-btn" style={{ fontSize: 'var(--text-xs)' }}>
-                View All Invoices →
-              </Link>
+        {canReports && <div className="dash-card">
+          <div className="dash-card-header">
+            <div>
+              <h2 className="dash-card-title">Top-Selling Garments</h2>
+              <p className="dash-card-subtitle" style={{marginTop: '4px'}}>Ranked by sales revenue across all billing history.</p>
             </div>
-
-            <div style={{ overflowX: 'auto' }}>
-              <table className="cart-table">
-                <thead>
-                  <tr>
-                    <th>Invoice #</th>
-                    <th>Customer</th>
-                    <th style={{ textAlign: 'right' }}>Amount</th>
-                    <th style={{ textAlign: 'center' }}>Status</th>
-                    <th style={{ textAlign: 'right' }}>Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentInvoices.map((inv) => (
-                    <tr key={inv.id}>
+          </div>
+          
+          <div className="dash-table-wrap">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Garment &amp; Variant</th>
+                  <th>SKU</th>
+                  <th style={{textAlign: 'center'}}>Units Sold</th>
+                  <th style={{textAlign: 'right'}}>Revenue</th>
+                  <th style={{textAlign: 'right'}}>Gross Profit</th>
+                  <th style={{textAlign: 'right'}}>Margin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salesReport && salesReport.salesByProduct.length > 0 ? (
+                  salesReport.salesByProduct.slice(0, 5).map((p) => (
+                    <tr key={p.sku}>
                       <td>
-                        <code style={{ fontFamily: 'var(--font-mono)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)', background: 'var(--color-paper)', padding: '2px 6px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--color-border)' }}>
-                          {inv.invoiceNumber}
-                        </code>
+                        <div style={{fontWeight: 600, color: 'var(--color-ink)'}}>{p.productName}</div>
                       </td>
-                      <td style={{ fontWeight: 'var(--font-medium)' }}>
-                        {inv.customerName || 'Walk-in Customer'}
-                      </td>
-                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 'var(--font-bold)' }}>
-                        ₹{parseFloat(inv.grandTotal || 0).toFixed(2)}
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <span className="badge badge--success badge--sm">
-                          {inv.status}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'right', fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
-                        {new Date(inv.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      <td style={{color: 'var(--color-ink-secondary)', fontSize: '12px'}}>{p.sku}</td>
+                      <td style={{textAlign: 'center', fontWeight: 500}}>{p.unitsSold}</td>
+                      <td style={{textAlign: 'right', fontWeight: 600}}>{fmt(p.revenue)}</td>
+                      <td style={{textAlign: 'right', color: 'var(--color-ink-secondary)'}}>{fmt(p.profit)}</td>
+                      <td style={{textAlign: 'right'}}>
+                        <span className="dash-status-pill success">{p.margin.toFixed(1)}%</span>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} style={{textAlign: 'center', color: 'var(--color-ink-muted)', padding: '32px'}}>
+                      No sales yet. Scan a product barcode in POS Billing to make your first sale.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>}
       </div>
     </PermissionGuard>
   );

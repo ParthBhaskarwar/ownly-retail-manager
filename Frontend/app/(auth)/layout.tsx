@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
+// The root layout's template already appends "| Ownly"; repeating it here produced
+// "Sign In | Ownly | Ownly".
 export const metadata: Metadata = {
-  title: {
-    default: 'Sign In | Ownly',
-    template: '%s | Ownly',
-  },
+  title: 'Sign In',
 };
 
 export default function AuthLayout({ children }: { children: ReactNode }) {

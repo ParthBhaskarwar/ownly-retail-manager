@@ -5,15 +5,20 @@
   "description": "Ownly AI Retail Manager — REST API backend",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/app.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/app.js",
     "lint": "eslint src --ext .ts",
     "test": "jest --runInBand",
     "db:migrate": "knex migrate:latest --knexfile src/db/knexfile.ts",
     "db:rollback": "knex migrate:rollback --knexfile src/db/knexfile.ts",
-    "db:seed": "knex seed:run --knexfile src/db/knexfile.ts"
+    "db:seed": "knex seed:run --knexfile src/db/knexfile.ts",
+    "ai:probe": "ts-node -r tsconfig-paths/register --transpile-only src/scripts/embedding-probe.ts",
+    "ai:backfill": "ts-node -r tsconfig-paths/register --transpile-only src/scripts/backfill-embeddings.ts",
+    "data:load-synthetic": "ts-node -r tsconfig-paths/register --transpile-only src/scripts/load-synthetic.ts",
+    "ai:backtest": "ts-node -r tsconfig-paths/register --transpile-only src/scripts/ai-backtest.ts"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.3.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -22,6 +27,7 @@
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
     "pg": "^8.13.0",
+    "sharp": "^0.35.4",
     "uuid": "^9.0.1",
     "zod": "^3.23.8"
   },

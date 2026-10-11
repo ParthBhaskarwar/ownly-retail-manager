@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding - Retail Type - Ownly Retail Manager</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter & Newsreader -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,600&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Newsreader', 'serif'],
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#0F766E',
+              hover: '#0D655E',
+              light: '#0F766E0D', // ~5% opacity
+            },
+            surface: {
+              canvas: '#FAF9F6',
+              border: '#E7E5E4',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-typography">
+    .font-brand-title {
+      font-family: 'Newsreader', serif;
+    }
+  </style>
+</head>
+<body class="bg-[#FAF9F6] text-stone-800 font-sans antialiased min-h-screen flex flex-col justify-center items-center py-12 px-4 selection:bg-[#0F766E] selection:text-white">
+<!-- BEGIN: OnboardingContainer -->
+<main class="w-full max-w-[500px] flex flex-col items-center">
+<!-- BEGIN: BrandHeader -->
+<header class="flex flex-col items-center mb-6 text-center" data-purpose="brand-header">
+<!-- Logo Mark and Text -->
+<div class="flex items-center gap-3 mb-2">
+<div aria-hidden="true" class="w-10 h-10 rounded-xl bg-[#0F766E] flex items-center justify-center shadow-sm">
+<span class="text-white font-serif font-bold text-2xl leading-none select-none">O</span>
+</div>
+<div class="text-left">
+<h1 class="font-serif text-2xl font-bold tracking-tight text-stone-900 leading-none">Ownly</h1>
+<span class="text-[10px] font-semibold tracking-wider text-stone-500 uppercase mt-1 block">Retail Manager</span>
+</div>
+</div>
+</header>
+<!-- END: BrandHeader -->
+<!-- BEGIN: StepperIndicator -->
+<!-- 3-Step Progress Indicator -->
+<nav aria-label="Onboarding Progress" class="w-full max-w-sm mb-6" data-purpose="progress-tracker">
+<div class="flex items-center justify-between relative">
+<!-- Step 1: Active -->
+<div class="flex flex-col items-center relative z-10">
+<div class="flex items-center gap-1.5 pb-1 border-b-2 border-[#0F766E]">
+<span class="w-5 h-5 rounded-full bg-[#0F766E] text-white text-xs font-semibold flex items-center justify-center shadow-xs">
+              1
+            </span>
+<span class="text-xs font-semibold text-[#0F766E]">Retail Type</span>
+</div>
+</div>
+<!-- Connector Line 1-2 -->
+<div aria-hidden="true" class="flex-1 h-[1px] bg-[#E7E5E4] mx-2 -mt-3.5"></div>
+<!-- Step 2: Inactive -->
+<div class="flex flex-col items-center relative z-10">
+<div class="flex items-center gap-1.5 pb-1 border-b-2 border-transparent">
+<span class="w-5 h-5 rounded-full border border-stone-300 text-stone-400 text-xs font-normal flex items-center justify-center">
+              2
+            </span>
+<span class="text-xs font-normal text-stone-400">Store Setup</span>
+</div>
+</div>
+<!-- Connector Line 2-3 -->
+<div aria-hidden="true" class="flex-1 h-[1px] bg-[#E7E5E4] mx-2 -mt-3.5"></div>
+<!-- Step 3: Inactive -->
+<div class="flex flex-col items-center relative z-10">
+<div class="flex items-center gap-1.5 pb-1 border-b-2 border-transparent">
+<span class="w-5 h-5 rounded-full border border-stone-300 text-stone-400 text-xs font-normal flex items-center justify-center">
+              3
+            </span>
+<span class="text-xs font-normal text-stone-400">Done</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- END: StepperIndicator -->
+<!-- BEGIN: RetailTypeSelectionCard -->
+<section class="bg-white border border-[#E7E5E4] rounded-2xl shadow-sm p-8 w-full" data-purpose="retail-type-form">
+<!-- Card Titles -->
+<div class="text-center mb-6">
+<h2 class="font-serif text-2xl font-bold text-stone-900 tracking-tight">
+          What kind of store do you run?
+        </h2>
+<p class="text-sm text-stone-500 mt-2 leading-relaxed">
+          Select your primary retail category to customize catalog attributes and sizing grids.
+        </p>
+</div>
+<!-- Category Selection 2x2 Grid -->
+<div aria-label="Primary retail categories" class="grid grid-cols-2 gap-4 mb-8" role="radiogroup">
+<!-- Category 1: Clothing (Selected) -->
+<div aria-checked="true" class="relative flex flex-col text-left p-4 rounded-xl border-2 border-[#0F766E] bg-[#0F766E]/5 cursor-pointer transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:ring-offset-2" role="radio" tabindex="0">
+<!-- Selection Check Badge -->
+<div class="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#0F766E] text-white flex items-center justify-center shadow-xs">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<!-- Apparel / Hanger Icon -->
+<div class="w-9 h-9 rounded-lg bg-white border border-[#0F766E]/20 flex items-center justify-center text-[#0F766E] mb-3 shadow-xs">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M12 4a3 3 0 00-3 3c0 .828.672 1.5 1.5 1.5H12m0 0l7.5 4.5a2 2 0 011 1.732V19a2 2 0 01-2 2H5.5a2 2 0 01-2-2v-4.268a2 2 0 011-1.732L12 8.5z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-semibold text-base text-stone-900 leading-tight">Clothing</span>
+<span class="text-xs text-stone-500 mt-1 leading-snug">Apparel, ethnic wear, fabrics &amp; sizing</span>
+</div>
+<!-- Category 2: Footwear -->
+<div aria-checked="false" class="relative flex flex-col text-left p-4 rounded-xl border border-[#E7E5E4] bg-white hover:border-stone-300 hover:bg-stone-50/50 cursor-pointer transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:ring-offset-2" role="radio" tabindex="0">
+<!-- Sneaker / Shoe Icon -->
+<div class="w-9 h-9 rounded-lg bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 mb-3">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M3 17h18m-18 0a2 2 0 002 2h14a2 2 0 002-2m-18 0v-4a2 2 0 012-2h4l4-3h4a3 3 0 013 3v4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-medium text-base text-stone-800 leading-tight">Footwear</span>
+<span class="text-xs text-stone-500 mt-1 leading-snug">Shoes, sandals, heels &amp; size runs</span>
+</div>
+<!-- Category 3: Accessories -->
+<div aria-checked="false" class="relative flex flex-col text-left p-4 rounded-xl border border-[#E7E5E4] bg-white hover:border-stone-300 hover:bg-stone-50/50 cursor-pointer transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:ring-offset-2" role="radio" tabindex="0">
+<!-- Handbag / Watch Icon -->
+<div class="w-9 h-9 rounded-lg bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 mb-3">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-medium text-base text-stone-800 leading-tight">Accessories</span>
+<span class="text-xs text-stone-500 mt-1 leading-snug">Bags, jewelry, belts &amp; stoles</span>
+</div>
+<!-- Category 4: General Store -->
+<div aria-checked="false" class="relative flex flex-col text-left p-4 rounded-xl border border-[#E7E5E4] bg-white hover:border-stone-300 hover:bg-stone-50/50 cursor-pointer transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:ring-offset-2" role="radio" tabindex="0">
+<!-- Storefront Icon -->
+<div class="w-9 h-9 rounded-lg bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-500 mb-3">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="font-medium text-base text-stone-800 leading-tight">General Store</span>
+<span class="text-xs text-stone-500 mt-1 leading-snug">Multi-category boutique items</span>
+</div>
+</div>
+<!-- Action Button -->
+<div>
+<button class="w-full bg-[#0F766E] hover:bg-[#0D655E] active:bg-[#0b544e] text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:ring-offset-2" type="button">
+<span>Continue</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</section>
+<!-- END: RetailTypeSelectionCard -->
+<!-- BEGIN: StepFooterMicrocopy -->
+<footer class="text-center mt-6 flex items-center justify-center gap-1.5 text-xs text-stone-400" data-purpose="footer-status">
+<svg class="w-3.5 h-3.5 text-stone-400 inline-block flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect>
+<path d="M7 11V7a5 5 0 0110 0v4"></path>
+</svg>
+<span>Step 1 of 3 • You can adjust categories anytime in Settings</span>
+</footer>
+<!-- END: StepFooterMicrocopy -->
+</main>
+<!-- END: OnboardingContainer -->
+</body></html>

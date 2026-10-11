@@ -22,3 +22,7 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+# Downloaded photo-AI model files (re-downloaded automatically)
+models/
+backups/

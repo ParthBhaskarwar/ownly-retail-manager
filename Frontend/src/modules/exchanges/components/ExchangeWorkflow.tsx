@@ -3,43 +3,55 @@
 import React, { useState } from 'react';
 import { BarcodeScannerInput } from '@/modules/billing/components/BarcodeScannerInput';
 import { BillingService } from '@/modules/billing/services/BillingService';
-import { getAuthHeaders } from '@/shared/utils/auth';
-import { db } from '@/db/db';
+import { apiClient } from '@/lib/apiClient';
+import { computeTax } from '@/lib/money';
+import { useStoreContext } from '@/context/StoreContext';
+
+interface ExchangeableItem {
+  id: string;
+  productName: string;
+  variantName: string;
+  barcode: string;
+  finalPrice: number | string;
+  refundableAmount: number;
+  eligibleForReturn: boolean;
+}
+
+interface ExchangeInvoice {
+  invoice: { id: string; invoiceNumber: string };
+  items: ExchangeableItem[];
+}
+
+interface ReplacementItem {
+  inventoryItemId: string;
+  barcode: string;
+  productName: string;
+  variantName: string;
+  unitPrice: number | string;
+}
+
+interface ExchangeResult {
+  exchangeNumber: string;
+  replacementInvoiceNumber: string;
+  returnedValue: number;
+  replacementValue: number;
+  differenceAmount: number;
+  paymentStatus: string;
+  creditNoteNumber: string | null;
+}
 
 export function ExchangeWorkflow() {
+  const { store } = useStoreContext();
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [invoiceData, setInvoiceData] = useState<any>(null);
+  const [invoiceData, setInvoiceData] = useState<ExchangeInvoice | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [successResult, setSuccessResult] = useState<any>(null);
+  const [successResult, setSuccessResult] = useState<ExchangeResult | null>(null);
 
   const [selectedReturnItemId, setSelectedReturnItemId] = useState<string | null>(null);
   const [returnCondition, setReturnCondition] = useState<string>('RESELLABLE');
-  const [replacementItems, setReplacementItems] = useState<any[]>([]);
+  const [replacementItems, setReplacementItems] = useState<ReplacementItem[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'UPI' | 'CARD' | 'CREDIT_NOTE'>('CASH');
-
-  const tryDexieInvoice = async (num: string) => {
-    const inv = await db.invoices.where('invoiceNumber').equals(num).first().catch(() => null);
-    if (!inv) return null;
-    const items = await db.invoiceItems.where('invoiceId').equals(inv.id).toArray();
-    return {
-      invoice: {
-        ...inv,
-        id: inv.id,
-        invoice_number: inv.invoiceNumber,
-        grand_total: inv.grandTotal,
-        customer_name: inv.customerName,
-        created_at: inv.createdAt,
-      },
-      items: items.map((i: any) => ({
-        ...i,
-        product_name: i.productName,
-        variant_name: i.variantName,
-        final_price: i.finalPrice,
-        eligibleForReturn: i.status === 'ACTIVE',
-      })),
-    };
-  };
 
   const handleSearchInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,33 +65,11 @@ export function ExchangeWorkflow() {
     setReplacementItems([]);
 
     try {
-      const res = await fetch(`/api/returns/eligible/${encodeURIComponent(invoiceNumber.trim())}`, {
-        headers: getAuthHeaders(),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setInvoiceData(data);
-      } else {
-        const offline = await tryDexieInvoice(invoiceNumber.trim());
-        if (offline) {
-          setInvoiceData(offline);
-        } else {
-          const errData = await res.json().catch(() => ({}));
-          setError((errData as any).error || 'Invoice not found.');
-        }
-      }
-    } catch {
-      try {
-        const offline = await tryDexieInvoice(invoiceNumber.trim());
-        if (offline) {
-          setInvoiceData(offline);
-        } else {
-          setError('Invoice not found. Please verify invoice number.');
-        }
-      } catch {
-        setError('Cannot search invoice. Check your connection.');
-      }
+      setInvoiceData(
+        await apiClient.get<ExchangeInvoice>(`/api/returns/eligible/${encodeURIComponent(invoiceNumber.trim())}`)
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not search the invoice.');
     } finally {
       setIsLoading(false);
     }
@@ -89,23 +79,28 @@ export function ExchangeWorkflow() {
     setError(null);
     try {
       const item = await BillingService.lookupBarcode(barcode);
-      if (replacementItems.some((r: any) => r.barcode === item.barcode)) {
+      if (replacementItems.some((r) => r.barcode === item.barcode)) {
         setError(`Barcode ${barcode} is already in the replacement list.`);
         return;
       }
       setReplacementItems((prev) => [...prev, item]);
-    } catch (err: any) {
-      setError(err.message || 'Barcode lookup failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Barcode lookup failed');
     }
   };
 
-  const returnedItem = invoiceData?.items?.find((i: any) => i.id === selectedReturnItemId);
-  const returnedValue = returnedItem ? parseFloat(returnedItem.final_price ?? returnedItem.finalPrice ?? 0) : 0;
-  const replacementValue = replacementItems.reduce((sum, item) => sum + parseFloat(item.unitPrice), 0);
+  const returnedItem = invoiceData?.items.find((i) => i.id === selectedReturnItemId);
+  // Preview only — the server recomputes both sides (replacement prices and GST come from the database).
+  const returnedValue = returnedItem ? Number(returnedItem.refundableAmount ?? returnedItem.finalPrice ?? 0) : 0;
+  // Replacement is billed like a normal sale, so GST from the store settings applies.
+  const replacementValue = computeTax(
+    store?.taxSettings,
+    replacementItems.reduce((sum, item) => sum + Number(item.unitPrice), 0)
+  ).grandTotal;
   const priceDifference = replacementValue - returnedValue;
 
   const handleSubmitExchange = async () => {
-    if (!selectedReturnItemId) {
+    if (!invoiceData || !selectedReturnItemId) {
       setError('Select a returned item from the original invoice.');
       return;
     }
@@ -118,33 +113,19 @@ export function ExchangeWorkflow() {
     setError(null);
 
     try {
-      const res = await fetch('/api/exchanges', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify({
-          originalInvoiceId: invoiceData.invoice.id,
-          returnedItems: [{ invoiceItemId: selectedReturnItemId, condition: returnCondition }],
-          replacementItems: replacementItems.map((r) => ({
-            barcode: r.barcode,
-            inventoryItemId: r.inventoryItemId,
-            unitPrice: r.unitPrice,
-          })),
-          paymentMethod,
-        }),
+      const result = await apiClient.post<ExchangeResult>('/api/exchanges', {
+        originalInvoiceId: invoiceData.invoice.id,
+        returnedItems: [{ invoiceItemId: selectedReturnItemId, condition: returnCondition }],
+        replacementItems: replacementItems.map((r) => ({ inventoryItemId: r.inventoryItemId })),
+        // A store-credit note can only be issued for a balance owed TO the customer.
+        paymentMethod: priceDifference > 0 && paymentMethod === 'CREDIT_NOTE' ? 'CASH' : paymentMethod,
       });
-
-      if (res.ok) {
-        const result = await res.json();
-        setSuccessResult(result);
-        setInvoiceData(null);
-        setReplacementItems([]);
-        setSelectedReturnItemId(null);
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        setError((errData as any).error || 'Failed to process exchange');
-      }
-    } catch {
-      setError('Network error. Please check your connection.');
+      setSuccessResult(result);
+      setInvoiceData(null);
+      setReplacementItems([]);
+      setSelectedReturnItemId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process exchange');
     } finally {
       setIsLoading(false);
     }
@@ -213,6 +194,11 @@ export function ExchangeWorkflow() {
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)', marginTop: 'var(--space-2)' }}>
               Exchange Record: <strong style={{ fontFamily: 'var(--font-mono)' }}>{successResult.exchangeNumber}</strong>
             </p>
+            {successResult.creditNoteNumber && (
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)', marginTop: '2px' }}>
+                Store Credit Note: <strong style={{ fontFamily: 'var(--font-mono)' }}>{successResult.creditNoteNumber}</strong>
+              </p>
+            )}
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-secondary)', marginTop: '2px' }}>
               Replacement Invoice: <strong style={{ fontFamily: 'var(--font-mono)' }}>{successResult.replacementInvoiceNumber}</strong>
             </p>
@@ -221,15 +207,15 @@ export function ExchangeWorkflow() {
           <div style={{ background: '#FFFFFF', border: '1px solid var(--color-paid-border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)', width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
               <span>Returned Credit:</span>
-              <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{parseFloat(successResult.returnedValue).toFixed(2)}</strong>
+              <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{Number(successResult.returnedValue).toFixed(2)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
               <span>Replacement Total:</span>
-              <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{parseFloat(successResult.replacementValue).toFixed(2)}</strong>
+              <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{Number(successResult.replacementValue).toFixed(2)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-base)', fontWeight: 'var(--font-bold)', color: 'var(--color-denim-dark)', borderTop: '1px dashed var(--color-border)', paddingTop: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
               <span>Settlement:</span>
-              <span>₹{parseFloat(successResult.differenceAmount).toFixed(2)} ({successResult.paymentStatus})</span>
+              <span>₹{Math.abs(Number(successResult.differenceAmount)).toFixed(2)} ({successResult.paymentStatus})</span>
             </div>
           </div>
 
@@ -254,7 +240,7 @@ export function ExchangeWorkflow() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', maxHeight: '320px', overflowY: 'auto' }}>
-              {invoiceData.items.map((item: any) => {
+              {invoiceData.items.map((item) => {
                 const isSelected = selectedReturnItemId === item.id;
                 const canReturn = item.eligibleForReturn;
 
@@ -275,14 +261,14 @@ export function ExchangeWorkflow() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <div style={{ fontWeight: 'var(--font-bold)', color: 'var(--color-ink)', fontSize: 'var(--text-sm)' }}>
-                          {item.product_name || item.productName}
+                          {item.productName}
                         </div>
                         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', marginTop: '2px' }}>
-                          Size: {item.variant_name || item.variantName} • <code style={{ fontFamily: 'var(--font-mono)' }}>{item.barcode}</code>
+                          Size: {item.variantName} • <code style={{ fontFamily: 'var(--font-mono)' }}>{item.barcode}</code>
                         </div>
                       </div>
                       <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 'var(--font-bold)', color: 'var(--color-ink)' }}>
-                        ₹{parseFloat(item.final_price ?? item.finalPrice ?? 0).toFixed(2)}
+                        ₹{Number(item.refundableAmount ?? item.finalPrice ?? 0).toFixed(2)}
                       </div>
                     </div>
                     {isSelected && (
@@ -356,7 +342,7 @@ export function ExchangeWorkflow() {
                   <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{returnedValue.toFixed(2)}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-sm)' }}>
-                  <span>Replacement Total:</span>
+                  <span>Replacement Total{store?.taxSettings?.gstEnabled ? ' (incl. GST)' : ''}:</span>
                   <strong style={{ fontFamily: 'var(--font-mono)' }}>₹{replacementValue.toFixed(2)}</strong>
                 </div>
 
@@ -373,7 +359,9 @@ export function ExchangeWorkflow() {
                       {priceDifference > 0 ? 'Collect Difference Via:' : 'Refund Difference Via:'}
                     </label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-2)' }}>
-                      {(['CASH', 'UPI', 'CARD', 'CREDIT_NOTE'] as const).map((m) => (
+                      {(['CASH', 'UPI', 'CARD', 'CREDIT_NOTE'] as const)
+                        .filter((m) => priceDifference < 0 || m !== 'CREDIT_NOTE')
+                        .map((m) => (
                         <button
                           key={m}
                           type="button"
@@ -382,7 +370,7 @@ export function ExchangeWorkflow() {
                         >
                           {m === 'CREDIT_NOTE' ? 'Store Credit' : m}
                         </button>
-                      ))}
+                        ))}
                     </div>
                   </div>
                 )}

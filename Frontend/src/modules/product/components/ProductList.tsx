@@ -19,91 +19,134 @@ const STATUS_COLORS: Record<ProductStatus, string> = {
 export function ProductList({ products, isLoading, canEdit }: ProductListProps) {
   if (isLoading) {
     return (
-      <div className="product-list product-list--loading">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="skeleton" style={{ height: 56, borderRadius: 8, marginBottom: 8 }} />
-        ))}
+      <div className="products-card">
+        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton" style={{ height: 56, borderRadius: 8 }} />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (products.length === 0) {
     return (
-      <div className="empty-state" id="products-empty-state">
-        <div className="empty-state__icon">📦</div>
-        <h3 className="empty-state__title">No products yet</h3>
-        <p className="empty-state__message">Add your first product to start managing inventory.</p>
-        {canEdit && (
-          <Link href="/products/new" className="btn btn--primary empty-state__action" id="empty-add-product">
-            + Add Product
-          </Link>
-        )}
+      <div className="products-empty" id="products-empty-state">
+        <div className="products-empty__icon">
+          <span className="material-symbols-outlined">checkroom</span>
+        </div>
+        <h3 className="products-empty__title">No products found</h3>
+        <p className="products-empty__desc">No products match your current filter query. Get started by adding garments and inventory items to your shop directory.</p>
+        <div className="products-empty__actions">
+          <button className="btn btn-secondary" type="button">
+            Reset Filters
+          </button>
+          {canEdit && (
+            <Link href="/products/new" className="btn btn-primary" id="empty-add-product">
+              <span className="material-symbols-outlined">add</span>
+              Add Product
+            </Link>
+          )}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="product-list" role="table" aria-label="Product list">
-      <div className="product-list__header" role="row">
-        <span role="columnheader">Product</span>
-        <span role="columnheader">SKU</span>
-        <span role="columnheader">Category</span>
-        <span role="columnheader">Variants</span>
-        <span role="columnheader">In Stock</span>
-        <span role="columnheader">Selling Price</span>
-        <span role="columnheader">Status</span>
-        <span role="columnheader">Actions</span>
-      </div>
-
-      {products.map((product) => (
-        <div key={product.id} className="product-list__row" role="row">
-          <span className="product-list__cell product-list__cell--name" role="cell">
-            <Link href={`/products/${product.id}`} className="product-list__name-link">
-              {product.name}
-            </Link>
-          </span>
-          <span className="product-list__cell product-list__cell--sku" role="cell">
-            <code className="sku-badge">{product.baseSku}</code>
-          </span>
-          <span className="product-list__cell" role="cell">
-            {product.categoryName}
-          </span>
-          <span className="product-list__cell product-list__cell--number" role="cell">
-            {product.variantCount}
-          </span>
-          <span className="product-list__cell product-list__cell--number" role="cell">
-            <span className={`stock-pill ${product.totalInStock === 0 ? 'stock-pill--empty' : 'stock-pill--ok'}`}>
-              {product.totalInStock}
-            </span>
-          </span>
-          <span className="product-list__cell product-list__cell--price" role="cell">
-            ₹{product.baseSellingPrice.toLocaleString('en-IN')}
-          </span>
-          <span className="product-list__cell" role="cell">
-            <span className={`status-badge status-badge--${STATUS_COLORS[product.status]}`}>
-              {product.status}
-            </span>
-          </span>
-          <span className="product-list__cell product-list__cell--actions" role="cell">
-            <Link
-              href={`/products/${product.id}`}
-              className="btn btn--ghost btn--sm"
-              id={`view-product-${product.id}`}
-            >
-              View
-            </Link>
-            {canEdit && (
-              <Link
-                href={`/products/${product.id}/edit`}
-                className="btn btn--ghost btn--sm"
-                id={`edit-product-${product.id}`}
-              >
-                Edit
-              </Link>
-            )}
-          </span>
+    <div className="products-card">
+      <div className="products-card__header">
+        <div className="products-card__title-wrap">
+          <h2 className="products-card__title">Products Directory</h2>
+          <span className="products-card__subtitle">• Store Inventory</span>
         </div>
-      ))}
+        <span className="products-card__meta">Sorted by: Recently Updated</span>
+      </div>
+      <div className="products-table-wrapper">
+        <table className="products-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Category</th>
+              <th style={{ textAlign: 'center' }}>Variants</th>
+              <th style={{ textAlign: 'center' }}>In Stock</th>
+              <th style={{ textAlign: 'right' }}>Selling Price</th>
+              <th style={{ textAlign: 'center' }}>Status</th>
+              <th style={{ textAlign: 'right' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => {
+              const outOfStock = product.totalInStock === 0;
+              return (
+                <tr key={product.id}>
+                  <td>
+                    <div className="product-cell">
+                      <div className="product-cell__image">
+                        {product.imageUrls && product.imageUrls.length > 0 ? (
+                          <img src={product.imageUrls[0]} alt="" />
+                        ) : (
+                          <span className="material-symbols-outlined">styler</span>
+                        )}
+                      </div>
+                      <div className="product-cell__info">
+                        <Link href={`/products/${product.id}`} className="product-cell__name">
+                          {product.name}
+                        </Link>
+                        <div className="product-cell__variant">{product.description || 'General Item'}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="sku-badge" style={{ fontFamily: 'var(--font-body, "DM Sans", sans-serif)' }}>{product.baseSku}</span>
+                  </td>
+                  <td style={{ fontWeight: 500, color: 'var(--color-ink)' }}>{product.categoryName}</td>
+                  <td style={{ textAlign: 'center' }}>{product.variantCount} variants</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span className={`stock-badge ${outOfStock ? 'stock-badge--out-stock' : 'stock-badge--in-stock'}`}>
+                      {outOfStock ? '0 (Out of stock)' : `${product.totalInStock} in stock`}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--color-ink)' }}>
+                    ₹{product.baseSellingPrice.toLocaleString('en-IN')}
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span className={`badge badge--sm ${
+                      product.status === 'ACTIVE' ? 'badge--success' :
+                      product.status === 'INACTIVE' ? 'badge--warning' : 'badge--error'
+                    }`}>
+                      {product.status}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div className="products-actions">
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="btn btn-sm btn-ghost"
+                        id={`view-product-${product.id}`}
+                      >
+                        View
+                      </Link>
+                      {canEdit && (
+                        <>
+                          <span className="products-actions-divider">|</span>
+                          <Link
+                            href={`/products/${product.id}/edit`}
+                            className="btn btn-sm btn-ghost"
+                            id={`edit-product-${product.id}`}
+                          >
+                            Edit
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

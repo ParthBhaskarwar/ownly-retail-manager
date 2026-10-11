@@ -135,6 +135,8 @@ export interface AttributeDefinition {
   isVariantLevel: boolean;
   /** JSON-serialized string[] — kept as a string to match the frontend contract. */
   enumValues: string | null;
+  /** JSON-serialized string[] of applicable category names, or null/empty for global. */
+  applicableCategories?: string | null;
   displayOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -203,6 +205,9 @@ export interface VariantWithStock extends ProductVariant {
 }
 
 export interface ProductDetail extends Product {
+  categoryName?: string;
+  subcategoryName?: string;
+  supplierName?: string;
   attributes: ResolvedAttribute[];
   variants: VariantWithStock[];
 }
@@ -234,6 +239,7 @@ export interface CreateProductInput {
   baseSellingPrice: number;
   baseCostPrice: number;
   status?: ProductStatus;
+  imageUrls?: string[];
   attributeValues: AttributeValueInput[];
   variants: CreateVariantInput[];
   createdBy: string;
@@ -248,6 +254,8 @@ export interface UpdateProductInput {
   baseSellingPrice?: number;
   baseCostPrice?: number;
   status?: ProductStatus;
+  imageUrls?: string[];
+  attributeValues?: AttributeValueInput[];
   updatedBy: string;
 }
 
@@ -286,19 +294,21 @@ export const ALL_INVENTORY_STATUSES: InventoryStatus[] = [
 export type MovementType =
   | 'PURCHASE' | 'SALE' | 'RETURN_TO_STOCK' | 'RETURN_DAMAGED'
   | 'DAMAGE_WRITE_OFF' | 'LOSS_WRITE_OFF' | 'TRANSFER_OUT' | 'TRANSFER_IN'
-  | 'MANUAL_ADJUSTMENT' | 'EXCHANGE' | 'DEFECT_WRITE_OFF' | 'SUPPLIER_RETURN';
+  | 'MANUAL_ADJUSTMENT' | 'EXCHANGE' | 'DEFECT_WRITE_OFF' | 'SUPPLIER_RETURN'
+  | 'RESTOCK';
 
 export const ALL_MOVEMENT_TYPES: MovementType[] = [
   'PURCHASE', 'SALE', 'RETURN_TO_STOCK', 'RETURN_DAMAGED', 'DAMAGE_WRITE_OFF',
   'LOSS_WRITE_OFF', 'TRANSFER_OUT', 'TRANSFER_IN', 'MANUAL_ADJUSTMENT',
-  'EXCHANGE', 'DEFECT_WRITE_OFF', 'SUPPLIER_RETURN',
+  'EXCHANGE', 'DEFECT_WRITE_OFF', 'SUPPLIER_RETURN', 'RESTOCK',
 ];
 
 /** Statuses that count as physically present and sellable. */
 export const IN_STOCK_STATUSES: InventoryStatus[] = ['IN_STOCK', 'RETURNED_TO_STOCK'];
 
 export type MovementReferenceType =
-  | 'INVOICE' | 'RETURN_TRANSACTION' | 'MANUAL_ADJUSTMENT' | 'PURCHASE_ENTRY';
+  | 'INVOICE' | 'RETURN_TRANSACTION' | 'MANUAL_ADJUSTMENT' | 'PURCHASE_ENTRY'
+  | 'RESTOCK_BATCH';
 
 export interface InventoryItem {
   id: string;
@@ -426,4 +436,107 @@ export interface StockAlerts {
   lowStock: LowStockVariant[];
   outOfStock: LowStockVariant[];
   ageing: AgeingBucket[];
+}
+
+// ─── Restocking (plan Week 5) ─────────────────────────────────────────────────
+
+/** One size/variant line in a manual restock request. */
+export interface RestockLineInput {
+  variantId: string;
+  quantity: number;
+  purchaseCostPrice: number;
+  purchaseDate: string; // YYYY-MM-DD
+}
+
+/** Full restock request for one batch operation. */
+export interface RestockInput {
+  storeId: string;
+  performedBy: string;
+  lines: RestockLineInput[];
+  notes?: string;
+}
+
+/** Result for one variant within a restock batch. */
+export interface RestockBatchLine {
+  variantId: string;
+  itemsCreated: InventoryItem[];
+}
+
+export interface RestockBatchResult {
+  batchId: string;
+  totalUnits: number;
+  lines: RestockBatchLine[];
+}
+
+// ─── Week 6 — Photo Intelligence ──────────────────────────────────────────────
+
+/**
+ * Result of analysing one product photo (POST /api/products/analyze-photo).
+ * Quality checks need no model, so they are present even when photo AI is
+ * unavailable; suggestions and similar products need the embedding model.
+ */
+export interface PhotoAnalysisResult {
+  /** false when the CLIP model is disabled or failed to load. */
+  aiAvailable: boolean;
+  /** 0–1 quality score (resolution, brightness, contrast, sharpness). */
+  qualityScore: number;
+  /** Human-readable quality issues detected (empty = good quality). */
+  qualityIssues: string[];
+  /** Colour / pattern suggestions to pre-fill product attributes (null without AI). */
+  attributeSuggestions: {
+    colours: string[];
+    pattern: string;
+    patternConfidence: number;
+  } | null;
+  /** Existing products that look like this photo, best first. */
+  similar: SimilarProduct[];
+  /** Similarity at/above which a match is flagged as a possible duplicate. */
+  duplicateThreshold: number;
+  /** Why AI parts are missing, when they are. */
+  message?: string;
+}
+
+/**
+ * A product returned by the similar-product search.
+ * Similarity is the cosine similarity between CLIP image embeddings.
+ */
+export interface SimilarProduct {
+  productId: string;
+  name: string;
+  baseSku: string;
+  similarity: number;
+  /** Warning flag: true when similarity >= the configured duplicate threshold. */
+  isPossibleDuplicate: boolean;
+  imageUrls: string[];
+}
+
+// ─── Week 6 — Product Performance ────────────────────────────────────────────
+
+/** Per-size sell-through breakdown entry. */
+export interface SizeDemandEntry {
+  size: string;
+  sold: number;
+  inStock: number;
+  /** sold / (sold + inStock), 0–1. */
+  sellThroughRate: number;
+}
+
+/**
+ * All performance metrics for a single product.
+ * Any field may be null when insufficient data exists (e.g. never stocked).
+ */
+export interface ProductPerformanceMetrics {
+  productId: string;
+  /** Days from first inventory item to first invoice sale. null = never sold. */
+  timeToFirstSaleDays: number | null;
+  /** Units sold per day averaged over the last 30 days. */
+  salesVelocity30d: number | null;
+  /** sold / (sold + inStock) across all variants, 0–1. null = no stock ever. */
+  sellThroughRate: number | null;
+  /** Average (NOW() - purchase_date) in days for currently in-stock items. */
+  avgStockAgeDays: number | null;
+  /** Per-size sell-through breakdown. Empty when no size attribute exists. */
+  sizeDemand: SizeDemandEntry[];
+  /** ISO timestamp of when these metrics were last computed. */
+  computedAt: string;
 }

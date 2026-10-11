@@ -62,7 +62,7 @@ export function PermissionGuard({
         <div className="permission-denied__icon">🔒</div>
         <h3 className="permission-denied__title">Access Restricted</h3>
         <p className="permission-denied__message">
-          You don't have permission to view this content. Contact your store owner if you need access.
+          You don&apos;t have permission to view this content. Contact your store owner if you need access.
         </p>
       </div>
     );

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { Role } from '@/modules/account/types';
+import { useAuthContext } from '@/context/AuthContext';
 
 const ROLES: Array<{ value: Role; label: string; description: string }> = [
   {
@@ -38,9 +39,13 @@ interface RoleSelectorProps {
 }
 
 export function RoleSelector({ value, onChange, error }: RoleSelectorProps) {
+  const { user } = useAuthContext();
+  // Only the owner may create managers; the server enforces this too.
+  const roles = user?.role === 'OWNER' ? ROLES : ROLES.filter((r) => r.value !== 'MANAGER');
+
   return (
     <div className="role-selector" role="radiogroup" aria-label="Select staff role">
-      {ROLES.map((role) => (
+      {roles.map((role) => (
         <label
           key={role.value}
           className={`role-option ${value === role.value ? 'role-option--selected' : ''}`}

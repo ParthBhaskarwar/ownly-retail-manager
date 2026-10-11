@@ -1,5 +1,7 @@
 /**
- * Migration 002 — Billing, Invoices, Customers, Returns, Exchanges, Credit Notes, and Audit Logs.
+ * Migration 002 — Billing, Invoices, Customers, Returns, Exchanges, Credit Notes.
+ *
+ * Note: audit_logs is managed by 002_audit_logs.ts and must not be created here.
  */
 
 import type { Knex } from 'knex';
@@ -135,23 +137,10 @@ export async function up(knex: Knex): Promise<void> {
     t.unique(['store_id', 'credit_note_number']);
   });
 
-  // ── Step 9: audit_logs ──────────────────────────────────────────────────────
-  await knex.schema.createTable('audit_logs', (t) => {
-    t.uuid('id').primary();
-    t.uuid('store_id').notNullable().references('id').inTable('stores').onDelete('CASCADE');
-    t.uuid('user_id').notNullable().references('id').inTable('users');
-    t.string('action', 100).notNullable();
-    t.string('entity_type', 50).notNullable();
-    t.string('entity_id', 100).notNullable();
-    t.jsonb('details').nullable();
-    t.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
-    t.index(['store_id', 'created_at']);
-    t.index(['entity_type', 'entity_id']);
-  });
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.dropTableIfExists('audit_logs');
+  // audit_logs is owned by 002_audit_logs.ts — do not drop it here.
   await knex.schema.dropTableIfExists('credit_notes');
   await knex.schema.dropTableIfExists('exchanges');
   await knex.schema.dropTableIfExists('return_items');

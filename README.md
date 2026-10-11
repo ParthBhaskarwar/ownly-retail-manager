@@ -42,10 +42,9 @@ npm run dev
 
 ## Week Progress
 
-- ✅ Week 0: PWA shell, auth, onboarding
-- ✅ Week 1: Staff & roles, permissions
-- 🔄 Week 2: Product catalog & inventory (in progress)
-- ⏳ Week 3: Billing / POS
-- ⏳ Week 4: Reports & analytics
-- ⏳ Week 5: Product images
-- ⏳ Week 6: Backend API (replace local adapters)
+- ✅ Week 0–1: PWA shell, auth, onboarding, staff & roles
+- ✅ Week 2–3: Product catalog, unique barcodes, inventory lifecycle (PostgreSQL)
+- ✅ Week 4: Billing / POS, invoices, returns & exchanges
+- ✅ Week 5: Manual restock, dashboard, reports, backup
+- ✅ Week 6: Photo AI (CLIP embeddings, pgvector similarity), product performance
+- ✅ Week 7: Offline AI scoring, AI-assisted restocking, prediction history & evaluation — see [docs/week-7-ai-scoring.md](docs/week-7-ai-scoring.md)

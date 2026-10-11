@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
+import { useStoreContext } from '@/context/StoreContext';
 import { evaluatePermission } from '@/config/permissions';
 import { AuthGuard, PermissionGuard } from '@/shared/components/PermissionGuard';
 import {
@@ -12,6 +13,7 @@ import {
 } from '@/modules/inventory/services/InventoryItemService';
 import { MovementTimeline } from '@/modules/inventory/components/MovementTimeline';
 import { StatusBadge } from '@/modules/inventory/components/StatusBadge';
+import { BarcodeLabelPrint } from '@/modules/inventory/components/BarcodeLabelPrint';
 import {
   ALL_INVENTORY_STATUSES,
   MOVEMENT_FOR_STATUS,
@@ -36,6 +38,7 @@ function ItemDetailContent() {
   const params = useParams();
   const itemId = String(params.id);
   const { user } = useAuthContext();
+  const { store } = useStoreContext();
   const canEdit = user ? evaluatePermission(user.role as Role, 'inventory:edit') : false;
 
   const [item, setItem] = useState<InventoryItemRow | null>(null);
@@ -130,9 +133,52 @@ function ItemDetailContent() {
           <h1 className="page-header__title mono">{item.barcode}</h1>
           <StatusBadge status={item.status} />
         </div>
-        <Link href={`/products/${item.productId}`} className="btn btn-secondary btn-sm">
-          View Product
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            id="print-label-btn"
+            className="btn btn-secondary btn-sm"
+            onClick={() => window.print()}
+          >
+            🖨 Print Label
+          </button>
+          <Link href={`/inventory/barcodes`} className="btn btn-secondary btn-sm">
+            ▦ All Barcodes
+          </Link>
+          <Link href={`/products/${item.productId}`} className="btn btn-secondary btn-sm">
+            View Product
+          </Link>
+        </div>
+      </div>
+
+      {/* Barcode preview — on screen */}
+      <div className="my-4 flex items-center justify-center p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+        <BarcodeLabelPrint
+          label={{
+            barcode: item.barcode,
+            productName: item.productName,
+            variantDisplayName: item.variantDisplayName || item.size || undefined,
+            sku: item.variantSku,
+            sellingPrice: item.sellingPrice,
+            storeName: store?.name,
+          }}
+        />
+      </div>
+
+      {/* Print-only label — hidden on screen, shown when window.print() fires */}
+      <div className="barcode-print-root" aria-hidden="true">
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 60 }}>
+          <BarcodeLabelPrint
+            label={{
+              barcode: item.barcode,
+              productName: item.productName,
+              variantDisplayName: item.variantDisplayName || item.size || undefined,
+              sku: item.variantSku,
+              sellingPrice: item.sellingPrice,
+              storeName: store?.name,
+            }}
+          />
+        </div>
       </div>
 
       {error && (
