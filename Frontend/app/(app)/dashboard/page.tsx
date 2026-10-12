@@ -189,7 +189,7 @@ export default function DashboardPage() {
         <div className="dash-kpi-grid">
           <div className="dash-kpi-card">
             <div className="dash-kpi-header">
-              <span className="dash-kpi-title">Today's Sales</span>
+              <span className="dash-kpi-title">Today&apos;s Sales</span>
               <span className="material-symbols-outlined">payments</span>
             </div>
             <div>

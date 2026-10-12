@@ -172,7 +172,7 @@ export function CustomerSelectModal({
                 ))}
                 {searchResults.length === 0 && searchQuery && !isSearching && (
                   <p style={{ textAlign: 'center', fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', padding: 'var(--space-4) 0' }}>
-                    No existing customers match "{searchQuery}". Click "+ Add New Customer" above.
+                    No existing customers match &quot;{searchQuery}&quot;. Click &quot;+ Add New Customer&quot; above.
                   </p>
                 )}
               </div>

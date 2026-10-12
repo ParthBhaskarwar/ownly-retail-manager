@@ -63,5 +63,25 @@ export function param(
 
 /** Reads a single query-string value as a string, or undefined when absent. */
 export function queryParam(value: unknown): string | undefined {
-  return typeof value === 'string' && value.length > 0 ? value : undefined;
+  if (typeof value !== 'string') return undefined;
+  // Postgres cannot store a NUL byte in text, and a stray one turns into a 500.
+  const clean = value.split('\u0000').join('');
+  return clean.length > 0 ? clean : undefined;
+}
+
+/** Positive integer from a query/body value, clamped to [min, max]; falls back when absent or not a number. */
+export function clampInt(value: unknown, fallback: number, min: number, max: number): number {
+  const n = typeof value === 'number' ? value : typeof value === 'string' && value.trim() !== '' ? Number(value) : NaN;
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, Math.trunc(n)));
+}
+
+/** A real calendar date in YYYY-MM-DD form, or throws a 400. */
+export function dateParam(value: unknown, name: string): string | undefined {
+  const s = queryParam(value);
+  if (s === undefined) return undefined;
+  const ok = /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s + 'T00:00:00Z'))
+    && new Date(s + 'T00:00:00Z').toISOString().slice(0, 10) === s;
+  if (!ok) throw AppError.badRequest(`"${name}" must be a valid date in YYYY-MM-DD format.`);
+  return s;
 }

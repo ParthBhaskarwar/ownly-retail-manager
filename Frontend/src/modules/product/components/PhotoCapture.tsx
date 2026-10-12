@@ -85,9 +85,6 @@ export default function PhotoCapture({
   const [cameraActive, setCameraActive] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Guard: render nothing if disabled or file API unavailable
-  if (!enabled || typeof File === 'undefined') return null;
-
   const processFile = useCallback(async (file: File) => {
     setError(null);
     setUploadState('computing');
@@ -163,6 +160,9 @@ export default function PhotoCapture({
   };
 
   const hasDuplicates = similar.some((s) => s.isPossibleDuplicate);
+
+  // Guard (after all hooks, so hook order never changes between renders)
+  if (!enabled || typeof File === 'undefined') return null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

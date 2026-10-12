@@ -20,7 +20,7 @@
 import { Router } from 'express';
 import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
 import { ReportsService, type ReportDateFilter } from '@/services/reports.service';
-import { queryParam } from '@/shared/AppError';
+import { queryParam, dateParam } from '@/shared/AppError';
 
 export const reportsRouter = Router();
 reportsRouter.use(authenticate);
@@ -30,8 +30,8 @@ reportsRouter.use(requirePermission('reports:view'));
 
 function dateFilter(query: Record<string, unknown>): ReportDateFilter {
   return {
-    from: queryParam(query.from),
-    to: queryParam(query.to),
+    from: dateParam(query.from, 'from'),
+    to: dateParam(query.to, 'to'),
   };
 }
 

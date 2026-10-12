@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { db } from '@/db/client';
 import { InventoryService } from '@/services/inventory.service';
 import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
-import { AppError, param, queryParam } from '@/shared/AppError';
+import { AppError, param, queryParam, dateParam, clampInt } from '@/shared/AppError';
 import { ALL_INVENTORY_STATUSES, ALL_MOVEMENT_TYPES, type InventoryStatus, type MovementType } from '@/types/domain';
 
 export const inventoryRouter = Router();
@@ -39,10 +39,10 @@ inventoryRouter.get('/', requirePermission('inventory:view'), async (req, res, n
         categoryId: queryParam(q.categoryId),
         supplierId: queryParam(q.supplierId),
         size: queryParam(q.size),
-        purchaseDateFrom: queryParam(q.purchaseDateFrom),
-        purchaseDateTo: queryParam(q.purchaseDateTo),
-        page: q.page ? Number(q.page) : undefined,
-        pageSize: q.pageSize ? Number(q.pageSize) : undefined,
+        purchaseDateFrom: dateParam(q.purchaseDateFrom, 'purchaseDateFrom'),
+        purchaseDateTo: dateParam(q.purchaseDateTo, 'purchaseDateTo'),
+        page: clampInt(q.page, 1, 1, 100_000),
+        pageSize: clampInt(q.pageSize, 50, 1, 200),
       })
     );
   } catch (err) {

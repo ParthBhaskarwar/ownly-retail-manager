@@ -97,6 +97,24 @@ app.use((
     return;
   }
 
+  // Malformed JSON body.
+  if (err instanceof SyntaxError && (err as { type?: string }).type === 'entity.parse.failed') {
+    res.status(400).json({ error: 'The request body is not valid JSON.' });
+    return;
+  }
+
+  // Postgres "your input is invalid" classes that slip past validation:
+  // 22xxx data exceptions (bad date/number/NUL byte/too long/out of range) and
+  // 2201W/2201X negative LIMIT/OFFSET. These are the caller's fault, not ours.
+  {
+    const code = typeof err === 'object' && err !== null ? (err as { code?: string }).code : undefined;
+    if (typeof code === 'string' && ((code.startsWith('22') && code !== '22P02') || code === '2201W' || code === '2201X')) {
+      console.warn('[INPUT]', code, (err as Error).message);
+      res.status(400).json({ error: 'One of the values in that request is not valid.' });
+      return;
+    }
+  }
+
   if (err instanceof ZodError) {
     // Surface the first validation message — the forms show a single error line.
     const first = err.issues[0];

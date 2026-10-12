@@ -305,8 +305,8 @@ export const InventoryService = {
    * variant-level attribute.
    */
   async search(filters: InventorySearchFilters): Promise<{ items: InventoryItemRow[]; total: number }> {
-    const page = filters.page ?? 1;
-    const pageSize = filters.pageSize ?? 50;
+    const page = Math.max(1, Math.trunc(Number(filters.page ?? 1)) || 1);
+    const pageSize = Math.min(200, Math.max(1, Math.trunc(Number(filters.pageSize ?? 50)) || 50));
 
     const applyFilters = (qb: Knex.QueryBuilder): Knex.QueryBuilder => {
       qb.where('i.store_id', filters.storeId);
