@@ -6,7 +6,7 @@
  * stylesheet hides every other direct child of <body>. The class is removed on
  * `afterprint`, which also fires when the user cancels the dialog.
  */
-export function printSection(name: 'labels' | 'slip'): void {
+export function printSection(name: 'labels' | 'slip' | 'report'): void {
   const cls = `print-${name}`;
   document.body.classList.add(cls);
   const cleanup = () => {

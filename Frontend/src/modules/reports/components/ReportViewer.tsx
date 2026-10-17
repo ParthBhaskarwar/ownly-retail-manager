@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuthContext } from '@/context/AuthContext';
 import { useStoreContext } from '@/context/StoreContext';
 import { CategoryService, SupplierService } from '@/modules/catalog/services/CategoryService';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
+import { printSection } from '@/lib/printSection';
 import type {
   ReportType,
   DateRangePreset,
@@ -97,145 +99,103 @@ export function ReportViewer() {
     void load();
   }, [storeId, activeTab, datePreset, selectedCategory, selectedSupplier]);
 
-  const handleExportCsv = () => {
-    const filename = `ownly-${activeTab.toLowerCase()}-${datePreset.toLowerCase()}`;
+  type Cell = string | number | null | undefined;
+  interface ExportTable {
+    title: string;
+    sheetName: string;
+    headers: string[];
+    rows: Cell[][];
+    summary?: Cell[][];
+  }
 
+  /** One description of the active tab's data, shared by CSV, Excel and Print so they can never disagree. */
+  const buildExportTable = (): ExportTable | null => {
+    const t = buildRawTable();
+    if (!t) return null;
+    // Totals summed from decimals pick up float noise (e.g. 114.49999992); show paise precision only.
+    const round = (rows: Cell[][]): Cell[][] => rows.map((r) => r.map((v) => (typeof v === 'number' ? Math.round(v * 100) / 100 : v)));
+    return { ...t, rows: round(t.rows), summary: t.summary && round(t.summary) };
+  };
+
+  const buildRawTable = (): ExportTable | null => {
     if (activeTab === 'SALES_PROFIT' && salesData) {
-      const headers = ['Product Name', 'SKU', 'Units Sold', 'Revenue (₹)', 'Cost of Goods (₹)', 'Profit (₹)', 'Margin (%)'];
-      const rows = salesData.salesByProduct.map((p) => [
-        p.productName,
-        p.sku,
-        p.unitsSold,
-        p.revenue,
-        p.revenue - p.profit,
-        p.profit,
-        p.margin.toFixed(1) + '%',
-      ]);
-      ExportService.exportToCsv(filename, headers, rows);
-    } else if (activeTab === 'INVENTORY_VALUATION' && valuationData) {
-      const headers = ['Product Name', 'SKU', 'Category', 'In Stock Units', 'Cost Value (₹)', 'Retail Value (₹)', 'Potential Profit (₹)', 'Status'];
-      const rows = valuationData.itemsByProduct.map((p) => [
-        p.productName,
-        p.sku,
-        p.categoryName,
-        p.inStock,
-        p.costValue,
-        p.retailValue,
-        p.potentialProfit,
-        p.status,
-      ]);
-      ExportService.exportToCsv(filename, headers, rows);
-    } else if (activeTab === 'STOCK_AGEING' && ageingData) {
-      const headers = ['Product Name', 'SKU', 'Oldest Item (Days)', 'In Stock', 'Cost Value (₹)', 'Risk Tier'];
-      const rows = ageingData.slowMovingProducts.map((p) => [
-        p.productName,
-        p.sku,
-        p.oldestItemAgeDays,
-        p.inStock,
-        p.costValue,
-        p.riskTier,
-      ]);
-      ExportService.exportToCsv(filename, headers, rows);
-    } else if (activeTab === 'SUPPLIERS' && supplierData) {
-      const headers = ['Supplier Name', 'Code', 'Products Supplied', 'Purchased Qty', 'Total Spend (₹)', 'In Stock', 'Sold Qty', 'Sell-Through (%)'];
-      const rows = supplierData.suppliers.map((s) => [
-        s.supplierName,
-        s.code,
-        s.totalProductsSupplied,
-        s.totalItemsPurchased,
-        s.totalSpendAmount,
-        s.currentStockOnHand,
-        s.itemsSold,
-        s.sellThroughRate.toFixed(1) + '%',
-      ]);
-      ExportService.exportToCsv(filename, headers, rows);
-    } else if (activeTab === 'RETURNS' && returnsData) {
-      const headers = ['Return Metric / Reason', 'Count / Value'];
-      const rows = [
-        ['Total Returns', returnsData.totalReturnsCount],
-        ['Total Refund Amount (₹)', returnsData.totalRefundAmount],
-        ['Return Rate (%)', returnsData.returnRatePercent.toFixed(1) + '%'],
-        ['Damaged or Defective Items', returnsData.damagedOrDefectiveCount],
-        ['Returned to Stock', returnsData.returnedToStockCount],
-        ...Object.entries(returnsData.returnsByReason).map(([reason, count]) => [`Reason: ${reason}`, count]),
-      ];
-      ExportService.exportToCsv(filename, headers, rows);
-    } else if (activeTab === 'STAFF_ACTIVITY' && staffData) {
-      const headers = ['Staff Name', 'Role', 'Transactions Logged', 'Stock Movements Performed', 'Sales Assisted'];
-      const rows = staffData.staffMembers.map((s) => [
-        s.name,
-        s.role,
-        s.totalTransactionsLogged,
-        s.stockMovementsPerformed,
-        s.salesAssisted,
-      ]);
-      ExportService.exportToCsv(filename, headers, rows);
+      return {
+        title: 'Sales & Profit',
+        sheetName: 'Sales and Profit',
+        headers: ['Product Name', 'SKU', 'Units Sold', 'Revenue (₹)', 'Cost of Goods (₹)', 'Profit (₹)', 'Margin (%)'],
+        rows: salesData.salesByProduct.map((p) => [p.productName, p.sku, p.unitsSold, p.revenue, p.revenue - p.profit, p.profit, p.margin.toFixed(1) + '%']),
+        summary: [['TOTAL / AVERAGE', '', salesData.totalItemsSold, salesData.totalRevenue, salesData.totalCostOfGoodsSold, salesData.grossProfit, salesData.grossMarginPercent.toFixed(1) + '%']],
+      };
     }
+    if (activeTab === 'INVENTORY_VALUATION' && valuationData) {
+      return {
+        title: 'Stock Valuation',
+        sheetName: 'Stock Valuation',
+        headers: ['Product Name', 'SKU', 'Category', 'In Stock Units', 'Cost Value (₹)', 'Retail Value (₹)', 'Potential Profit (₹)', 'Status'],
+        rows: valuationData.itemsByProduct.map((p) => [p.productName, p.sku, p.categoryName, p.inStock, p.costValue, p.retailValue, p.potentialProfit, p.status]),
+        summary: [['TOTAL', '', '', valuationData.totalStockQuantity, valuationData.totalStockCostValue, valuationData.totalStockRetailValue, valuationData.potentialGrossProfit, '']],
+      };
+    }
+    if (activeTab === 'STOCK_AGEING' && ageingData) {
+      return {
+        title: 'Stock Ageing & Dead Stock',
+        sheetName: 'Stock Ageing',
+        headers: ['Product Name', 'SKU', 'Oldest Item (Days)', 'In Stock', 'Cost Value (₹)', 'Risk Tier'],
+        rows: ageingData.slowMovingProducts.map((p) => [p.productName, p.sku, p.oldestItemAgeDays, p.inStock, p.costValue, p.riskTier]),
+      };
+    }
+    if (activeTab === 'SUPPLIERS' && supplierData) {
+      return {
+        title: 'Supplier Performance',
+        sheetName: 'Suppliers',
+        headers: ['Supplier Name', 'Code', 'Products Supplied', 'Purchased Qty', 'Total Spend (₹)', 'In Stock', 'Sold Qty', 'Sell-Through (%)'],
+        rows: supplierData.suppliers.map((s) => [s.supplierName, s.code, s.totalProductsSupplied, s.totalItemsPurchased, s.totalSpendAmount, s.currentStockOnHand, s.itemsSold, s.sellThroughRate.toFixed(1) + '%']),
+      };
+    }
+    if (activeTab === 'RETURNS' && returnsData) {
+      return {
+        title: 'Returns & Damages',
+        sheetName: 'Returns',
+        headers: ['Return Metric / Reason', 'Count / Value'],
+        rows: [
+          ['Total Returns', returnsData.totalReturnsCount],
+          ['Total Refund Amount (₹)', returnsData.totalRefundAmount],
+          ['Return Rate (%)', returnsData.returnRatePercent.toFixed(1) + '%'],
+          ['Damaged or Defective Items', returnsData.damagedOrDefectiveCount],
+          ['Returned to Stock', returnsData.returnedToStockCount],
+          ...Object.entries(returnsData.returnsByReason).map(([reason, count]): Cell[] => [`Reason: ${reason}`, count]),
+        ],
+      };
+    }
+    if (activeTab === 'STAFF_ACTIVITY' && staffData) {
+      return {
+        title: 'Staff Audit',
+        sheetName: 'Staff Audit',
+        headers: ['Staff Name', 'Role', 'Transactions Logged', 'Stock Movements Performed', 'Sales Assisted'],
+        rows: staffData.staffMembers.map((s) => [s.name, s.role, s.totalTransactionsLogged, s.stockMovementsPerformed, s.salesAssisted]),
+      };
+    }
+    return null;
+  };
+
+  const exportFilename = () => `ownly-${activeTab.toLowerCase()}-${datePreset.toLowerCase()}`;
+
+  const handleExportCsv = () => {
+    const t = buildExportTable();
+    if (t) ExportService.exportToCsv(exportFilename(), t.headers, [...t.rows, ...(t.summary ?? [])]);
   };
 
   const handleExportExcel = () => {
-    const filename = `ownly-${activeTab.toLowerCase()}-${datePreset.toLowerCase()}`;
-    const sheetName = activeTab.replace('_', ' ').slice(0, 20);
-
-    if (activeTab === 'SALES_PROFIT' && salesData) {
-      const headers = ['Product Name', 'SKU', 'Units Sold', 'Revenue (₹)', 'Cost of Goods (₹)', 'Profit (₹)', 'Margin (%)'];
-      const rows = salesData.salesByProduct.map((p) => [
-        p.productName,
-        p.sku,
-        p.unitsSold,
-        p.revenue,
-        p.revenue - p.profit,
-        p.profit,
-        p.margin.toFixed(1) + '%',
-      ]);
-      const summary = [
-        ['TOTAL / AVERAGE', '', salesData.totalItemsSold, salesData.totalRevenue, salesData.totalCostOfGoodsSold, salesData.grossProfit, salesData.grossMarginPercent.toFixed(1) + '%'],
-      ];
-      ExportService.exportToExcel(filename, sheetName, headers, rows, summary);
-    } else if (activeTab === 'INVENTORY_VALUATION' && valuationData) {
-      const headers = ['Product Name', 'SKU', 'Category', 'In Stock Units', 'Cost Value (₹)', 'Retail Value (₹)', 'Potential Profit (₹)', 'Status'];
-      const rows = valuationData.itemsByProduct.map((p) => [
-        p.productName,
-        p.sku,
-        p.categoryName,
-        p.inStock,
-        p.costValue,
-        p.retailValue,
-        p.potentialProfit,
-        p.status,
-      ]);
-      const summary = [
-        ['TOTAL', '', '', valuationData.totalStockQuantity, valuationData.totalStockCostValue, valuationData.totalStockRetailValue, valuationData.potentialGrossProfit, ''],
-      ];
-      ExportService.exportToExcel(filename, sheetName, headers, rows, summary);
-    } else if (activeTab === 'STOCK_AGEING' && ageingData) {
-      const headers = ['Product Name', 'SKU', 'Oldest Item (Days)', 'In Stock', 'Cost Value (₹)', 'Risk Tier'];
-      const rows = ageingData.slowMovingProducts.map((p) => [
-        p.productName,
-        p.sku,
-        p.oldestItemAgeDays,
-        p.inStock,
-        p.costValue,
-        p.riskTier,
-      ]);
-      ExportService.exportToExcel(filename, sheetName, headers, rows);
-    } else if (activeTab === 'SUPPLIERS' && supplierData) {
-      const headers = ['Supplier Name', 'Code', 'Products Supplied', 'Purchased Qty', 'Total Spend (₹)', 'In Stock', 'Sold Qty', 'Sell-Through (%)'];
-      const rows = supplierData.suppliers.map((s) => [
-        s.supplierName,
-        s.code,
-        s.totalProductsSupplied,
-        s.totalItemsPurchased,
-        s.totalSpendAmount,
-        s.currentStockOnHand,
-        s.itemsSold,
-        s.sellThroughRate.toFixed(1) + '%',
-      ]);
-      ExportService.exportToExcel(filename, sheetName, headers, rows);
-    } else {
-      handleExportCsv();
-    }
+    const t = buildExportTable();
+    if (t) ExportService.exportToExcel(exportFilename(), t.sheetName, t.headers, t.rows, t.summary);
   };
+
+  const handlePrint = () => {
+    if (buildExportTable()) printSection('report');
+  };
+
+  const printTable = buildExportTable();
+  const presetLabel = datePreset.replace(/_/g, ' ').toLowerCase().replace(/^\w|\s\w/g, (c) => c.toUpperCase());
 
   return (
     <div className="reports-container animate-fade-in">
@@ -268,7 +228,7 @@ export function ReportViewer() {
             type="button"
             id="print-report-btn"
             className="btn btn--ghost btn--sm"
-            onClick={() => ExportService.printCurrentView()}
+            onClick={handlePrint}
           >
             <span className="material-symbols-outlined" aria-hidden="true">print</span> Print
           </button>
@@ -668,6 +628,44 @@ export function ReportViewer() {
             </div>
           )}
         </div>
+      )}
+      {typeof document !== 'undefined' && printTable && createPortal(
+        <div className="report-print-root" data-print-section="report" aria-hidden="true">
+          <div className="report-print">
+            <div className="report-print__top">
+              <div>
+                <div className="report-print__store">{store?.name ?? 'Ownly'}</div>
+                <div className="report-print__title">{printTable.title}</div>
+              </div>
+              <div className="report-print__meta">
+                <div>Period: {presetLabel}</div>
+                <div>Printed: {new Date().toLocaleString('en-IN')}</div>
+              </div>
+            </div>
+            <table className="report-print__table">
+              <thead>
+                <tr>{printTable.headers.map((h) => <th key={h}>{h}</th>)}</tr>
+              </thead>
+              <tbody>
+                {printTable.rows.length === 0 ? (
+                  <tr><td colSpan={printTable.headers.length}>No data for the selected period.</td></tr>
+                ) : (
+                  printTable.rows.map((r, i) => (
+                    <tr key={i}>{r.map((v, j) => <td key={j} className={typeof v === 'number' ? 'num' : undefined}>{v ?? ''}</td>)}</tr>
+                  ))
+                )}
+              </tbody>
+              {printTable.summary && (
+                <tfoot>
+                  {printTable.summary.map((r, i) => (
+                    <tr key={i}>{r.map((v, j) => <td key={j} className={typeof v === 'number' ? 'num' : undefined}>{v ?? ''}</td>)}</tr>
+                  ))}
+                </tfoot>
+              )}
+            </table>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );
