@@ -40,6 +40,13 @@ export interface StorageHealth {
   totalSizeBytes: number;
   backupDirectory: string;
   directoryExists: boolean;
+  database?: {
+    connected: boolean;
+    tableCounts: Record<string, number>;
+    totalRecords: number;
+  };
+  healthTier: 'HEALTHY' | 'WARNING' | 'CRITICAL';
+  backupDue: boolean;
 }
 
 export interface RestoreSummary {
@@ -278,7 +285,7 @@ export const BackupService = {
     };
   },
 
-  /** Returns storage health metadata for the store's backups. */
+  /** Returns storage health metadata for the store's backups and database tables. */
   async getStorageHealth(storeId: string): Promise<StorageHealth> {
     const rows = (await db('backups')
       .where('store_id', storeId)
@@ -286,13 +293,95 @@ export const BackupService = {
       .orderBy('created_at', 'desc')) as Array<{ createdAt: string; fileSizeBytes: number }>;
 
     const dir = path.resolve(config.backupDir);
+    const directoryExists = fs.existsSync(dir);
+    const latestBackupAt = rows[0]?.createdAt ?? null;
+    const backupCount = rows.length;
+    const totalSizeBytes = rows.reduce((sum, r) => sum + Number(r.fileSizeBytes), 0);
+
+    // Compute health tier
+    let healthTier: 'HEALTHY' | 'WARNING' | 'CRITICAL' = 'HEALTHY';
+    let backupDue = false;
+
+    if (!directoryExists || backupCount === 0 || !latestBackupAt) {
+      healthTier = 'CRITICAL';
+      backupDue = true;
+    } else {
+      const daysSince = Math.max(0, Math.floor((Date.now() - new Date(latestBackupAt).getTime()) / 86_400_000));
+      if (daysSince >= 7) {
+        healthTier = 'WARNING';
+        backupDue = true;
+      }
+    }
+
+    // Query store table row counts
+    let database = {
+      connected: true,
+      tableCounts: {} as Record<string, number>,
+      totalRecords: 0,
+    };
+
+    try {
+      const [
+        productsCount,
+        inventoryCount,
+        invoicesCount,
+        customersCount,
+        suppliersCount,
+        batchesCount,
+        returnsCount,
+        exchangesCount,
+        creditNotesCount,
+        auditLogsCount,
+      ] = await Promise.all([
+        db('products').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('inventory_items').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('invoices').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('customers').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('suppliers').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('restock_batches').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('returns').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('exchanges').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('credit_notes').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+        db('audit_logs').where('store_id', storeId).count<{ count: string | number }>('id as count').first(),
+      ]);
+
+      const counts: Record<string, number> = {
+        products: Number(productsCount?.count ?? 0),
+        inventory_items: Number(inventoryCount?.count ?? 0),
+        invoices: Number(invoicesCount?.count ?? 0),
+        customers: Number(customersCount?.count ?? 0),
+        suppliers: Number(suppliersCount?.count ?? 0),
+        restock_batches: Number(batchesCount?.count ?? 0),
+        returns: Number(returnsCount?.count ?? 0),
+        exchanges: Number(exchangesCount?.count ?? 0),
+        credit_notes: Number(creditNotesCount?.count ?? 0),
+        audit_logs: Number(auditLogsCount?.count ?? 0),
+      };
+
+      const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+
+      database = {
+        connected: true,
+        tableCounts: counts,
+        totalRecords: total,
+      };
+    } catch (dbErr) {
+      database = {
+        connected: false,
+        tableCounts: {},
+        totalRecords: 0,
+      };
+    }
 
     return {
-      backupCount: rows.length,
-      latestBackupAt: rows[0]?.createdAt ?? null,
-      totalSizeBytes: rows.reduce((sum, r) => sum + Number(r.fileSizeBytes), 0),
+      backupCount,
+      latestBackupAt,
+      totalSizeBytes,
       backupDirectory: dir,
-      directoryExists: fs.existsSync(dir),
+      directoryExists,
+      database,
+      healthTier,
+      backupDue,
     };
   },
 };

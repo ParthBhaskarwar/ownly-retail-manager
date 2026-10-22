@@ -17,6 +17,13 @@ export interface BackupHealth {
   latestBackupAt: string | null;
   totalSizeBytes: number;
   directoryExists: boolean;
+  database?: {
+    connected: boolean;
+    tableCounts: Record<string, number>;
+    totalRecords: number;
+  };
+  healthTier?: 'HEALTHY' | 'WARNING' | 'CRITICAL';
+  backupDue?: boolean;
 }
 
 export interface RestoreSummary {

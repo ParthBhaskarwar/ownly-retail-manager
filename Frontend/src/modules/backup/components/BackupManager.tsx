@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { BackupService, getBackupStatus } from '../services/BackupService';
 import type { BackupHealth, BackupRecord, RestoreSummary } from '../types';
 
@@ -13,6 +14,7 @@ function formatBytes(bytes: number): string {
 export function BackupManager() {
   const [backups, setBackups] = useState<BackupRecord[]>([]);
   const [health, setHealth] = useState<BackupHealth | null>(null);
+  const [browserQuota, setBrowserQuota] = useState<{ usage: number; quota: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -29,6 +31,12 @@ export function BackupManager() {
       const [list, h] = await Promise.all([BackupService.listBackups(), BackupService.getHealth()]);
       setBackups(list);
       setHealth(h);
+
+      if (typeof window !== 'undefined' && navigator.storage?.estimate) {
+        navigator.storage.estimate().then((est) => {
+          setBrowserQuota({ usage: est.usage ?? 0, quota: est.quota ?? 0 });
+        }).catch(() => {});
+      }
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : 'Could not load backups.');
     } finally {
@@ -190,6 +198,71 @@ export function BackupManager() {
         </section>
       </div>
 
+      {/* Storage Health Widget — DEF-009 */}
+      <section className="card" style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-5)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h2 className="card__title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <span className="material-symbols-outlined" style={{ color: 'var(--color-accent)' }}>storage</span>
+              Storage Health Overview
+            </h2>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', margin: '4px 0 0 0' }}>
+              Live server disk usage, browser IndexedDB quota, and PostgreSQL table row counts.
+            </p>
+          </div>
+          <Link href="/storage-health" className="btn btn--secondary btn--sm">
+            View Storage Health Dashboard →
+          </Link>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: 'var(--space-4)',
+          }}
+        >
+          {/* 1. Disk Usage */}
+          <div className="stat-pill" style={{ padding: '12px 14px' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', textTransform: 'uppercase' }}>
+              Server Disk Usage
+            </span>
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--color-accent)', marginTop: 4 }}>
+              {formatBytes(health?.totalSizeBytes ?? 0)}
+            </div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', marginTop: 4 }}>
+              {health?.backupCount ?? 0} backups · {health?.directoryExists ? 'Disk online' : 'Disk error'}
+            </div>
+          </div>
+
+          {/* 2. IndexedDB Quota */}
+          <div className="stat-pill" style={{ padding: '12px 14px' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', textTransform: 'uppercase' }}>
+              IndexedDB &amp; Browser Quota
+            </span>
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--color-ink)', marginTop: 4 }}>
+              {formatBytes(browserQuota?.usage ?? 0)}
+            </div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', marginTop: 4 }}>
+              of {formatBytes(browserQuota?.quota ?? 0)} quota ({browserQuota?.quota ? ((browserQuota.usage / browserQuota.quota) * 100).toFixed(1) : '0'}%)
+            </div>
+          </div>
+
+          {/* 3. DB Row Counts */}
+          <div className="stat-pill" style={{ padding: '12px 14px' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-secondary)', textTransform: 'uppercase' }}>
+              Store Database Records
+            </span>
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--color-ink)', marginTop: 4 }}>
+              {(health?.database?.totalRecords ?? 0).toLocaleString()} rows
+            </div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', marginTop: 4 }}>
+              Across {Object.keys(health?.database?.tableCounts || {}).length || 10} store tables
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="card">
         <div className="card__header">
           <h2 className="card__title">Backup history</h2>
@@ -245,18 +318,23 @@ export function BackupManager() {
         )}
       </section>
 
+      {/* Restore Confirmation Modal — DEF-007 Warning Dialog */}
       {restoreTarget && (
         <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="modal card animate-fade-in-up" style={{ maxWidth: 520, width: '90%', padding: 'var(--space-6)' }}>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xl)', marginTop: 0 }}>Restore this backup?</h2>
+            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xl)', marginTop: 0, color: 'var(--color-ink)' }}>
+              Confirm Restore — Data Overwrite Warning
+            </h2>
             <p style={{ color: 'var(--color-ink-secondary)', fontSize: 'var(--text-sm)' }}>
-              Snapshot from <strong>{new Date(restoreTarget.createdAt).toLocaleString()}</strong>.
+              Snapshot from <strong>{new Date(restoreTarget.createdAt).toLocaleString()}</strong> ({restoreTarget.filename}).
             </p>
-            <div className="alert alert--warning" style={{ fontSize: 'var(--text-xs)', margin: 'var(--space-3) 0' }}>
-              Restore only adds records that are <strong>missing</strong> from the database. Records that still exist —
-              including anything you changed after this backup — are left exactly as they are.
+            <div className="alert alert--warning" style={{ fontSize: 'var(--text-xs)', margin: 'var(--space-4) 0' }}>
+              <strong>Caution:</strong> This will restore records from the selected backup file into your active store. <strong>This will overwrite current data. Proceed?</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 'var(--space-4)' }}>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)', margin: 0 }}>
+              Existing rows with identical IDs are skipped. Missing records across products, variants, inventory, and invoices will be restored.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 'var(--space-5)' }}>
               <button type="button" className="btn btn--secondary" onClick={() => setRestoreTarget(null)}>
                 Cancel
               </button>
@@ -267,7 +345,7 @@ export function BackupManager() {
                 onClick={() => void handleConfirmRestore()}
                 disabled={busyId === restoreTarget.id}
               >
-                {busyId === restoreTarget.id ? 'Restoring…' : 'Restore missing records'}
+                {busyId === restoreTarget.id ? 'Restoring…' : 'Yes, Proceed with Restore'}
               </button>
             </div>
           </div>
