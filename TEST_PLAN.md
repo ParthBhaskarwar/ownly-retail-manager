@@ -193,6 +193,28 @@ Each test case maps to a project deliverable (D1–D14).
 
 ---
 
+### TC-AUDIT & TC-STORAGE — Audit Logs, Storage Health (D14)
+
+**Backend**
+
+| ID | Description | Type | Expected Result | Status |
+|----|-------------|------|-----------------|--------|
+| TC-AUD-01 | `AuditService.log` writes event row with user & meta | Integration | Row exists in `audit_logs`, JSON parsed | ✅ Backend audit.test.ts L82 |
+| TC-AUD-02 | `listByStore` enforces tenant isolation | Integration | Only logs matching caller's `store_id` returned | ✅ Backend audit.test.ts L124 |
+| TC-AUD-03 | `listByStore` filters by action and entityType | Integration | Filtered subset matches criteria | ✅ Backend audit.test.ts L132 |
+| TC-AUD-04 | `listByStore` supports offset & limit pagination | Integration | Pagination slices distinct pages, total preserved | ✅ Backend audit.test.ts L142 |
+| TC-AUD-05 | `getDistinctActions` returns sorted unique actions | Unit | Unique action strings returned | ✅ Backend audit.test.ts L151 |
+
+**Frontend**
+
+| ID | Description | Type | Expected Result | Status |
+|----|-------------|------|-----------------|--------|
+| TC-AUD-06 | `AuditService.exportToCsv` downloads formatted CSV | Unit | Valid CSV header and rows generated | ✅ Frontend audit-log.test.ts L37 |
+| TC-STR-01 | `formatBytes` converts bytes to KB, MB, GB | Unit | Accurate representation for all ranges | ✅ Frontend storage-health.test.ts L6 |
+| TC-STR-02 | `getBrowserStorageEstimate` returns quota metrics | Unit | Structure contains usage, quota, percentage | ✅ Frontend storage-health.test.ts L33 |
+
+---
+
 ### TC-AI — AI Scoring, Statistics (D12)
 
 | ID | Description | Type | Expected Result | Status |

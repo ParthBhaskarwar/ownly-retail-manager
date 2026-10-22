@@ -40,6 +40,13 @@ npm run dev
 | Auth | JWT + bcryptjs |
 | Validation | Zod |
 
+## Documentation & Guides (D14–D16)
+
+- 📖 **[End-User Manual](docs/USER_MANUAL.md)** — Step-by-step cashier and floor staff workflow guide for POS checkout, barcode scanning, returns, exchanges, and stock receiving.
+- 🛠️ **[Administrator & Operations Guide](docs/ADMIN_GUIDE.md)** — Store owner and general manager manual for onboarding, RBAC permission matrices, AI restocking, backups, storage health diagnostics, and audit trail investigations.
+- 🧪 **[Test Plan](TEST_PLAN.md)** & **[Test Results](TEST_RESULTS.md)** — Comprehensive unit & integration testing specifications, verification suites, and coverage reports (D15).
+- 📋 **[Defect Log](DEFECT_LOG.md)** — Active and resolved defect register tracking resolutions for DEF-001 through DEF-009.
+
 ## Week Progress
 
 - ✅ Week 0–1: PWA shell, auth, onboarding, staff & roles
@@ -48,3 +55,4 @@ npm run dev
 - ✅ Week 5: Manual restock, dashboard, reports, backup
 - ✅ Week 6: Photo AI (CLIP embeddings, pgvector similarity), product performance
 - ✅ Week 7: Offline AI scoring, AI-assisted restocking, prediction history & evaluation — see [docs/week-7-ai-scoring.md](docs/week-7-ai-scoring.md)
+- ✅ Week 8: Storage Health, Audit Logs, Defect Hardening & Production User Documentation (D14, D15, D16)

@@ -110,17 +110,23 @@ Time:        28.638 s
 | TC-BC-07 | Duplicate barcode rejected with 409 Conflict | ✅ PASS |
 | TC-BC-08 | barcodes[] length ≠ quantity rejected with 400 Bad Request | ✅ PASS |
 
-### 3.3 Integration Tests — Backup & Restore (D14)
+### 3.3 Integration Tests — Backup, Restore, Audit & Storage Health (D14)
 
-**Command:** `cd Backend && npm test -- --testPathPattern="backup"`  
-**Test:** `tests/backup.test.ts`
+**Commands:**  
+- `cd Backend && npm test -- tests/backup.test.ts tests/audit.test.ts`  
+- `cd Frontend && npm test -- storage-health.test.ts audit-log.test.ts`  
 
 | Test Case | Description | Result |
 |-----------|-------------|--------|
 | TC-BKP-05/06 | `createBackup` writes valid JSON file, records DB row | ✅ PASS |
 | TC-BKP-07 | `restoreBackup` re-inserts deleted inventory_items | ✅ PASS |
 | TC-BKP-08 | Second restore is idempotent — no duplicate rows | ✅ PASS |
-| TC-BKP-09 | `getStorageHealth` returns positive backup count and size | ✅ PASS |
+| TC-BKP-09 | `getStorageHealth` returns positive backup count, size, and table row counts | ✅ PASS |
+| TC-AUD-01/02 | `AuditService.log` writes event and `listByStore` enforces tenant isolation | ✅ PASS |
+| TC-AUD-03/04 | `listByStore` filters by action/entityType and supports pagination | ✅ PASS |
+| TC-AUD-05 | `getDistinctActions` returns sorted unique actions | ✅ PASS |
+| TC-AUD-06 | `AuditService.exportToCsv` exports valid CSV | ✅ PASS |
+| TC-STR-01/02 | `formatBytes` and `getBrowserStorageEstimate` return accurate metrics | ✅ PASS |
 
 ---
 

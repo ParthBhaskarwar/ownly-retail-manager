@@ -32,6 +32,7 @@ import { restockRouter } from './api/inventory/restock.router';
 import { dashboardRouter } from './api/dashboard/dashboard.router';
 import { reportsRouter } from './api/reports/reports.router';
 import { backupRouter } from './api/backup/backup.router';
+import { auditRouter } from './api/audit/audit.router';
 // Week 7 — offline AI scoring and AI-assisted restocking
 import { aiRouter } from './api/ai/ai.router';
 
@@ -74,6 +75,7 @@ app.use('/api/inventory/restock', restockRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/backup', backupRouter);
+app.use('/api/audit', auditRouter);
 // Week 7 routes
 app.use('/api/ai', aiRouter);
 

@@ -142,6 +142,24 @@ const ALL_NAV_ITEMS: NavItem[] = [
     permissionKey: 'settings:view',
     section: 'system',
   },
+  // Storage Health
+  {
+    id: 'nav-storage-health',
+    label: 'Storage Health',
+    href: '/storage-health',
+    icon: 'storage',
+    permissionKey: 'settings:view',
+    section: 'system',
+  },
+  // Audit Logs (D14 / DEF-008)
+  {
+    id: 'nav-audit',
+    label: 'Audit Logs',
+    href: '/audit',
+    icon: 'history',
+    permissionKey: 'audit:view',
+    section: 'system',
+  },
   // Settings
   {
     id: 'nav-settings',
