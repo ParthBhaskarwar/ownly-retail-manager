@@ -91,7 +91,7 @@ export const AuthService = {
     await AuditService.log({ action: 'auth.signup', userId: id, meta: { email } });
 
     // Stub: a real deployment would email this instead of returning it.
-    console.info(`[Auth] Verification code for ${email}: ${code}`);
+    if (config.isDev) console.info(`[Auth] Verification code for ${email}: ${code}`);
     return { userId: id, email, devCode: config.isDev ? code : undefined };
   },
 
@@ -140,7 +140,7 @@ export const AuthService = {
     await db('users').where({ id: userId }).update({ verification_code: code, updated_at: new Date() });
     codeAttempts.delete(userId);
 
-    console.info(`[Auth] New verification code for ${user.email}: ${code}`);
+    if (config.isDev) console.info(`[Auth] New verification code for ${user.email}: ${code}`);
     return { devCode: config.isDev ? code : undefined };
   },
 
