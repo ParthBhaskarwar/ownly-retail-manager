@@ -242,8 +242,8 @@ export const ProductService = {
 
   /** Paginated search with category/supplier names and total stock joined in. */
   async searchProducts(filters: ProductSearchFilters): Promise<{ items: ProductSummary[]; total: number }> {
-    const page = filters.page ?? 1;
-    const pageSize = filters.pageSize ?? 20;
+    const page = Math.max(1, Math.trunc(Number(filters.page ?? 1)) || 1);
+    const pageSize = Math.min(200, Math.max(1, Math.trunc(Number(filters.pageSize ?? 20)) || 20));
 
     const base = db('products as p').where('p.store_id', filters.storeId);
     if (filters.categoryId) base.andWhere('p.category_id', filters.categoryId);

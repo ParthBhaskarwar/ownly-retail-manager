@@ -23,7 +23,7 @@ import { ProductEmbeddingRepository } from '@/services/product-embedding.reposit
 import { ProductPerformanceService } from '@/services/product-performance.service';
 import { db } from '@/db/client';
 import { authenticate, requirePermission, requireStoreId } from '@/middleware/auth.middleware';
-import { AppError, param } from '@/shared/AppError';
+import { AppError, param, queryParam, clampInt } from '@/shared/AppError';
 import type { PhotoAnalysisResult } from '@/types/domain';
 
 export const productsRouter = Router();
@@ -75,13 +75,13 @@ productsRouter.get('/', requirePermission('inventory:view'), async (req, res, ne
     res.json(
       await ProductService.searchProducts({
         storeId,
-        query: typeof q.query === 'string' && q.query ? q.query : undefined,
-        categoryId: typeof q.categoryId === 'string' && q.categoryId ? q.categoryId : undefined,
-        subcategoryId: typeof q.subcategoryId === 'string' && q.subcategoryId ? q.subcategoryId : undefined,
-        supplierId: typeof q.supplierId === 'string' && q.supplierId ? q.supplierId : undefined,
-        status: typeof q.status === 'string' && q.status ? (q.status as never) : undefined,
-        page: q.page ? Number(q.page) : undefined,
-        pageSize: q.pageSize ? Number(q.pageSize) : undefined,
+        query: queryParam(q.query),
+        categoryId: queryParam(q.categoryId),
+        subcategoryId: queryParam(q.subcategoryId),
+        supplierId: queryParam(q.supplierId),
+        status: queryParam(q.status) as never,
+        page: clampInt(q.page, 1, 1, 100_000),
+        pageSize: clampInt(q.pageSize, 20, 1, 200),
       })
     );
   } catch (err) {

@@ -16,6 +16,7 @@
  */
 
 import { db } from '@/db/client';
+import { AppError } from '@/shared/AppError';
 import { IN_STOCK_STATUSES } from '@/types/domain';
 import type { ProductPerformanceMetrics, SizeDemandEntry } from '@/types/domain';
 
@@ -33,7 +34,7 @@ export const ProductPerformanceService = {
       .where({ id: productId, store_id: storeId })
       .first();
     if (!product) {
-      throw new Error(`Product ${productId} not found in store ${storeId}`);
+      throw AppError.notFound('Product not found.');
     }
 
     const [
@@ -85,6 +86,11 @@ export const ProductPerformanceService = {
     storeId: string,
     productId: string
   ): Promise<ProductPerformanceMetrics> {
+    // Tenant check first: the cache is keyed by product only, so without this a
+    // user from another store could read this product's metrics by guessing its id.
+    const owned = await db('products').where({ id: productId, store_id: storeId }).first('id');
+    if (!owned) throw AppError.notFound('Product not found.');
+
     const cached = await db('product_performance_cache')
       .where({ product_id: productId })
       .first();

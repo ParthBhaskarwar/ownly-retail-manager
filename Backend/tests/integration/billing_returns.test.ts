@@ -544,3 +544,43 @@ describe('found during browser end-to-end testing', () => {
     expect(back).toBeTruthy();
   });
 });
+
+describe('input hardening and tenant isolation (found by fuzzing)', () => {
+  const NO_SUCH = '11111111-1111-4111-8111-111111111111';
+
+  test('malformed JSON is a 400, not a 500', async () => {
+    const res = await request(app).post('/api/customers').set(bearer(owner.token))
+      .set('Content-Type', 'application/json').send('{bad json');
+    expect(res.status).toBe(400);
+  });
+
+  test('negative or zero pagination is clamped instead of crashing', async () => {
+    await request(app).get('/api/inventory?page=-5').set(bearer(owner.token)).expect(200);
+    await request(app).get('/api/products?page=0&pageSize=-1').set(bearer(owner.token)).expect(200);
+    const big = await request(app).get('/api/inventory?pageSize=999999').set(bearer(owner.token));
+    expect(big.status).toBe(200);
+    expect(big.body.items.length).toBeLessThanOrEqual(200);
+  });
+
+  test('invalid dates are rejected with 400', async () => {
+    await request(app).get('/api/reports/sales/summary?from=garbage').set(bearer(owner.token)).expect(400);
+    await request(app).get('/api/reports/returns/summary?to=2026-13-45').set(bearer(owner.token)).expect(400);
+    await request(app).get('/api/inventory?purchaseDateFrom=nope').set(bearer(owner.token)).expect(400);
+  });
+
+  test('a NUL byte in a search term does not crash the query', async () => {
+    await request(app).get('/api/products?query=%00').set(bearer(owner.token)).expect(200);
+  });
+
+  test('performance of an unknown product is 404', async () => {
+    await request(app).get(`/api/products/${NO_SUCH}/performance`).set(bearer(owner.token)).expect(404);
+  });
+
+  test('another store cannot read a product\'s performance metrics', async () => {
+    const productId: string = (await db('products').where({ store_id: owner.storeId }).first('id')).id;
+    // Owner can (and this fills the cache)…
+    await request(app).get(`/api/products/${productId}/performance`).set(bearer(owner.token)).expect(200);
+    // …a different store cannot, even though the cache row now exists.
+    await request(app).get(`/api/products/${productId}/performance`).set(bearer(otherOwner.token)).expect(404);
+  });
+});
