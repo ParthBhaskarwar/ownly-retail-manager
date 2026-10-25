@@ -247,6 +247,13 @@ function InvoicesPageContent() {
               >
                 Close
               </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="btn btn-primary"
+              >
+                🖨 Print
+              </button>
             </div>
           </div>
         </div>

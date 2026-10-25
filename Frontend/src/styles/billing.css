@@ -720,46 +720,55 @@
 /* ── Print Styles ────────────────────────────────────────── */
 @media print {
   /* Hide the entire app shell and modal chrome */
-  body > *:not(.billing-layout):not(.pos-modal-overlay):not(.app-layout) {
+  /* NOTE: The actual wrapper class is shell-app-layout, not app-layout */
+  body > *:not(.billing-layout):not(.pos-modal-overlay):not(.shell-app-layout) {
     display: none !important;
   }
-  
+
   .app-sidebar,
   .app-header,
+  .shell-sidebar,
+  .shell-header,
   .billing-header,
   .scanner-hero,
   .billing-grid,
   .toast-container,
-  .pos-modal__header,
-  .pos-modal__footer,
-  .pos-modal-header,
-  .pos-modal-footer,
   .billing-modal-card.payment {
     display: none !important;
   }
-  
-  /* Reset layout constraints to let receipt print fully */
-  .app-main, .app-content {
-    margin: 0 !important;
-    padding: 0 !important;
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
+
+  /* Hide only the modal chrome — header and footer buttons, not the body */
+  .pos-modal__header,
+  .pos-modal__footer,
+  .pos-modal-header,
+  .pos-modal-footer {
+    display: none !important;
   }
-  
+
+  /* ── CRITICAL: counteract components.css [class*="modal"] { display: none }  ──
+     components.css has a global @media print rule that hides every element whose
+     class contains the word "modal" (written for barcode-label printing to hide
+     the barcode manager modal). This includes pos-modal-overlay, pos-modal, and
+     pos-modal__body, making the entire invoice invisible during print.
+     These overrides explicitly restore visibility for the invoice container chain.
+  */
   .pos-modal-overlay,
   .billing-modal-overlay {
+    display: block !important;
     position: static !important;
     padding: 0 !important;
     background: transparent !important;
     overflow: visible !important;
     height: auto !important;
+    width: 100% !important;
   }
-  
-  .pos-modal, 
+
+  .pos-modal,
   .pos-modal--wide {
+    display: flex !important;
+    flex-direction: column !important;
     max-width: none !important;
-    width: auto !important;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     box-shadow: none !important;
@@ -768,22 +777,38 @@
     max-height: none !important;
     background: transparent !important;
   }
-  
+
   .pos-modal__body {
+    display: block !important;
     max-height: none !important;
     overflow: visible !important;
     padding: 0 !important;
     background: transparent !important;
   }
-  
-  /* Make sure everything prints black & white, no shadows */
+
+  /* Reset layout constraints to let receipt print fully */
+  .app-main, .app-content,
+  .shell-app-layout, .shell-main {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Make receipt containers print with white background and black text */
   .thermal-receipt-container,
+  .a4-receipt-container {
+    display: block !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
   .thermal-receipt-container *,
-  .a4-receipt-container,
   .a4-receipt-container * {
     color: #000 !important;
     box-shadow: none !important;
     text-shadow: none !important;
-    background: transparent !important;
   }
 }
