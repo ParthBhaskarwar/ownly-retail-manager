@@ -22,6 +22,7 @@ import {
 import { ProductEmbeddingRepository } from '@/services/product-embedding.repository';
 import { AiFeaturesRepository, type StoreFeatures } from './ai-features.repository';
 import { analyse, analyseAll, MODEL_VERSION } from './ai-scoring';
+import { ModelRegistry } from './model-registry';
 import { AiPredictionRepository, type PredictionRow } from './ai-prediction.repository';
 import type { AiAnalysis, AiDecision, OwnerAction } from './ai.types';
 
@@ -29,6 +30,8 @@ const FEATURE_TTL_MS = 5 * 60_000;
 const featureCache = new Map<string, { at: number; features: Promise<StoreFeatures> }>();
 
 function storeFeatures(storeId: string): Promise<StoreFeatures> {
+  // Every analysis starts here, so a retrained model dropped into model/ goes live on the next request.
+  ModelRegistry.applyActive();
   const hit = featureCache.get(storeId);
   if (hit && Date.now() - hit.at < FEATURE_TTL_MS) return hit.features;
   const features = AiFeaturesRepository.loadStoreFeatures(storeId);

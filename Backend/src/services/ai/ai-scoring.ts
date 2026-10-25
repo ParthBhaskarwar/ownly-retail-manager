@@ -39,7 +39,13 @@ import type {
   DataSufficiency, LifecycleStage, ProductAction, ProductMetrics, SizeRecommendation,
 } from './ai.types';
 
-export const MODEL_VERSION = 'ownly-scoring-v1';
+export const BASE_MODEL_VERSION = 'ownly-scoring-v1';
+/**
+ * The version stamped on every stored prediction. It is the shipped version
+ * until a retrained model is activated (see model-registry.ts), after which it
+ * names that model so old and new predictions can be compared fairly.
+ */
+export let MODEL_VERSION: string = BASE_MODEL_VERSION;
 export const HORIZON_DAYS = 30;
 
 /**
@@ -48,24 +54,66 @@ export const HORIZON_DAYS = 30;
  * q10–q90 coverage 80.7%. The surface is flat — ±1 point across sensible
  * values — so these are chosen for balance, not squeezed for the last digit.
  */
-export const PARAMS = {
+export interface ModelParams {
   /** NB shape of demand noise beyond parameter uncertainty (sets interval width). */
-  overdispersion: 3,
+  overdispersion: number;
   /** Weight of days 31–90 relative to the last 30 days. */
-  olderWindowWeight: 0.75,
+  olderWindowWeight: number;
   /** Peer prior strength in pseudo in-stock days. */
-  priorStrength: { minRate: 3, maxRate: 15 },
+  priorStrength: { minRate: number; maxRate: number };
   /** Pseudo-units pulling a size curve toward the peer curve. */
-  sizePriorUnits: 10,
+  sizePriorUnits: number;
   /** Pseudo-units pulling a return rate toward the peer rate. */
+  returnPriorUnits: number;
+  maxPeers: number;
+  /** Wider (category / store) tiers top the pool up to this many peers. */
+  minPeersForPrior: number;
+  /** A peer's price may differ by up to this factor (1.5 = ±50%). */
+  peerPriceFactor: number;
+  minPeerDays: number;
+}
+
+/** The shipped settings. Retraining searches around these; it never edits them. */
+export const DEFAULT_PARAMS: Readonly<ModelParams> = Object.freeze({
+  overdispersion: 3,
+  olderWindowWeight: 0.75,
+  priorStrength: Object.freeze({ minRate: 3, maxRate: 15 }),
+  sizePriorUnits: 10,
   returnPriorUnits: 20,
   maxPeers: 12,
-  /** Wider (category / store) tiers top the pool up to this many peers. */
   minPeersForPrior: 5,
-  /** A peer's price may differ by up to this factor (1.5 = ±50%). */
   peerPriceFactor: 1.5,
   minPeerDays: 14,
-} as const;
+});
+
+/** The settings in force. Mutated only by activateModel() / resetModel() below. */
+export const PARAMS: ModelParams = {
+  ...DEFAULT_PARAMS,
+  priorStrength: { ...DEFAULT_PARAMS.priorStrength },
+};
+
+/**
+ * Switches the live scoring to a (retrained) model. Clears the per-snapshot
+ * reference cache, because it was computed under the old settings.
+ */
+export function activateModel(version: string, params: Partial<ModelParams>): void {
+  Object.assign(PARAMS, params, {
+    priorStrength: { ...PARAMS.priorStrength, ...(params.priorStrength ?? {}) },
+  });
+  MODEL_VERSION = version;
+  clearScoringCaches();
+}
+
+/** Back to the shipped model. */
+export function resetModel(): void {
+  Object.assign(PARAMS, DEFAULT_PARAMS, { priorStrength: { ...DEFAULT_PARAMS.priorStrength } });
+  MODEL_VERSION = BASE_MODEL_VERSION;
+  clearScoringCaches();
+}
+
+export function clearScoringCaches(): void {
+  referenceCache = new WeakMap();
+}
 
 // ─── Inputs ───────────────────────────────────────────────────────────────────
 
@@ -120,7 +168,7 @@ interface StoreReference {
   realisationStore: number;
 }
 
-const referenceCache = new WeakMap<StoreFeatures, StoreReference>();
+let referenceCache = new WeakMap<StoreFeatures, StoreReference>();
 
 /** Demand share per size, smoothed, used to weight in-stock days by size. */
 function sizeWeightsOf(variants: VariantFeatures[]): Map<string, number> {
